@@ -1,0 +1,1843 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KaramokoBHDS — Carte Aventure</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- PWA -->
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#10b981">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="KaramokoBHDS">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+<style>
+:root {
+  --bg: #0b0f1e;
+  --card: #111827;
+  --text: #f0f4ff;
+  --accent: #a78bfa;
+  --gold: #fbbf24;
+  --green: #34d399;
+  --red: #f87171;
+  --teal: #4ecdc4;
+  --orange: #fb923c;
+  --blue: #60a5fa;
+  --pink: #f472b6;
+  --indigo: #818cf8;
+
+  /* Matière colors */
+  --maths: #60a5fa;
+  --physique: #4ecdc4;
+  --chimie: #a78bfa;
+  --francais: #f472b6;
+  --bio: #34d399;
+  --geo: #fbbf24;
+  --histoire: #fb923c;
+  --civique: #f87171;
+  --philo: #c084fc;
+  --eco: #6ee7b7;
+  --culture: #93c5fd;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ===== STARFIELD ===== */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 5% 15%, rgba(255,255,255,0.8) 0%, transparent 100%),
+    radial-gradient(1px 1px at 18% 42%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 33% 8%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 47% 67%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(2px 2px at 62% 22%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 75% 55%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 88% 12%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(2px 2px at 92% 78%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 25% 88%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 55% 95%, rgba(255,255,255,0.4) 0%, transparent 100%);
+  pointer-events: none; z-index: 0;
+}
+
+/* ===== LAYOUT ===== */
+.app {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== HEADER ===== */
+.header {
+  text-align: center;
+  padding: 24px 0 16px;
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.flag {
+  display: flex;
+  width: 44px; height: 26px;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+.flag div { flex: 1; }
+.flag .r { background: #CE1126; }
+.flag .y { background: #FCD116; }
+.flag .g { background: #009460; }
+
+.header-controls { display: flex; gap: 8px; }
+.ctrl-btn {
+  background: rgba(255,255,255,0.1);
+  border: none; border-radius: 50%;
+  width: 36px; height: 36px;
+  font-size: 1.1rem;
+  cursor: pointer; color: #fff;
+  transition: all 0.2s;
+}
+.ctrl-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.1); }
+
+.title {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(1.4rem, 5vw, 2.4rem);
+  background: linear-gradient(135deg, #a78bfa, #60a5fa, #34d399);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: titlePulse 3s ease-in-out infinite;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+@keyframes titlePulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.02)} }
+
+.subtitle {
+  font-size: 0.82rem;
+  opacity: 0.55;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+/* ===== SCORE BAR ===== */
+.score-bar {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 12px 0;
+  flex-wrap: wrap;
+}
+.score-pill {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 30px;
+  padding: 6px 16px;
+  font-weight: 800;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ===== TABS ===== */
+.tabs {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin: 14px 0;
+}
+.tab-btn {
+  padding: 9px 22px;
+  border-radius: 30px;
+  border: 2px solid transparent;
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  font-family: 'Fredoka One', cursive;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.tab-btn.primaire { border-color: var(--green); }
+.tab-btn.college { border-color: var(--blue); }
+.tab-btn.lycee { border-color: var(--orange); }
+.tab-btn.active.primaire { background: linear-gradient(135deg, #10b981, #059669); border-color: transparent; }
+.tab-btn.active.college { background: linear-gradient(135deg, #3b82f6, #7c3aed); border-color: transparent; }
+.tab-btn.active.lycee { background: linear-gradient(135deg, #ea580c, #d97706); border-color: transparent; }
+.tab-btn:hover:not(.active) { background: rgba(255,255,255,0.12); transform: translateY(-2px); }
+
+/* ===== MAP CONTAINER ===== */
+.map-wrapper {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  margin: 8px 0;
+  border: 2px solid rgba(167,139,250,0.2);
+  box-shadow: 0 0 60px rgba(107,203,119,0.08), 0 20px 60px rgba(0,0,0,0.5);
+}
+
+.map-bg {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 30% 20%, #0d2a1e 0%, #071411 50%, #050d0a 100%);
+  z-index: 0;
+}
+
+/* Map texture dots */
+.map-bg::after {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.015) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.map-title-bar {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px 6px;
+}
+
+.map-region-label {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.7rem;
+  letter-spacing: 3px;
+  color: rgba(255,255,255,0.25);
+  text-transform: uppercase;
+}
+
+.map-progress-info {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent);
+  opacity: 0.8;
+}
+
+/* ===== PATHS (SVG) ===== */
+.map-svg {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* ===== GRID ===== */
+.map-grid {
+  position: relative;
+  z-index: 2;
+  padding: 10px 16px 24px;
+  min-height: 440px;
+}
+
+/* ===== CITY NODE ===== */
+.city-node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  z-index: 3;
+  width: 72px;
+}
+
+.city-pin {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin: 0 auto 5px;
+  border: 3px solid transparent;
+  transition: all 0.35s;
+  position: relative;
+}
+
+/* States */
+.city-node.locked .city-pin {
+  background: rgba(255,255,255,0.04);
+  border-color: rgba(255,255,255,0.1);
+  filter: grayscale(1) opacity(0.4);
+  cursor: not-allowed;
+}
+
+.city-node.unlocked .city-pin {
+  animation: glowCity 2s ease-in-out infinite;
+}
+
+.city-node.completed .city-pin {
+  box-shadow: 0 0 16px var(--green), 0 0 32px rgba(52,211,153,0.3);
+}
+
+@keyframes glowCity {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+.city-node:hover.unlocked .city-pin { transform: scale(1.18) translateY(-4px); }
+.city-node:hover.completed .city-pin { transform: scale(1.1); }
+
+.city-name {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.75);
+  text-shadow: 0 1px 6px rgba(0,0,0,0.9);
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+}
+.city-node.locked .city-name { opacity: 0.3; }
+
+.city-stars {
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  margin-top: 2px;
+  min-height: 12px;
+}
+
+.city-badge {
+  position: absolute;
+  top: -5px; right: -5px;
+  background: var(--gold);
+  color: #1a1a2e;
+  font-size: 0.48rem;
+  font-weight: 900;
+  border-radius: 8px;
+  padding: 2px 5px;
+  font-family: 'Nunito', sans-serif;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+/* Level separator label */
+.map-section-label {
+  position: absolute;
+  z-index: 2;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.62rem;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  padding: 3px 12px;
+  border-radius: 20px;
+  pointer-events: none;
+}
+
+/* ===== INFO PANEL ===== */
+.info-panel {
+  background: linear-gradient(135deg, rgba(167,139,250,0.1), rgba(78,205,196,0.07));
+  border: 1px solid rgba(167,139,250,0.25);
+  border-radius: 18px;
+  padding: 18px 20px;
+  margin-top: 12px;
+  display: none;
+  animation: fadeSlide 0.3s ease;
+}
+.info-panel.show { display: block; }
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.info-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.info-emoji { font-size: 2.2rem; }
+.info-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.4rem;
+  color: var(--accent);
+}
+.info-level {
+  font-size: 0.75rem;
+  font-weight: 700;
+  opacity: 0.6;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.info-desc {
+  font-size: 0.84rem;
+  opacity: 0.72;
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+.info-tags {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.tag {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.info-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.stat-box {
+  background: rgba(255,255,255,0.05);
+  border-radius: 10px;
+  padding: 8px;
+  text-align: center;
+}
+.stat-val {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.3rem;
+  color: var(--accent);
+}
+.stat-lbl {
+  font-size: 0.65rem;
+  opacity: 0.55;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.btn-start {
+  background: linear-gradient(135deg, var(--accent), #7c3aed);
+  border: none;
+  border-radius: 14px;
+  color: white;
+  cursor: pointer;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.05rem;
+  padding: 12px 28px;
+  transition: all 0.25s;
+  width: 100%;
+  box-shadow: 0 4px 20px rgba(167,139,250,0.35);
+}
+.btn-start:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(167,139,250,0.5); }
+.btn-start:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+
+/* ===== GAME CARD ===== */
+.game-wrap {
+  display: none;
+  animation: fadeSlide 0.4s ease;
+}
+.game-wrap.show { display: block; }
+
+.mission-banner {
+  background: linear-gradient(90deg, rgba(167,139,250,0.15), rgba(78,205,196,0.12));
+  border: 1px solid rgba(167,139,250,0.3);
+  border-radius: 12px;
+  padding: 10px 16px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+.mission-city {
+  color: var(--accent);
+  font-family: 'Fredoka One', cursive;
+  font-size: 1rem;
+}
+
+.btn-back {
+  background: rgba(167,139,250,0.15);
+  border: 1px solid rgba(167,139,250,0.35);
+  border-radius: 10px;
+  color: var(--accent);
+  cursor: pointer;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.9rem;
+  padding: 7px 16px;
+  transition: all 0.2s;
+  margin-bottom: 8px;
+}
+.btn-back:hover { background: rgba(167,139,250,0.25); }
+
+.game-card {
+  background: var(--card);
+  border-radius: 22px;
+  padding: 28px;
+  border: 1.5px solid rgba(255,255,255,0.08);
+  box-shadow: 0 12px 50px rgba(0,0,0,0.5);
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: fadeSlide 0.4s ease;
+}
+
+.q-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.5;
+  margin-bottom: 14px;
+  font-weight: 800;
+}
+.q-text {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.7rem;
+  text-align: center;
+  margin-bottom: 18px;
+  line-height: 1.3;
+}
+.q-hint {
+  font-size: 0.85rem;
+  opacity: 0.55;
+  font-style: italic;
+  margin-bottom: 16px;
+}
+
+.opts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+}
+.opt-btn {
+  padding: 12px 10px;
+  border-radius: 12px;
+  border: 2px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
+  color: var(--text);
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  text-align: center;
+  line-height: 1.3;
+}
+.opt-btn:hover:not(:disabled) { background: rgba(255,255,255,0.12); transform: scale(1.03); }
+.opt-btn.correct { background: var(--green); border-color: var(--green); color: #0a1a0f; animation: bounce 0.4s; }
+.opt-btn.wrong { background: var(--red); border-color: var(--red); color: white; animation: shake 0.4s; }
+@keyframes bounce { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-7px)} 75%{transform:translateX(7px)} }
+
+.feedback {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.3rem;
+  margin-top: 14px;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.3s;
+  min-height: 28px;
+}
+.feedback.show { opacity: 1; }
+.feedback.ok { color: var(--green); }
+.feedback.ko { color: var(--red); }
+
+.fact-box {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.78rem;
+  opacity: 0.75;
+  margin-top: 10px;
+  line-height: 1.5;
+  text-align: left;
+  width: 100%;
+  display: none;
+}
+.fact-box.show { display: block; }
+
+.btn-next {
+  background: linear-gradient(135deg, var(--green), #059669);
+  border: none;
+  border-radius: 13px;
+  color: white;
+  cursor: pointer;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1rem;
+  padding: 11px 28px;
+  margin-top: 14px;
+  transition: all 0.2s;
+  display: none;
+}
+.btn-next.show { display: inline-block; animation: fadeSlide 0.3s ease; }
+.btn-next:hover { transform: translateY(-2px); }
+
+/* Progress bar */
+.progress-wrap {
+  background: rgba(255,255,255,0.08);
+  border-radius: 8px;
+  height: 7px;
+  margin: 10px 0;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  border-radius: 8px;
+  background: linear-gradient(90deg, var(--accent), var(--teal), var(--green));
+  transition: width 0.5s ease;
+}
+
+/* ===== RESULT OVERLAY ===== */
+.result-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  backdrop-filter: blur(6px);
+  animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+.result-card {
+  background: linear-gradient(135deg, #111827, #0f172a);
+  border-radius: 26px;
+  padding: 40px 32px;
+  text-align: center;
+  border: 2px solid rgba(167,139,250,0.4);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.7);
+  max-width: 360px;
+  width: 90%;
+  animation: fadeSlide 0.4s ease;
+}
+.result-emoji { font-size: 4rem; margin-bottom: 12px; }
+.result-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.9rem;
+  margin-bottom: 8px;
+}
+.result-stars { font-size: 2rem; letter-spacing: 4px; margin-bottom: 14px; }
+.result-stats {
+  font-size: 0.9rem;
+  opacity: 0.75;
+  margin-bottom: 22px;
+  line-height: 1.8;
+}
+.result-unlock {
+  font-size: 0.8rem;
+  color: var(--accent);
+  margin-bottom: 16px;
+  font-weight: 700;
+}
+.result-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+/* ===== CONFETTI ===== */
+.confetti-piece {
+  position: fixed;
+  width: 9px; height: 9px;
+  border-radius: 2px;
+  animation: confettiFall 1.8s ease forwards;
+  pointer-events: none;
+  z-index: 999;
+}
+@keyframes confettiFall {
+  0%{transform:translateY(-20px) rotate(0deg);opacity:1}
+  100%{transform:translateY(100vh) rotate(800deg);opacity:0}
+}
+
+/* ===== FOOTER ===== */
+.footer {
+  text-align: center;
+  margin: 30px 0 16px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+}
+.footer-brand {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1rem;
+  background: linear-gradient(135deg, #CE1126, #FCD116, #009460);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.footer-sub { font-size: 0.7rem; opacity: 0.4; margin-top: 4px; letter-spacing: 1px; text-transform: uppercase; }
+
+/* ===== LIGHT MODE ===== */
+body.light {
+  --bg: #f0f4ff;
+  --card: #ffffff;
+  --text: #1a1a2e;
+}
+body.light::before { display: none; }
+body.light .map-bg { background: radial-gradient(ellipse at 30% 20%, #c8e6c9 0%, #a5d6a7 60%, #81c784 100%); }
+body.light .opt-btn { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.12); color: #1a1a2e; }
+body.light .score-pill { background: rgba(0,0,0,0.06); border-color: rgba(0,0,0,0.1); }
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:500px) {
+  .title { font-size: 1.8rem; }
+  .q-text { font-size: 1.35rem; }
+  .opts-grid { grid-template-columns: 1fr; }
+  .map-grid { min-height: 380px; }
+  .info-stats { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-top">
+      <div class="flag"><div class="r"></div><div class="y"></div><div class="g"></div></div>
+      <div style="text-align:center;flex:1;">
+        <div class="title">KaramokoBHDS</div>
+        <div class="subtitle">Carte Aventure · Collection BHDS</div>
+      </div>
+      <div class="header-controls">
+        <button class="ctrl-btn" onclick="window.location.href='karamoko_accueil.html'" title="Accueil">🏠</button>
+        <button class="ctrl-btn" id="themeBtn" onclick="toggleTheme()" title="Thème">🌙</button>
+        <button class="ctrl-btn" id="musicBtn" onclick="toggleMusic()" title="Son">🔊</button>
+      </div>
+    </div>
+
+    <div class="score-bar">
+      <div class="score-pill">✅ <span id="sOk">0</span></div>
+      <div class="score-pill">❌ <span id="sKo">0</span></div>
+      <div class="score-pill">🏆 <span id="sPts">0</span> pts</div>
+      <div class="score-pill">🏙️ <span id="sVilles">0</span>/<span id="sTotal">0</span> étapes</div>
+    </div>
+  </header>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn primaire" id="tabPrimaire" onclick="switchTab('primaire')">
+      🌟 Primaire
+    </button>
+    <button class="tab-btn college active" id="tabCollege" onclick="switchTab('college')">
+      🎓 Collège
+    </button>
+    <button class="tab-btn lycee" id="tabLycee" onclick="switchTab('lycee')">
+      🏫 Lycée
+    </button>
+  </div>
+
+  <!-- MAP VIEW -->
+  <div id="mapView">
+    <div class="map-wrapper">
+      <div class="map-bg"></div>
+      <svg class="map-svg" id="mapSvg" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+      <div class="map-title-bar">
+        <div class="map-region-label" id="mapLabel">Royaume du Collège</div>
+        <div class="map-progress-info" id="mapProgressInfo">0 / 8 étapes</div>
+      </div>
+      <div class="map-grid" id="mapGrid"></div>
+    </div>
+
+    <div class="info-panel" id="infoPanel">
+      <div class="info-header">
+        <div class="info-emoji" id="infoEmoji">🏫</div>
+        <div>
+          <div class="info-title" id="infoTitle">—</div>
+          <div class="info-level" id="infoLevel">—</div>
+        </div>
+      </div>
+      <div class="info-desc" id="infoDesc">—</div>
+      <div class="info-tags" id="infoTags"></div>
+      <div class="info-stats">
+        <div class="stat-box">
+          <div class="stat-val" id="statQuestions">—</div>
+          <div class="stat-lbl">Questions</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="statBest">—</div>
+          <div class="stat-lbl">Meilleur</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="statDiff">—</div>
+          <div class="stat-lbl">Difficulté</div>
+        </div>
+      </div>
+      <button class="btn-start" id="btnStart" onclick="startMission()">🚀 Commencer la mission !</button>
+    </div>
+  </div>
+
+  <!-- GAME VIEW -->
+  <div class="game-wrap" id="gameView">
+    <button class="btn-back" onclick="backToMap()">← Retour carte</button>
+    <div class="mission-banner">
+      <span>🎯 Mission :</span>
+      <span class="mission-city" id="missionLabel">—</span>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progressBar" style="width:0%"></div>
+    </div>
+    <div class="game-card" id="gameCard"></div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-brand">🎓 KaramokoBHDS · Collection BHDS</div>
+    <div class="footer-sub">Fait en Guinée Conakry 🇬🇳 · Boubacar Diallo Édition 2026</div>
+  </footer>
+</div>
+
+<script>
+// ===================== DONNÉES =====================
+
+const PRIMAIRES = [
+  {
+    id:'p_calcul',
+    nom:'Village des Chiffres',
+    emoji:'🔢',
+    matiere:'Calcul',
+    niveau:'1ère/2ème année',
+    desc:'Apprends à compter, additionner et soustraire. Le premier pas dans le monde des maths !',
+    tags:[{t:'Calcul',c:'#34d399'}],
+    diff:'⭐',
+    questions:8,
+    prerequis:[],
+    x:18, y:18,
+    data:[
+      { q:"Combien font 3 + 4 ?", opts:["6","7","8","5"], ans:1 },
+      { q:"Combien font 10 - 3 ?", opts:["6","8","7","5"], ans:2 },
+      { q:"Quel nombre vient après 9 ?", opts:["8","11","10","12"], ans:2 },
+      { q:"Combien font 5 + 5 ?", opts:["9","11","10","12"], ans:2 },
+      { q:"Combien font 15 - 6 ?", opts:["8","9","10","7"], ans:1 },
+      { q:"Quel est le double de 4 ?", opts:["6","8","10","4"], ans:1 },
+      { q:"Combien font 2 + 3 + 4 ?", opts:["7","8","9","10"], ans:2 },
+      { q:"Lequel est le plus grand : 17 ou 13 ?", opts:["13","17","Égaux","On ne sait pas"], ans:1 },
+    ]
+  },
+  {
+    id:'p_lecture',
+    nom:'Jardin des Lettres',
+    emoji:'📖',
+    matiere:'Lecture',
+    niveau:'2ème/3ème année',
+    desc:'Lis des mots, reconnais les lettres et forme des phrases simples.',
+    tags:[{t:'Lecture',c:'#f472b6'}],
+    diff:'⭐',
+    questions:8,
+    prerequis:[],
+    x:48, y:14,
+    data:[
+      { q:"Combien de lettres a l'alphabet français ?", opts:["24","25","26","27"], ans:2 },
+      { q:"Quel mot commence par la lettre 'M' ?", opts:["Banane","Chat","Maison","École"], ans:2 },
+      { q:"Quelle est la première lettre du mot 'éléphant' ?", opts:["A","É","E","O"], ans:1 },
+      { q:"Combien de syllabes a le mot 'ma-ma-n' ?", opts:["1","2","3","4"], ans:2 },
+      { q:"Lequel de ces mots est un prénom ?", opts:["Maison","Mamadou","Chaise","Soleil"], ans:1 },
+      { q:"Quel mot se lit 'cha-pe-au' ?", opts:["Chapeau","Cheval","Charade","Chariot"], ans:0 },
+      { q:"Combien de lettres a le mot 'CHAT' ?", opts:["3","4","5","6"], ans:1 },
+      { q:"Quel mot est le contraire de 'grand' ?", opts:["Fort","Rapide","Petit","Lourd"], ans:2 },
+    ]
+  },
+  {
+    id:'p_multiplication',
+    nom:'Fort des Tables',
+    emoji:'✖️',
+    matiere:'Calcul',
+    niveau:'3ème/4ème année',
+    desc:'Maîtrise les tables de multiplication de 1 à 10. Un passage obligé pour tous les élèves !',
+    tags:[{t:'Multiplication',c:'#60a5fa'}],
+    diff:'⭐⭐',
+    questions:8,
+    prerequis:['p_calcul'],
+    x:20, y:48,
+    data:[
+      { q:"Combien font 3 × 4 ?", opts:["10","11","12","13"], ans:2 },
+      { q:"Combien font 7 × 6 ?", opts:["42","36","48","40"], ans:0 },
+      { q:"Combien font 9 × 5 ?", opts:["40","45","50","55"], ans:1 },
+      { q:"Combien font 8 × 8 ?", opts:["56","60","64","72"], ans:2 },
+      { q:"Combien font 2 × 9 ?", opts:["16","17","18","19"], ans:2 },
+      { q:"Combien font 6 × 7 ?", opts:["36","42","48","40"], ans:1 },
+      { q:"Combien font 10 × 5 ?", opts:["45","50","55","60"], ans:1 },
+      { q:"Combien font 4 × 4 ?", opts:["12","14","16","18"], ans:2 },
+    ]
+  },
+  {
+    id:'p_grammaire',
+    nom:'Château des Phrases',
+    emoji:'✍️',
+    matiere:'Français',
+    niveau:'3ème/4ème année',
+    desc:'Apprends les noms, les verbes, les adjectifs et construis de belles phrases.',
+    tags:[{t:'Grammaire',c:'#f472b6'}],
+    diff:'⭐⭐',
+    questions:8,
+    prerequis:['p_lecture'],
+    x:75, y:22,
+    data:[
+      { q:"Dans la phrase 'Le chat mange', quel est le verbe ?", opts:["Le","Chat","Mange","—"], ans:2 },
+      { q:"Quel mot est un nom ?", opts:["Courir","Beau","Maison","Vite"], ans:2 },
+      { q:"Dans 'La belle fleur rouge', quel mot est un adjectif ?", opts:["La","Fleur","Belle","—"], ans:2 },
+      { q:"Quel est le pluriel de 'chapeau' ?", opts:["Chapeaux","Chapeaus","Chapeus","Chapeauz"], ans:0 },
+      { q:"Quel est le féminin de 'acteur' ?", opts:["Acteure","Actrice","Acteuse","Acteuresse"], ans:1 },
+      { q:"Dans 'Ils jouent', 'ils' est :", opts:["Un nom","Un verbe","Un pronom sujet","Un adjectif"], ans:2 },
+      { q:"Quel mot est un verbe ?", opts:["Table","Manger","Bleu","Livre"], ans:1 },
+      { q:"Quel est le contraire de 'monter' ?", opts:["Avancer","Courir","Descendre","Sauter"], ans:2 },
+    ]
+  },
+  {
+    id:'p_sciences',
+    nom:'Laboratoire des Curieux',
+    emoji:'🔬',
+    matiere:'Sciences',
+    niveau:'4ème/5ème année',
+    desc:'Découvre le corps humain, les animaux, les plantes et les phénomènes de la nature.',
+    tags:[{t:'Sciences',c:'#34d399'},{t:'Nature',c:'#fbbf24'}],
+    diff:'⭐⭐',
+    questions:8,
+    prerequis:['p_calcul','p_lecture'],
+    x:50, y:52,
+    data:[
+      { q:"Combien de sens possède l'être humain ?", opts:["3","4","5","6"], ans:2, fact:"Les 5 sens sont : la vue, l'ouïe, le toucher, l'odorat et le goût." },
+      { q:"Quel organe pompe le sang dans notre corps ?", opts:["Le poumon","Le foie","Le cœur","Le rein"], ans:2, fact:"Le cœur bat environ 60 à 100 fois par minute pour faire circuler le sang dans tout le corps." },
+      { q:"De quoi une plante a-t-elle besoin pour pousser ?", opts:["Seulement de l'eau","Eau, lumière et terre","Seulement de la lumière","Seulement de la terre"], ans:1, fact:"Les plantes ont besoin d'eau, de lumière solaire et de minéraux du sol pour grandir." },
+      { q:"Quel animal pond des œufs ?", opts:["Le chien","La vache","La poule","Le lapin"], ans:2, fact:"Les oiseaux, les reptiles, les poissons et certains autres animaux se reproduisent en pondant des œufs." },
+      { q:"Qu'est-ce qui fait tomber la pluie ?", opts:["Le vent","Les nuages chargés d'eau","Le soleil","Les arbres"], ans:1, fact:"La pluie se forme quand les gouttelettes d'eau dans les nuages deviennent trop lourdes pour rester en suspension." },
+      { q:"Combien d'os a un être humain adulte ?", opts:["106","206","306","406"], ans:1, fact:"Le corps humain adulte possède 206 os. Un bébé en a environ 270, certains os fusionnent en grandissant." },
+      { q:"Quel est l'astre qui éclaire la Terre le jour ?", opts:["La Lune","Une étoile lointaine","Le Soleil","Mars"], ans:2, fact:"Le Soleil est une étoile située à environ 150 millions de km de la Terre. Sa lumière met 8 minutes à nous parvenir." },
+      { q:"L'eau à l'état gazeux s'appelle :", opts:["Glace","Vapeur d'eau","Brouillard","Nuage"], ans:1, fact:"L'eau existe sous 3 états : solide (glace), liquide (eau), gazeux (vapeur d'eau)." },
+    ]
+  },
+  {
+    id:'p_geo_guinee',
+    nom:'Tour de la Guinée',
+    emoji:'🌍',
+    matiere:'Géographie',
+    niveau:'5ème/6ème année',
+    desc:'Découvre la Guinée : ses villes, ses fleuves, ses animaux et ses richesses naturelles.',
+    tags:[{t:'Géographie',c:'#fbbf24'},{t:'Guinée',c:'#CE1126'}],
+    diff:'⭐⭐⭐',
+    questions:8,
+    prerequis:['p_sciences','p_grammaire'],
+    x:80, y:55,
+    data:[
+      { q:"Quelle est la capitale de la Guinée ?", opts:["Labé","Kankan","Conakry","Kindia"], ans:2, fact:"Conakry est la capitale et la plus grande ville de la Guinée, située sur la presqu'île de Kaloum." },
+      { q:"De quelle couleur n'est PAS le drapeau guinéen ?", opts:["Rouge","Vert","Bleu","Jaune"], ans:2, fact:"Le drapeau guinéen a trois bandes : rouge (à gauche), jaune (au centre) et vert (à droite)." },
+      { q:"Quel grand fleuve naît en Guinée ?", opts:["Le Congo","Le Niger","Le Nil","La Volta"], ans:1, fact:"Le fleuve Niger prend sa source dans les montagnes du Fouta-Djalon en Guinée." },
+      { q:"Quel est le principal minerai de la Guinée ?", opts:["Le pétrole","Le diamant","La bauxite","L'or"], ans:2, fact:"La Guinée possède les plus grandes réserves mondiales de bauxite, le minerai qui sert à fabriquer l'aluminium." },
+      { q:"Combien de pays ont une frontière avec la Guinée ?", opts:["3","4","5","6"], ans:3, fact:"La Guinée partage ses frontières avec 6 pays : Guinea-Bissau, Sénégal, Mali, Côte d'Ivoire, Libéria et Sierra Leone." },
+      { q:"Dans quelle région naturelle se trouve le Fouta-Djalon ?", opts:["Basse Guinée","Moyenne Guinée","Haute Guinée","Guinée Forestière"], ans:1, fact:"Le Fouta-Djalon est le massif montagneux de Moyenne Guinée, surnommé 'château d'eau de l'Afrique de l'Ouest'." },
+      { q:"Quel animal est souvent appelé 'roi des animaux' ?", opts:["Le crocodile","L'éléphant","Le lion","Le gorille"], ans:2, fact:"On trouve des lions, éléphants, chimpanzés et gorilles en Guinée. Le Parc National du Haut Niger protège ces espèces." },
+      { q:"Quelle est la principale langue officielle de la Guinée ?", opts:["L'anglais","L'arabe","Le français","Le peulh"], ans:2, fact:"Le français est la langue officielle de la Guinée. Les langues nationales les plus parlées sont le poular, le malinké et le soussou." },
+    ]
+  },
+  {
+    id:'p_calcul_avance',
+    nom:'Palais des Problèmes',
+    emoji:'🧮',
+    matiere:'Calcul',
+    niveau:'5ème/6ème année',
+    desc:'Résous des problèmes de division, de fractions simples et de géométrie de base.',
+    tags:[{t:'Calcul Avancé',c:'#60a5fa'}],
+    diff:'⭐⭐⭐',
+    questions:8,
+    prerequis:['p_multiplication','p_sciences'],
+    x:35, y:75,
+    data:[
+      { q:"Combien font 48 ÷ 6 ?", opts:["6","7","8","9"], ans:2 },
+      { q:"Quel est le périmètre d'un carré de côté 5 cm ?", opts:["10 cm","15 cm","20 cm","25 cm"], ans:2 },
+      { q:"Combien font 1/2 + 1/2 ?", opts:["1/4","2/4","1","2"], ans:2 },
+      { q:"Quelle est l'heure si une horloge indique 9h15 puis on ajoute 30 minutes ?", opts:["9h30","9h45","10h15","10h00"], ans:1 },
+      { q:"Un marchand a 72 oranges à mettre dans des sacs de 8. Combien de sacs faut-il ?", opts:["7","8","9","10"], ans:2 },
+      { q:"Combien font 3/4 de 100 ?", opts:["25","50","75","80"], ans:2 },
+      { q:"L'aire d'un rectangle de 6 cm × 4 cm est :", opts:["10 cm²","20 cm²","24 cm²","30 cm²"], ans:2 },
+      { q:"Si j'ai 500 francs et je dépense 175 francs, il me reste :", opts:["225 francs","325 francs","375 francs","425 francs"], ans:1 },
+    ]
+  },
+  {
+    id:'p_histoire_guinee',
+    nom:'Mémoire de la Guinée',
+    emoji:'🏛️',
+    matiere:'Histoire',
+    niveau:'6ème année',
+    desc:'Connais les grands moments de l\'histoire de la Guinée et ses héros nationaux.',
+    tags:[{t:'Histoire',c:'#fb923c'},{t:'Guinée',c:'#CE1126'}],
+    diff:'⭐⭐⭐',
+    questions:8,
+    prerequis:['p_geo_guinee','p_calcul_avance'],
+    x:70, y:78,
+    data:[
+      { q:"En quelle année la Guinée est devenue indépendante ?", opts:["1956","1958","1960","1962"], ans:1, fact:"Le 2 octobre 1958, la Guinée proclame son indépendance après avoir voté NON au référendum de De Gaulle." },
+      { q:"Qui était le premier président de la Guinée ?", opts:["Lansana Conté","Alpha Condé","Sékou Touré","Diallo Telli"], ans:2, fact:"Ahmed Sékou Touré (1922–1984) fut le premier président de la Guinée." },
+      { q:"Quel héros guinéen a résisté aux colonisateurs français ?", opts:["Soundiata Keïta","Samory Touré","Lansana Conté","Diallo Telli"], ans:1, fact:"Samory Touré résista héroïquement à la colonisation française pendant près de 20 ans (1882-1898)." },
+      { q:"Quel pays colonisa la Guinée avant l'indépendance ?", opts:["L'Angleterre","Le Portugal","La France","L'Espagne"], ans:2, fact:"La France colonisa la Guinée à partir de 1882. La colonie s'appelait 'Guinée française'." },
+      { q:"Quel grand empire médiéval couvrait la Haute Guinée ?", opts:["L'Empire Songhaï","L'Empire Romain","L'Empire du Mali","L'Empire Ottoman"], ans:2, fact:"L'Empire du Mali, fondé par Soundiata Keïta au XIIIe siècle, couvrait une grande partie de l'Afrique de l'Ouest." },
+      { q:"La fête nationale de la Guinée est célébrée le :", opts:["1er janvier","2 octobre","14 juillet","25 mai"], ans:1, fact:"Le 2 octobre est la fête de l'indépendance de la Guinée, célébrée chaque année depuis 1958." },
+      { q:"Quelle est la monnaie utilisée en Guinée ?", opts:["Le dollar","Le franc CFA","Le franc guinéen","L'euro"], ans:2, fact:"La Guinée utilise le franc guinéen (GNF) comme monnaie nationale." },
+      { q:"Qui est Soundiata Keïta ?", opts:["Un président guinéen","Le fondateur de l'Empire du Mali","Un chanteur célèbre","Un général français"], ans:1, fact:"Soundiata Keïta (XIIIe siècle) est le fondateur légendaire de l'Empire du Mali, dont l'épopée est chantée par les griots." },
+    ]
+  },
+];
+
+const COLLEGES = [
+  {
+    id:'c_maths_6',
+    nom:'Académie des Nombres',
+    emoji:'📐',
+    matiere:'Maths',
+    niveau:'7ème',
+    desc:'Explore le monde des fractions, des puissances et de la géométrie de 7ème.',
+    tags:[{t:'Maths',c:'var(--maths)'}],
+    diff:'⭐⭐',
+    questions:10,
+    prerequis:[],
+    x:15, y:18,
+    data:[
+      { q:"Quel est le résultat de 3 × (4 + 5) ?", opts:["21","27","19","24"], ans:1 },
+      { q:"Combien font 3/4 + 1/4 ?", opts:["4/8","1","2/4","4/4"], ans:1 },
+      { q:"Quel est le périmètre d'un carré de côté 6 cm ?", opts:["12 cm","18 cm","24 cm","36 cm"], ans:2 },
+      { q:"Quel nombre est premier parmi ces propositions ?", opts:["9","15","13","21"], ans:2 },
+      { q:"Quelle est la valeur de 2⁴ ?", opts:["6","8","16","12"], ans:2 },
+      { q:"Combien font 25 % de 200 ?", opts:["25","40","50","75"], ans:2 },
+      { q:"Quel est le PGCD de 12 et 18 ?", opts:["2","3","6","9"], ans:2 },
+      { q:"L'aire d'un rectangle de longueur 8 cm et largeur 5 cm est :", opts:["26 cm²","40 cm²","13 cm²","30 cm²"], ans:1 },
+      { q:"Si x + 7 = 15, alors x vaut :", opts:["6","7","8","22"], ans:2 },
+      { q:"Dans un triangle, la somme des angles vaut :", opts:["90°","180°","270°","360°"], ans:1 },
+    ]
+  },
+  {
+    id:'c_physique_6',
+    nom:'Labo des Forces',
+    emoji:'⚡',
+    matiere:'Physique',
+    niveau:'7ème',
+    desc:'Découvre la lumière, les états de la matière et les premiers circuits électriques.',
+    tags:[{t:'Physique',c:'var(--physique)'}],
+    diff:'⭐⭐',
+    questions:10,
+    prerequis:['c_maths_6'],
+    x:38, y:14,
+    data:[
+      { q:"L'unité de mesure de la longueur dans le système international est :", opts:["Le centimètre","Le mètre","Le kilomètre","Le pouce"], ans:1 },
+      { q:"Quel instrument mesure la masse ?", opts:["Le thermomètre","La balance","Le chronomètre","Le baromètre"], ans:1 },
+      { q:"Dans quel état de la matière les molécules sont-elles les plus proches ?", opts:["Gazeux","Liquide","Solide","Plasma"], ans:2 },
+      { q:"L'eau bout à quelle température sous pression normale ?", opts:["80°C","90°C","100°C","120°C"], ans:2 },
+      { q:"Quelle est la formule chimique de l'eau ?", opts:["HO","H₂O","H₂O₂","OH"], ans:1 },
+      { q:"L'unité de mesure de l'intensité électrique est :", opts:["Le volt","L'ohm","L'ampère","Le watt"], ans:2 },
+      { q:"La lumière voyage à environ :", opts:["300 000 km/s","300 km/s","3 000 km/s","30 000 km/s"], ans:0 },
+      { q:"Quel phénomène explique la formation de l'arc-en-ciel ?", opts:["La réflexion","La dispersion de la lumière","La réfraction simple","L'absorption"], ans:1 },
+      { q:"Un circuit électrique en série signifie que :", opts:["Les composants sont sur plusieurs branches","Les composants sont sur une seule branche","Il y a plusieurs générateurs","Il y a plusieurs interrupteurs"], ans:1 },
+      { q:"Qu'est-ce qu'une source lumineuse primaire ?", opts:["Un miroir","La Lune","Une lampe allumée","Un livre blanc"], ans:2 },
+    ]
+  },
+  {
+    id:'c_francais',
+    nom:'Temple des Mots',
+    emoji:'📖',
+    matiere:'Français',
+    niveau:'8e/9e',
+    desc:'Maîtrise la grammaire, les figures de style et la littérature africaine.',
+    tags:[{t:'Français',c:'var(--francais)'}],
+    diff:'⭐⭐⭐',
+    questions:10,
+    prerequis:['c_maths_6'],
+    x:60, y:22,
+    data:[
+      { q:"Qu'est-ce qu'un groupe nominal ?", opts:["Un verbe conjugué","Un ensemble formé d'un nom et de ses déterminants/expansions","Une proposition subordonnée","Un adverbe"], ans:1 },
+      { q:"La métaphore est une figure de style qui :", opts:["Compare deux choses avec 'comme'","Fait une comparaison sans outil de comparaison","Personnifie un objet","Répète un mot"], ans:1 },
+      { q:"Le participe passé s'accorde avec le sujet quand il est employé avec :", opts:["Avoir","Être","Les deux","Ni l'un ni l'autre"], ans:1 },
+      { q:"Quel est le mode du verbe 'Que tu viennes' ?", opts:["Indicatif","Conditionnel","Subjonctif","Impératif"], ans:2 },
+      { q:"Qu'est-ce qu'une proposition subordonnée relative ?", opts:["Une proposition principale","Une proposition qui complète un nom/pronom par un pronom relatif","Une proposition indépendante","Une proposition temporelle"], ans:1 },
+      { q:"L'hyperbole est une figure qui consiste à :", opts:["Atténuer","Exagérer","Comparer","Répéter"], ans:1 },
+      { q:"'L'Enfant noir' est écrit par :", opts:["Sembène Ousmane","Ahmadou Kourouma","Camara Laye","Cheikh Hamidou Kane"], ans:2 },
+      { q:"Quel temps exprime une action habituelle dans le passé ?", opts:["Passé composé","Passé simple","Imparfait","Plus-que-parfait"], ans:2 },
+      { q:"La personnification consiste à :", opts:["Exagérer une idée","Attribuer des qualités humaines à un objet ou animal","Comparer deux choses","Répéter un son"], ans:1 },
+      { q:"Un texte narratif a pour but principal de :", opts:["Convaincre","Décrire","Raconter une histoire","Expliquer un phénomène"], ans:2 },
+    ]
+  },
+  {
+    id:'c_bio',
+    nom:'Forêt du Vivant',
+    emoji:'🌿',
+    matiere:'Biologie',
+    niveau:'8e/9e',
+    desc:'Explore la cellule, les écosystèmes et la biologie des êtres vivants.',
+    tags:[{t:'Biologie',c:'var(--bio)'}],
+    diff:'⭐⭐⭐',
+    questions:10,
+    prerequis:['c_physique_6'],
+    x:82, y:18,
+    data:[
+      { q:"Qu'est-ce qu'une cellule ?", opts:["Un organe","L'unité de base du vivant","Un tissu","Un organisme"], ans:1 },
+      { q:"La photosynthèse se réalise dans :", opts:["Les mitochondries","Le noyau","Les chloroplastes","Les ribosomes"], ans:2 },
+      { q:"Quel organe filtre le sang dans notre corps ?", opts:["Le foie","Le rein","Le cœur","Le poumon"], ans:1 },
+      { q:"Un écosystème est :", opts:["Un ensemble de plantes","La totalité des êtres vivants d'une région avec leur milieu","Une espèce animale","Un sol fertile"], ans:1 },
+      { q:"Comment appelle-t-on un animal qui mange à la fois des plantes et de la viande ?", opts:["Carnivore","Herbivore","Omnivore","Décomposeur"], ans:2 },
+      { q:"La respiration cellulaire produit :", opts:["Du glucose","De l'O₂","De l'énergie et du CO₂","De l'eau pure"], ans:2 },
+      { q:"Les bactéries sont des organismes :", opts:["Eucaryotes pluricellulaires","Procaryotes unicellulaires","Eucaryotes unicellulaires","Virus"], ans:1 },
+      { q:"Quelle est la fonction principale du squelette ?", opts:["Pomper le sang","Soutenir, protéger, permettre le mouvement","Digérer les aliments","Produire des hormones"], ans:1 },
+      { q:"La chaîne alimentaire commence toujours par :", opts:["Un carnivore","Un décomposeur","Un végétal (producteur)","Un herbivore"], ans:2 },
+      { q:"L'ADN se trouve principalement dans :", opts:["Les mitochondries","Le cytoplasme","Le noyau de la cellule","La membrane"], ans:2 },
+    ]
+  },
+  {
+    id:'c_histoire',
+    nom:'Cité des Empires',
+    emoji:'🏛️',
+    matiere:'Histoire',
+    niveau:'9e/10e',
+    desc:'Parcours l\'histoire de la Guinée, des empires médiévaux à l\'indépendance.',
+    tags:[{t:'Histoire',c:'var(--histoire)'},{t:'Guinée',c:'var(--red)'}],
+    diff:'⭐⭐⭐',
+    questions:10,
+    prerequis:['c_francais','c_bio'],
+    x:25, y:50,
+    data:[
+      { q:"En quelle année la Guinée est-elle devenue indépendante ?", opts:["1956","1958","1960","1962"], ans:1, fact:"Le 2 octobre 1958, la Guinée proclame son indépendance après avoir voté NON au référendum de De Gaulle." },
+      { q:"Qui était le premier président de la Guinée ?", opts:["Lansana Conté","Alpha Condé","Sékou Touré","Diallo Telli"], ans:2, fact:"Ahmed Sékou Touré (1922–1984) fut le premier président de la Guinée de 1958 jusqu'à sa mort." },
+      { q:"Quel empire médiéval couvrait une partie de la Guinée actuelle au XIIIe siècle ?", opts:["L'Empire Songhaï","L'Empire du Mali","L'Empire du Ghana","L'Empire Ottoman"], ans:1, fact:"L'Empire du Mali sous Soundiata Keïta couvrait une grande partie de la Haute Guinée actuelle." },
+      { q:"Qui était Samory Touré ?", opts:["Un président guinéen","Un résistant malinké qui lutta contre les Français","Un roi peulh du Fouta-Djalon","Un missionnaire"], ans:1, fact:"Samory Touré (vers 1830–1900) résista héroïquement à la colonisation française pendant près de 20 ans." },
+      { q:"Le Fouta-Djalon était une théocratie islamique dirigée par :", opts:["Des rois","Des présidents","Des Almamy","Des généraux"], ans:2, fact:"L'Almamy était le chef suprême de la théocratie islamique du Fouta-Djalon. Le terme vient de l'arabe 'Al-Imam'." },
+      { q:"En quelle année Samory Touré fut-il capturé par les Français ?", opts:["1885","1890","1895","1898"], ans:3, fact:"Samory Touré fut capturé le 29 septembre 1898 et mourut en exil au Gabon en 1900." },
+      { q:"Quel pays a colonisé la Guinée avant 1958 ?", opts:["L'Angleterre","Le Portugal","L'Espagne","La France"], ans:3, fact:"La France colonisa la Guinée à partir de 1882. La colonie s'appelait 'Guinée française'." },
+      { q:"Quelle est la signification du vote NON au référendum de 1958 ?", opts:["Rejoindre l'URSS","Refus de la Communauté française = indépendance immédiate","S'allier au Ghana","Choisir un autre président"], ans:1, fact:"En votant NON à 95%, la Guinée choisit l'indépendance immédiate plutôt que de rester dans la Communauté française." },
+      { q:"Qui est Soundiata Keïta ?", opts:["Un roi peulh du Fouta","Le fondateur légendaire de l'Empire du Mali","Un griot célèbre","Le premier président de la Guinée"], ans:1, fact:"Soundiata Keïta (XIIIe siècle) est le fondateur de l'Empire du Mali, dont l'épopée est racontée par les griots." },
+      { q:"Après la mort de Sékou Touré en 1984, qui prit le pouvoir ?", opts:["Alpha Condé","Lansana Conté","Diallo Telli","Moussa Dadis Camara"], ans:1, fact:"Le général Lansana Conté prit le pouvoir par coup d'État militaire le 3 avril 1984." },
+    ]
+  },
+  {
+    id:'c_geo',
+    nom:'Carrefour des Régions',
+    emoji:'🌍',
+    matiere:'Géographie',
+    niveau:'9e/10e',
+    desc:'Découvre la géographie physique et humaine de la Guinée et de l\'Afrique de l\'Ouest.',
+    tags:[{t:'Géographie',c:'var(--geo)'}],
+    diff:'⭐⭐⭐',
+    questions:10,
+    prerequis:['c_francais','c_bio'],
+    x:55, y:48,
+    data:[
+      { q:"Combien de régions naturelles compte la Guinée ?", opts:["Deux","Trois","Quatre","Cinq"], ans:2, fact:"La Guinée est divisée en 4 régions naturelles : Basse Guinée, Moyenne Guinée (Fouta-Djalon), Haute Guinée et Guinée Forestière." },
+      { q:"Quel grand fleuve africain prend sa source en Guinée ?", opts:["Le Congo","Le Nil","Le Niger","Le Zambèze"], ans:2, fact:"Le fleuve Niger (4 180 km) prend sa source dans les montagnes du Fouta-Djalon, près de Faranah." },
+      { q:"Combien de pays partagent une frontière avec la Guinée ?", opts:["4","5","6","7"], ans:2, fact:"La Guinée partage ses frontières avec 6 pays : Guinea-Bissau, Sénégal, Mali, Côte d'Ivoire, Libéria et Sierra Leone." },
+      { q:"Quel est le principal minerai extrait en Guinée ?", opts:["Le pétrole","La bauxite","Le fer","Le charbon"], ans:1, fact:"La Guinée possède les plus grandes réserves mondiales de bauxite (minerai d'aluminium)." },
+      { q:"Le Fouta-Djalon est surnommé 'château d'eau de l'Afrique de l'Ouest' car :", opts:["Il fait très froid","De nombreux fleuves y prennent leur source","Il a beaucoup de lacs","Il reçoit le plus de pluies"], ans:1, fact:"Le Fouta-Djalon est la source de 23 grands fleuves d'Afrique de l'Ouest : le Niger, le Sénégal, la Gambie..." },
+      { q:"Quelle est la capitale de la Guinée ?", opts:["Labé","Kankan","Conakry","Kindia"], ans:2, fact:"Conakry est fondée en 1887 sur la presqu'île de Kaloum. Elle est la capitale politique et économique du pays." },
+      { q:"Quel est le point culminant de la Guinée ?", opts:["Mont Kakoulima","Mont Simandou","Mont Nimba","Pic du Fouta"], ans:2, fact:"Le Mont Nimba (1 752 m) est le point culminant de la Guinée, à la frontière avec la Côte d'Ivoire et le Libéria." },
+      { q:"Dans quelle région naturelle se trouve N'Zérékoré ?", opts:["Moyenne Guinée","Haute Guinée","Basse Guinée","Guinée Forestière"], ans:3, fact:"N'Zérékoré est la capitale de la Guinée Forestière, une région de forêt tropicale dense." },
+      { q:"Quel océan borde la Guinée à l'ouest ?", opts:["Océan Indien","Océan Pacifique","Océan Atlantique","Mer Méditerranée"], ans:2, fact:"La Guinée possède environ 300 km de côte sur l'Océan Atlantique." },
+      { q:"Quelle ville est surnommée 'le carrefour des 4 régions naturelles' ?", opts:["Conakry","Labé","Kindia","Mamou"], ans:3, fact:"Mamou est géographiquement au centre de la Guinée, à la jonction des 4 régions naturelles." },
+    ]
+  },
+  {
+    id:'c_civique',
+    nom:'Palais de la République',
+    emoji:'⚖️',
+    matiere:'Civique',
+    niveau:'10ème',
+    desc:'Comprends l\'organisation de l\'État, les droits des citoyens et la démocratie.',
+    tags:[{t:'Éducation Civique',c:'var(--civique)'}],
+    diff:'⭐⭐⭐⭐',
+    questions:10,
+    prerequis:['c_histoire','c_geo'],
+    x:80, y:52,
+    data:[
+      { q:"Quels sont les trois pouvoirs de l'État en Guinée ?", opts:["Exécutif, Militaire, Religieux","Exécutif, Législatif, Judiciaire","Gouvernement, Mairie, Village","Président, Armée, Police"], ans:1, fact:"La séparation des pouvoirs est un principe fondamental de la démocratie : le pouvoir exécutif gouverne, le législatif vote les lois, le judiciaire juge." },
+      { q:"Quel document garantit les droits et libertés des citoyens guinéens ?", opts:["Le journal","La Constitution","Le dictionnaire","Le règlement scolaire"], ans:1, fact:"La Constitution est la loi fondamentale de l'État guinéen. Elle organise les pouvoirs et garantit les droits fondamentaux." },
+      { q:"La CEDEAO regroupe combien de pays d'Afrique de l'Ouest ?", opts:["10","12","15","18"], ans:2, fact:"La CEDEAO (Communauté Économique des États de l'Afrique de l'Ouest) fondée en 1975 regroupe 15 pays." },
+      { q:"Qu'est-ce que l'État de droit ?", opts:["Un État sans loi","Un État où la loi s'applique à tous également","Un État militaire","Un État religieux"], ans:1, fact:"Dans un État de droit, nul n'est au-dessus de la loi. Les citoyens et les gouvernants sont soumis aux mêmes règles." },
+      { q:"La Convention des droits de l'enfant a été adoptée par l'ONU en :", opts:["1948","1965","1989","2000"], ans:2, fact:"La Convention internationale des droits de l'enfant (CIDE) a été adoptée par l'ONU le 20 novembre 1989." },
+      { q:"Le rôle de l'Assemblée nationale est de :", opts:["Juger les criminels","Voter les lois","Commander l'armée","Gérer les hôpitaux"], ans:1, fact:"L'Assemblée nationale est le pouvoir législatif. Elle vote les lois et contrôle l'action du gouvernement." },
+      { q:"Qu'est-ce que la laïcité ?", opts:["Une religion d'État","La séparation de l'État et des religions","L'interdiction des religions","La primauté de l'islam"], ans:1, fact:"La laïcité garantit la neutralité de l'État vis-à-vis de toutes les religions et assure la liberté de conscience." },
+      { q:"Le droit de vote en Guinée est accordé à partir de :", opts:["16 ans","18 ans","21 ans","25 ans"], ans:1, fact:"En Guinée, le droit de vote est accordé à tous les citoyens à partir de 18 ans révolus." },
+      { q:"Quelle organisation regroupe tous les États africains ?", opts:["ONU","OTAN","Union Africaine","UNESCO"], ans:2, fact:"L'Union Africaine (UA), fondée en 2002 à Durban, regroupe 55 États membres et a son siège à Addis-Abeba." },
+      { q:"Le devoir du citoyen comprend :", opts:["Seulement payer les impôts","Seulement voter","Voter, respecter les lois, défendre le pays, payer les impôts","Seulement respecter les lois"], ans:2, fact:"Le citoyen a des droits (voter, s'exprimer, être jugé équitablement) mais aussi des devoirs (impôts, vote, respect des lois, défense nationale)." },
+    ]
+  },
+  {
+    id:'c_maths_3',
+    nom:'Sommet de l\'Algèbre',
+    emoji:'🔢',
+    matiere:'Maths',
+    niveau:'10ème',
+    desc:'Maîtrise l\'algèbre, les fonctions et la trigonométrie du niveau 10ème.',
+    tags:[{t:'Maths Avancés',c:'var(--maths)'}],
+    diff:'⭐⭐⭐⭐',
+    questions:10,
+    prerequis:['c_histoire','c_geo'],
+    x:38, y:72,
+    data:[
+      { q:"Résoudre : x² - 5x + 6 = 0. Les solutions sont :", opts:["x=1 et x=6","x=2 et x=3","x=-2 et x=-3","x=3 et x=-2"], ans:1 },
+      { q:"cos(0°) vaut :", opts:["0","1","-1","√2/2"], ans:1 },
+      { q:"Dans un triangle rectangle d'hypoténuse 10 et d'un côté 6, l'autre côté vaut :", opts:["4","7","8","√136"], ans:2 },
+      { q:"√144 vaut :", opts:["11","12","13","14"], ans:1 },
+      { q:"La notation scientifique de 0,00045 est :", opts:["4,5×10⁻³","4,5×10⁻⁴","4,5×10⁴","45×10⁻⁴"], ans:1 },
+      { q:"Si f(x) = 3x - 2, quel est x pour f(x) = 10 ?", opts:["3","4","6","8"], ans:1 },
+      { q:"Le développement de (a + b)² est :", opts:["a² + b²","a² + 2ab + b²","a² - b²","2a + 2b"], ans:1 },
+      { q:"Quel est le discriminant de x² - 4x + 4 ?", opts:["0","4","8","16"], ans:0 },
+      { q:"Quel théorème permet de calculer un côté d'un triangle à partir de deux côtés et l'angle entre eux ?", opts:["Pythagore","Al-Kashi","Thalès","Euclide"], ans:1 },
+      { q:"L'écriture en base 2 de 13 est :", opts:["1101","1011","1110","1001"], ans:0 },
+    ]
+  },
+];
+
+const LYCEES = [
+  {
+    id:'l_maths',
+    nom:'Tour des Fonctions',
+    emoji:'📊',
+    matiere:'Maths',
+    niveau:'11e/12e',
+    desc:'Explore les limites, dérivées et intégrales. Le cœur des mathématiques du lycée.',
+    tags:[{t:'Maths',c:'var(--maths)'}],
+    diff:'⭐⭐⭐',
+    questions:10,
+    prerequis:[],
+    x:12, y:16,
+    data:[
+      { q:"La dérivée de f(x) = x³ est :", opts:["3x²","x²","3x","2x³"], ans:0 },
+      { q:"∫₀¹ x dx vaut :", opts:["0","1/3","1/2","1"], ans:2 },
+      { q:"La limite de (sin x)/x quand x→0 est :", opts:["0","∞","1","-1"], ans:2 },
+      { q:"Le taux de variation de f entre a et b est :", opts:["f(b)-f(a)","(f(b)-f(a))/(b-a)","f'(a)","f(a+b)"], ans:1 },
+      { q:"Une fonction est paire si :", opts:["f(-x) = f(x)","f(-x) = -f(x)","f(x+1) = f(x)","f(0) = 0"], ans:0 },
+      { q:"Le nombre e est approximativement :", opts:["2,718","3,141","1,618","2,303"], ans:0 },
+      { q:"La dérivée de e^x est :", opts:["xe^(x-1)","e^x","e","x·e^x"], ans:1 },
+      { q:"log₁₀(1000) vaut :", opts:["2","3","4","10"], ans:1 },
+      { q:"Si f'(x) > 0 sur [a,b], alors f est :", opts:["Décroissante","Constante","Croissante","Nulle"], ans:2 },
+      { q:"C(5,2) (combinaisons de 2 parmi 5) vaut :", opts:["5","10","15","20"], ans:1 },
+    ]
+  },
+  {
+    id:'l_physique',
+    nom:'Observatoire des Ondes',
+    emoji:'🔭',
+    matiere:'Physique',
+    niveau:'11e/12e',
+    desc:'Électricité, mécanique, ondes et optique : les fondements de la physique du lycée.',
+    tags:[{t:'Physique',c:'var(--physique)'}],
+    diff:'⭐⭐⭐',
+    questions:10,
+    prerequis:['l_maths'],
+    x:36, y:12,
+    data:[
+      { q:"La loi d'Ohm est :", opts:["P = UI","U = RI","F = ma","W = Fd"], ans:1 },
+      { q:"L'unité de la force en physique est :", opts:["Le joule","Le watt","Le newton","Le pascal"], ans:2 },
+      { q:"En mécanique, la 2e loi de Newton est :", opts:["F = mv","F = ma","E = mc²","P = mv"], ans:1 },
+      { q:"La fréquence est l'inverse de :", opts:["L'amplitude","La période","La vitesse","La longueur d'onde"], ans:1 },
+      { q:"Un champ électrique E crée une force F = qE sur une charge q. Si q est négatif, la force est :", opts:["Dans le sens de E","Perpendiculaire à E","Dans le sens opposé à E","Nulle"], ans:2 },
+      { q:"La puissance électrique est :", opts:["U/I","U×I","I/U","U²"], ans:1 },
+      { q:"L'énergie cinétique d'un objet de masse m et vitesse v est :", opts:["mv","mv²","½mv²","2mv"], ans:2 },
+      { q:"La longueur d'onde de la lumière visible est de l'ordre de :", opts:["1 mm","400-700 nm","1 m","0,1 nm"], ans:1 },
+      { q:"Le principe de conservation de l'énergie dit que l'énergie :", opts:["Peut être créée","Peut être détruite","Ni créée ni détruite, seulement transformée","Augmente toujours"], ans:2 },
+      { q:"La loi de gravitation universelle relie les masses à :", opts:["Leur vitesse","La force attractive entre elles","Leur énergie","Leur charge"], ans:1 },
+    ]
+  },
+  {
+    id:'l_chimie',
+    nom:'Château des Réactions',
+    emoji:'🧪',
+    matiere:'Chimie',
+    niveau:'11e/12e',
+    desc:'Réactions chimiques, équilibres, acides-bases et chimie organique au programme.',
+    tags:[{t:'Chimie',c:'var(--chimie)'}],
+    diff:'⭐⭐⭐',
+    questions:10,
+    prerequis:['l_maths'],
+    x:62, y:18,
+    data:[
+      { q:"Un acide est une espèce chimique qui :", opts:["Accepte des protons","Donne des protons H⁺","Accepte des électrons","Donne des électrons"], ans:1 },
+      { q:"Le pH d'une solution acide est :", opts:["Supérieur à 7","Égal à 7","Inférieur à 7","Indéfini"], ans:2 },
+      { q:"La réaction de saponification est :", opts:["Estérification","Hydrolyse d'un ester en milieu basique","Oxydation","Condensation"], ans:1 },
+      { q:"La formule chimique du dioxyde de carbone est :", opts:["CO","CO₂","C₂O","CO₃"], ans:1 },
+      { q:"Un catalyseur :", opts:["Est consommé dans la réaction","Augmente l'énergie d'activation","Accélère la réaction sans être consommé","Diminue le rendement"], ans:2 },
+      { q:"La liaison covalente est :", opts:["Un transfert d'électrons","Un partage d'électrons entre deux atomes","Une force électrostatique","Une liaison ionique"], ans:1 },
+      { q:"La formule de l'éthanol est :", opts:["CH₄","C₂H₅OH","CH₃COOH","C₆H₁₂O₆"], ans:1 },
+      { q:"Une réaction redox implique :", opts:["Un transfert de protons","Un transfert d'électrons","Un transfert d'atomes","Un changement de pH seul"], ans:1 },
+      { q:"Le tableau périodique classe les éléments selon :", opts:["Leur masse","Leur numéro atomique Z (nombre de protons)","Leur couleur","Leur état physique"], ans:1 },
+      { q:"La loi de Beer-Lambert relie l'absorbance A à :", opts:["La masse","La concentration et la longueur du trajet optique","La température","Le pH"], ans:1 },
+    ]
+  },
+  {
+    id:'l_bio',
+    nom:'Laboratoire de l\'ADN',
+    emoji:'🧬',
+    matiere:'Bio-Géologie',
+    niveau:'11e/12e',
+    desc:'Génétique, évolution, géologie et biotechnologies au programme du lycée.',
+    tags:[{t:'Bio-Géologie',c:'var(--bio)'}],
+    diff:'⭐⭐⭐⭐',
+    questions:10,
+    prerequis:['l_physique','l_chimie'],
+    x:85, y:14,
+    data:[
+      { q:"La mitose produit des cellules :", opts:["Haploïdes","Diploïdes identiques à la cellule mère","Haploïdes différentes","Triploïdes"], ans:1 },
+      { q:"L'ADN se réplique selon le modèle :", opts:["Conservatif","Semi-conservatif","Dispersif","Aléatoire"], ans:1 },
+      { q:"Un codon est composé de :", opts:["1 nucléotide","2 nucléotides","3 nucléotides","4 nucléotides"], ans:2 },
+      { q:"La transcription est le passage de :", opts:["ADN → Protéine","ARN → ADN","ADN → ARNm","Protéine → ADN"], ans:2 },
+      { q:"La sélection naturelle (Darwin) agit sur :", opts:["Les génotypes directement","Les phénotypes","Les gènes uniquement","Les mutations"], ans:1 },
+      { q:"La dérive des continents a été proposée par :", opts:["Darwin","Wegener","Pasteur","Newton"], ans:1 },
+      { q:"La zone de subduction est le lieu où :", opts:["Deux plaques s'éloignent","Une plaque plonge sous une autre","Deux plaques coulissent","Une plaque se fissure"], ans:1 },
+      { q:"La méiose se déroule en combien de divisions ?", opts:["Une","Deux","Trois","Quatre"], ans:1 },
+      { q:"Un OGM est créé par :", opts:["Sélection naturelle","Insertion d'un gène étranger dans le génome","Mutation spontanée","Hybridation naturelle"], ans:1 },
+      { q:"La traduction a lieu dans :", opts:["Le noyau","Les ribosomes","Les mitochondries","Le réticulum endoplasmique"], ans:1 },
+    ]
+  },
+  {
+    id:'l_francais',
+    nom:'Bibliothèque Littéraire',
+    emoji:'📚',
+    matiere:'Français',
+    niveau:'Terminale',
+    desc:'Littérature africaine, stylistique, argumentation et analyse de textes au plus haut niveau.',
+    tags:[{t:'Français',c:'var(--francais)'},{t:'Littérature',c:'var(--pink)'}],
+    diff:'⭐⭐⭐⭐',
+    questions:10,
+    prerequis:['l_physique','l_chimie'],
+    x:20, y:52,
+    data:[
+      { q:"Le roman 'L'Aventure ambiguë' est écrit par :", opts:["Camara Laye","Cheikh Hamidou Kane","Sembène Ousmane","Aminata Sow Fall"], ans:1 },
+      { q:"La catharsis selon Aristote est la :", opts:["Construction d'un héros","Purification des passions par le spectacle tragique","Défaite du héros","Résolution comique"], ans:1 },
+      { q:"L'ironie est une figure qui consiste à :", opts:["Exagérer","Dire le contraire de ce que l'on pense","Répéter un mot","Personnifier un objet"], ans:1 },
+      { q:"La prolepse narrative est une :", opts:["Anticipation sur des événements futurs","Retour en arrière","Pause descriptive","Ellipse temporelle"], ans:0 },
+      { q:"Un sonnet est composé de :", opts:["Deux tercets","Deux quatrains et deux tercets","Quatre quatrains","Trois strophes de 5 vers"], ans:1 },
+      { q:"Le registre lyrique exprime :", opts:["L'humour","Les sentiments personnels avec intensité","La violence","La satire sociale"], ans:1 },
+      { q:"'L'Enfant noir' de Camara Laye est un roman :", opts:["Policier","Autobiographique","Historique","Fantastique"], ans:1 },
+      { q:"Un oxymore associe :", opts:["Deux synonymes","Deux termes contradictoires","Deux images semblables","Deux anaphores"], ans:1 },
+      { q:"Le mouvement de la Négritude revendique :", opts:["L'assimilation à la culture occidentale","La fierté et la valorisation des cultures africaines et noires","L'abandon des langues africaines","L'indépendance politique uniquement"], ans:1 },
+      { q:"La narration homodiégétique signifie que le narrateur :", opts:["Est absent du récit","Est un personnage de sa propre histoire","Connaît tout","Est externe"], ans:1 },
+    ]
+  },
+  {
+    id:'l_philo',
+    nom:'Agora de la Pensée',
+    emoji:'🧠',
+    matiere:'Philosophie',
+    niveau:'Terminale',
+    desc:'Parcours les grandes questions philosophiques : liberté, vérité, justice et existence.',
+    tags:[{t:'Philosophie',c:'var(--philo)'}],
+    diff:'⭐⭐⭐⭐',
+    questions:10,
+    prerequis:['l_bio','l_francais'],
+    x:48, y:56,
+    data:[
+      { q:"'Je pense donc je suis' est une affirmation de :", opts:["Platon","Aristote","Descartes","Kant"], ans:2 },
+      { q:"L'existentialisme de Sartre affirme que :", opts:["L'essence précède l'existence","L'existence précède l'essence","L'être est immuable","La liberté n'existe pas"], ans:1 },
+      { q:"L'empirisme affirme que la connaissance vient de :", opts:["La raison pure","L'expérience et les sens","La révélation divine","La logique mathématique"], ans:1 },
+      { q:"Pour Marx, la religion est :", opts:["Un droit fondamental","L'opium du peuple","Une science","Un art"], ans:1 },
+      { q:"La dialectique hégélienne se compose de :", opts:["Cause, effet, résultat","Thèse, antithèse, synthèse","Idée, forme, matière","Être, néant, devenir"], ans:1 },
+      { q:"La philosophie africaine ubuntu signifie :", opts:["Je suis seul maître de moi","Je suis parce que nous sommes (solidarité communautaire)","La sagesse individuelle","Le respect des ancêtres seul"], ans:1 },
+      { q:"Pour Rousseau, l'homme est naturellement :", opts:["Mauvais","Bon mais corrompu par la société","Neutre","Esclave"], ans:1 },
+      { q:"La vérité en philosophie peut être définie comme :", opts:["Ce qui plaît","La conformité entre un jugement et la réalité","Ce que la majorité croit","Une opinion personnelle"], ans:1 },
+      { q:"L'utilitarisme (Bentham, Mill) juge les actions selon :", opts:["Les intentions","Les conséquences et le bonheur produit","Les traditions","La volonté divine"], ans:1 },
+      { q:"La justice selon Rawls repose sur :", opts:["Le mérite seul","Le 'voile d'ignorance' : des principes choisis sans connaître sa position sociale","La tradition","La force"], ans:1 },
+    ]
+  },
+  {
+    id:'l_eco',
+    nom:'Marché des Nations',
+    emoji:'💰',
+    matiere:'Économie',
+    niveau:'Terminale',
+    desc:'PIB, inflation, développement, mondialisation : l\'économie guinéenne et mondiale.',
+    tags:[{t:'Économie',c:'var(--eco)'}],
+    diff:'⭐⭐⭐⭐',
+    questions:10,
+    prerequis:['l_bio','l_francais'],
+    x:76, y:58,
+    data:[
+      { q:"Le PIB mesure :", opts:["La richesse individuelle","La valeur totale des biens et services produits dans un pays en une année","Le niveau de vie","Les exportations seules"], ans:1, fact:"Le Produit Intérieur Brut est l'indicateur économique le plus utilisé pour mesurer la production d'un pays." },
+      { q:"L'inflation est :", opts:["Une baisse des prix","Une hausse générale et durable des prix","Une augmentation du PIB","Une baisse du chômage"], ans:1, fact:"L'inflation érode le pouvoir d'achat. La Banque centrale vise généralement une inflation autour de 2% par an." },
+      { q:"La Guinée appartient au groupe des pays :", opts:["Développés","Émergents leaders","PMA (Pays les Moins Avancés)","BRICS"], ans:2, fact:"La Guinée est classée parmi les Pays les Moins Avancés (PMA) malgré ses immenses richesses minières, d'où le 'scandale géologique'." },
+      { q:"La politique monétaire est conduite par :", opts:["Le gouvernement","La Banque centrale","Le Parlement","Le FMI"], ans:1, fact:"La Banque centrale fixe les taux d'intérêt et contrôle la masse monétaire pour atteindre des objectifs économiques." },
+      { q:"L'IDH combine :", opts:["PIB seul","Espérance de vie, éducation et revenu","Exportations et importations","PIB et population"], ans:1, fact:"L'Indice de Développement Humain (PNUD) mesure le bien-être humain au-delà du seul revenu." },
+      { q:"La dévaluation d'une monnaie :", opts:["Augmente la valeur de la monnaie","Diminue la valeur de la monnaie par rapport aux autres","N'a aucun effet","Réduit l'inflation"], ans:1, fact:"La dévaluation rend les exportations moins chères et les importations plus chères, affectant la balance commerciale." },
+      { q:"La théorie keynésienne préconise, en période de récession :", opts:["La réduction des dépenses publiques","L'augmentation des dépenses publiques pour relancer la demande","La hausse des impôts","La baisse des salaires"], ans:1, fact:"Keynes (1936) prônait l'intervention de l'État pour stimuler la demande en période de crise économique." },
+      { q:"La mondialisation a pour effet, selon les critiques :", opts:["D'égaliser les richesses","D'accroître les inégalités entre pays et à l'intérieur des pays","De réduire le commerce","De renforcer les États"], ans:1, fact:"La mondialisation profite inégalement : elle génère de la croissance mais creuse aussi les inégalités Nord/Sud." },
+      { q:"Un monopole est une structure de marché où :", opts:["Il y a de nombreux vendeurs","Un seul vendeur domine l'offre","Deux vendeurs se partagent le marché","L'État contrôle tout"], ans:1, fact:"Dans un monopole, l'absence de concurrence permet au vendeur unique de fixer les prix librement." },
+      { q:"L'investissement direct étranger (IDE) en Guinée concerne principalement :", opts:["L'éducation","Le secteur minier (bauxite, or)","L'agriculture vivrière","Le tourisme"], ans:1, fact:"La Guinée attire les IDE principalement dans l'exploitation minière (bauxite, fer, or), son principal atout économique." },
+    ]
+  },
+  {
+    id:'l_culture',
+    nom:'Sommet de la Connaissance',
+    emoji:'🌐',
+    matiere:'Culture Générale',
+    niveau:'Terminale BAC',
+    desc:'Le défi ultime ! Culture générale, actualités africaines et mondiales. Le BAC t\'attend !',
+    tags:[{t:'Culture G.',c:'var(--culture)'},{t:'BAC',c:'var(--gold)'}],
+    diff:'⭐⭐⭐⭐⭐',
+    questions:12,
+    prerequis:['l_philo','l_eco'],
+    x:48, y:80,
+    data:[
+      { q:"L'ONU a été fondée en :", opts:["1939","1945","1948","1960"], ans:1, fact:"L'Organisation des Nations Unies a été fondée en 1945 après la Seconde Guerre mondiale, à San Francisco." },
+      { q:"Quel pays africain n'a jamais été colonisé (hormis une courte occupation) ?", opts:["Ghana","Kenya","Éthiopie","Sénégal"], ans:2, fact:"L'Éthiopie est le seul pays africain à n'avoir jamais été colonisé. La bataille d'Adoua (1896) repoussa l'Italie." },
+      { q:"Le siège de l'Union Africaine est à :", opts:["Nairobi","Lagos","Addis-Abeba","Le Caire"], ans:2, fact:"L'Union Africaine a son siège à Addis-Abeba, en Éthiopie, depuis la fondation de l'OUA en 1963." },
+      { q:"La Guinée est parfois appelée 'le scandale géologique'. Pourquoi ?", opts:["À cause de ses tremblements de terre","Car ses richesses minières sont énormes mais la population reste pauvre","Car sa géologie est mal connue","Car ses mines sont mal exploitées"], ans:1, fact:"La Guinée possède des réserves colossales de bauxite, fer, or et diamants, mais reste l'un des pays les plus pauvres du monde." },
+      { q:"Le concept de 'soft power' désigne :", opts:["La puissance militaire","L'influence culturelle et diplomatique d'un pays","La puissance économique","La force policière"], ans:1, fact:"Le 'soft power' (Joseph Nye) est la capacité d'un pays à influencer par l'attractivité de sa culture, ses valeurs et sa politique étrangère." },
+      { q:"La Guinée est membre de :", opts:["La Ligue arabe","L'OCI (Organisation de la Coopération Islamique)","L'OPEP","La zone euro"], ans:1, fact:"La Guinée est membre de l'Organisation de la Coopération Islamique (OCI), reflétant la majorité musulmane de sa population (environ 85%)." },
+      { q:"Quel outil numérique a révolutionné l'accès au savoir en Afrique de l'Ouest ?", opts:["La radio","Le téléphone portable et internet mobile","La télévision","La presse écrite"], ans:1, fact:"Le développement spectaculaire de la téléphonie mobile en Afrique (500M+ d'utilisateurs) transforme l'accès au savoir, à la banque et au commerce." },
+      { q:"La fracture numérique désigne :", opts:["Un problème technique","Les inégalités d'accès aux technologies numériques","La cybercriminalité","La panne d'internet"], ans:1, fact:"La fracture numérique oppose ceux qui ont accès aux outils numériques (ordinateurs, internet) à ceux qui en sont exclus." },
+      { q:"Le 28 septembre 2009, quel événement tragique marqua la Guinée ?", opts:["Une catastrophe naturelle","Le massacre de manifestants au stade de Conakry","La mort du président","Un coup d'État manqué"], ans:1, fact:"Le 28 septembre 2009, des soldats de la junte tirèrent sur des manifestants au stade de Conakry, faisant plus de 150 morts." },
+      { q:"L'Agenda 2063 de l'Union Africaine vise :", opts:["L'armement continental","Une Afrique intégrée, prospère et en paix d'ici 2063","La dépendance à l'aide","La suppression des frontières"], ans:1, fact:"L'Agenda 2063 est le plan stratégique de l'UA pour construire une Afrique prospère d'ici 2063, centenaire de l'OUA." },
+      { q:"La reconnaissance de la Guinée dans les arts concerne surtout :", opts:["La peinture","La musique (ballets, djembé, kora) et la danse traditionnelle","La littérature seule","L'architecture"], ans:1, fact:"Le Ballet Africain de Guinée (1958), le djembé, la kora et le balafon ont fait rayonner la culture guinéenne dans le monde entier." },
+      { q:"La démocratie délibérative (Habermas) repose sur :", opts:["Le vote seul","La discussion rationnelle et le consensus argumenté","La force du marché","L'autorité des experts"], ans:1, fact:"Habermas défend une démocratie où les décisions légitimes émergent d'un débat public rationnel, ouvert et inclusif." },
+    ]
+  },
+];
+
+// ===================== STATE =====================
+let currentTab = 'college';
+let saveData = {};
+let selectedCity = null;
+let mission = null;
+let missionQIdx = 0;
+let mOk = 0, mKo = 0, mPts = 0;
+let answered = false;
+let totalOk = 0, totalKo = 0, totalPts = 0;
+
+// Load save
+try { saveData = JSON.parse(localStorage.getItem('bhds_aventure_v2') || '{}'); } catch(e) { saveData = {}; }
+function save() { try { localStorage.setItem('bhds_aventure_v2', JSON.stringify(saveData)); } catch(e){} }
+
+function getList() {
+  if (currentTab === 'primaire') return PRIMAIRES;
+  if (currentTab === 'college') return COLLEGES;
+  return LYCEES;
+}
+
+function isUnlocked(city) {
+  if (!city.prerequis.length) return true;
+  return city.prerequis.every(p => saveData[p] && saveData[p].stars >= 1);
+}
+function isCompleted(city) { return saveData[city.id] && saveData[city.id].stars >= 1; }
+
+// ===================== TABS =====================
+function switchTab(tab) {
+  currentTab = tab;
+  document.getElementById('tabPrimaire').classList.toggle('active', tab==='primaire');
+  document.getElementById('tabCollege').classList.toggle('active', tab==='college');
+  document.getElementById('tabLycee').classList.toggle('active', tab==='lycee');
+  selectedCity = null;
+  document.getElementById('infoPanel').classList.remove('show');
+  renderMap();
+}
+
+// ===================== MAP RENDER =====================
+function renderMap() {
+  const list = getList();
+  const grid = document.getElementById('mapGrid');
+  const svg = document.getElementById('mapSvg');
+  const label = document.getElementById('mapLabel');
+  const info = document.getElementById('mapProgressInfo');
+
+  label.textContent = currentTab === 'primaire' ? '🌟 Royaume du Primaire' : currentTab === 'college' ? '🎓 Royaume du Collège' : '🏫 Royaume du Lycée';
+  grid.innerHTML = '';
+  svg.innerHTML = '';
+
+  const completed = list.filter(c => isCompleted(c)).length;
+  info.textContent = `${completed} / ${list.length} étapes`;
+
+  // Draw paths
+  list.forEach(city => {
+    city.prerequis.forEach(prereqId => {
+      const prereq = list.find(c => c.id === prereqId);
+      if (!prereq) return;
+      const x1 = prereq.x, y1 = prereq.y;
+      const x2 = city.x, y2 = city.y;
+      const done = isCompleted(prereq) && isCompleted(city);
+      const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1', x1+'%'); line.setAttribute('y1', y1+'%');
+      line.setAttribute('x2', x2+'%'); line.setAttribute('y2', y2+'%');
+      line.setAttribute('stroke', done ? 'rgba(52,211,153,0.5)' : 'rgba(255,215,0,0.2)');
+      line.setAttribute('stroke-width', '0.8');
+      line.setAttribute('stroke-dasharray', done ? '0' : '2,2');
+      svg.appendChild(line);
+    });
+  });
+
+  // Compute grid height
+  const maxY = Math.max(...list.map(c => c.y));
+  grid.style.minHeight = (maxY + 15) + '%';
+  // Normalize to pixel
+  const GH = grid.offsetHeight || 440;
+
+  list.forEach(city => {
+    const unlocked = isUnlocked(city);
+    const completed = isCompleted(city);
+    const state = !unlocked ? 'locked' : completed ? 'completed' : 'unlocked';
+
+    const node = document.createElement('div');
+    node.className = `city-node ${state}`;
+    node.style.left = city.x + '%';
+    node.style.top = city.y + '%';
+
+    const starsData = saveData[city.id];
+    const starsHtml = starsData
+      ? ['⭐','⭐','⭐'].map((s,i) => i < starsData.stars ? s : '☆').join('')
+      : '';
+
+    let pinStyle = '';
+    if (state === 'unlocked') {
+      const col = getComputedColor(city.matiere);
+      pinStyle = `background:${col}33;border-color:${col};box-shadow:0 0 18px ${col}88;`;
+    } else if (state === 'completed') {
+      const col = getComputedColor(city.matiere);
+      pinStyle = `background:linear-gradient(135deg,${col},${col}bb);border-color:${col};`;
+    }
+
+    node.innerHTML = `
+      <div class="city-pin" style="${pinStyle}">
+        ${state === 'locked' ? '🔒' : city.emoji}
+        ${state !== 'locked' ? `<div class="city-badge">${city.diff}</div>` : ''}
+      </div>
+      <div class="city-name">${city.nom}</div>
+      <div class="city-stars">${starsHtml}</div>
+    `;
+
+    if (state !== 'locked') {
+      node.addEventListener('click', () => selectCity(city));
+    }
+    grid.appendChild(node);
+  });
+
+  // Update global counters
+  updateGlobalScore();
+}
+
+function getComputedColor(matiere) {
+  const map = {
+    'Calcul':'#34d399', 'Lecture':'#f472b6', 'Français':'#f472b6',
+    'Multiplication':'#60a5fa', 'Sciences':'#4ecdc4', 'Géographie':'#fbbf24',
+    'Histoire':'#fb923c', 'Maths':'#60a5fa', 'Physique':'#4ecdc4', 'Chimie':'#a78bfa',
+    'Biologie':'#34d399', 'Bio-Géologie':'#34d399',
+    'Civique':'#f87171', 'Philosophie':'#c084fc', 'Économie':'#6ee7b7', 'Culture Générale':'#93c5fd',
+  };
+  return map[matiere] || '#a78bfa';
+}
+
+function selectCity(city) {
+  selectedCity = city;
+  const panel = document.getElementById('infoPanel');
+  panel.classList.add('show');
+  panel.scrollIntoView({ behavior:'smooth', block:'nearest' });
+
+  document.getElementById('infoEmoji').textContent = city.emoji;
+  document.getElementById('infoTitle').textContent = city.nom;
+  document.getElementById('infoLevel').textContent = `${city.matiere} · ${city.niveau}`;
+  document.getElementById('infoDesc').textContent = city.desc;
+  document.getElementById('statQuestions').textContent = city.questions;
+  document.getElementById('statDiff').textContent = city.diff;
+
+  const sd = saveData[city.id];
+  document.getElementById('statBest').textContent = sd ? sd.pts + ' pts' : '—';
+
+  // Tags
+  const tags = document.getElementById('infoTags');
+  tags.innerHTML = city.tags.map(t =>
+    `<span class="tag" style="background:${t.c}22;color:${t.c};border:1px solid ${t.c}55;">${t.t}</span>`
+  ).join('');
+
+  const btn = document.getElementById('btnStart');
+  const locked = !isUnlocked(city);
+  btn.disabled = locked;
+  btn.textContent = locked ? '🔒 Débloque les étapes précédentes' :
+    (isCompleted(city) ? '🔄 Rejouer cette étape' : '🚀 Commencer la mission !');
+}
+
+// ===================== MISSION =====================
+function startMission() {
+  if (!selectedCity) return;
+  mission = selectedCity;
+  missionQIdx = 0;
+  mOk = 0; mKo = 0; mPts = 0;
+  answered = false;
+
+  document.getElementById('mapView').style.display = 'none';
+  document.getElementById('gameView').classList.add('show');
+  document.getElementById('missionLabel').textContent = `${mission.emoji} ${mission.nom}`;
+  nextQ();
+}
+
+function backToMap() {
+  mission = null;
+  document.getElementById('mapView').style.display = 'block';
+  document.getElementById('gameView').classList.remove('show');
+  renderMap();
+}
+
+function nextQ() {
+  if (missionQIdx >= mission.questions) {
+    showResult();
+    return;
+  }
+  answered = false;
+  missionQIdx++;
+
+  const pct = ((missionQIdx - 1) / mission.questions) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+
+  const data = mission.data;
+  const idx = (missionQIdx - 1) % data.length;
+  const q = data[idx];
+
+  renderQ(q);
+}
+
+function renderQ(q) {
+  const card = document.getElementById('gameCard');
+  card.innerHTML = `
+    <div class="q-label">${mission.emoji} Question ${missionQIdx} / ${mission.questions}</div>
+    <div class="q-text">${q.q}</div>
+    <div class="opts-grid">
+      ${q.opts.map((o,i) => `
+        <button class="opt-btn" id="opt${i}" onclick="checkQ(${i},${q.ans},${JSON.stringify(q).replace(/"/g,'&quot;')})">
+          ${['🅰️','🅱️','🅲️','🅳️'][i]} ${o}
+        </button>
+      `).join('')}
+    </div>
+    <div class="feedback" id="feedback"></div>
+    <div class="fact-box" id="factBox"></div>
+    <button class="btn-next" id="btnNext" onclick="nextQ()">Suivant ➜</button>
+  `;
+}
+
+function checkQ(chosen, correct, q) {
+  if (answered) return;
+  answered = true;
+
+  const btns = document.querySelectorAll('.opt-btn');
+  btns.forEach(b => b.disabled = true);
+  btns[correct].classList.add('correct');
+
+  const fb = document.getElementById('feedback');
+  const fact = document.getElementById('factBox');
+  const next = document.getElementById('btnNext');
+
+  if (chosen === correct) {
+    btns[chosen].classList.add('correct');
+    fb.textContent = ['🎉 Excellent !','✅ Bravo !','🌟 Parfait !','💪 Très bien !'][Math.floor(Math.random()*4)];
+    fb.className = 'feedback show ok';
+    mOk++; mPts += 10;
+    totalOk++; totalPts += 10;
+    playSound('correct');
+  } else {
+    btns[chosen].classList.add('wrong');
+    fb.textContent = ['😬 Dommage !','❌ Pas tout à fait...','💡 Revois ce point !'][Math.floor(Math.random()*3)];
+    fb.className = 'feedback show ko';
+    mKo++;
+    totalKo++;
+    playSound('wrong');
+  }
+
+  if (q.fact) {
+    fact.textContent = '💡 ' + q.fact;
+    fact.classList.add('show');
+  }
+
+  next.classList.add('show');
+  updateGlobalScore();
+}
+
+// ===================== RESULT =====================
+function showResult() {
+  const ratio = mOk / mission.questions;
+  const stars = ratio >= 0.85 ? 3 : ratio >= 0.6 ? 2 : ratio >= 0.4 ? 1 : 0;
+  const win = stars >= 1;
+
+  // Save
+  const old = saveData[mission.id];
+  if (!old || stars > old.stars || (stars === old.stars && mPts > old.pts)) {
+    saveData[mission.id] = { stars, pts: mPts };
+    save();
+  }
+
+  playSound(win ? 'win' : 'lose');
+  if (win) confetti();
+
+  const list = getList();
+  const nextCity = list.find(c =>
+    c.prerequis.includes(mission.id) && !isCompleted(c) && isUnlocked(c)
+  );
+
+  const overlay = document.createElement('div');
+  overlay.className = 'result-overlay';
+
+  const starsHtml = ['⭐','⭐','⭐'].map((s,i) => i<stars?s:'☆').join('');
+
+  overlay.innerHTML = `
+    <div class="result-card">
+      <div class="result-emoji">${win ? mission.emoji : '😓'}</div>
+      <div class="result-title" style="color:${win?'var(--green)':'var(--red)'};">
+        ${win ? mission.nom + ' !' : 'Pas encore...'}
+      </div>
+      <div class="result-stars">${starsHtml}</div>
+      <div class="result-stats">
+        ✅ ${mOk} bonne(s) &nbsp;|&nbsp; ❌ ${mKo} erreur(s)<br>
+        🏆 ${mPts} points · ${Math.round(ratio*100)}% de réussite
+      </div>
+      ${nextCity && win ? `<div class="result-unlock">🔓 ${nextCity.nom} est maintenant débloquée !</div>` : ''}
+      <div class="result-btns">
+        <button class="btn-start" style="background:rgba(255,255,255,0.1);box-shadow:none;" onclick="closeResult(false)">
+          🗺️ Retour carte
+        </button>
+        <button class="btn-start" style="${win?'':'background:linear-gradient(135deg,var(--red),#b91c1c);'}" onclick="closeResult(true)">
+          ${win ? '🔄 Rejouer' : '💪 Réessayer'}
+        </button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+}
+
+function closeResult(replay) {
+  document.querySelector('.result-overlay')?.remove();
+  if (replay) {
+    startMission();
+  } else {
+    backToMap();
+  }
+}
+
+// ===================== SCORE =====================
+function updateGlobalScore() {
+  document.getElementById('sOk').textContent = totalOk;
+  document.getElementById('sKo').textContent = totalKo;
+  document.getElementById('sPts').textContent = totalPts;
+  const list = getList();
+  const done = list.filter(c => isCompleted(c)).length;
+  document.getElementById('sVilles').textContent = done;
+  document.getElementById('sTotal').textContent = list.length;
+}
+
+// ===================== AUDIO =====================
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let actx = null;
+let musicEnabled = true;
+let bgPlaying = false;
+let bgGain = null;
+
+function getCtx() { if (!actx) actx = new AudioCtx(); return actx; }
+
+function playSound(type) {
+  if (!musicEnabled) return;
+  const ctx = getCtx();
+  if (type === 'correct') {
+    [[523,0],[659,0.1],[784,0.2],[1047,0.32]].forEach(([f,d]) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'triangle'; o.frequency.setValueAtTime(f, ctx.currentTime+d);
+      g.gain.setValueAtTime(0.15, ctx.currentTime+d);
+      g.gain.linearRampToValueAtTime(0, ctx.currentTime+d+0.28);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(ctx.currentTime+d); o.stop(ctx.currentTime+d+0.32);
+    });
+  } else if (type === 'wrong') {
+    [[300,0],[250,0.14]].forEach(([f,d]) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'sawtooth'; o.frequency.setValueAtTime(f, ctx.currentTime+d);
+      g.gain.setValueAtTime(0.1, ctx.currentTime+d);
+      g.gain.linearRampToValueAtTime(0, ctx.currentTime+d+0.22);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(ctx.currentTime+d); o.stop(ctx.currentTime+d+0.26);
+    });
+  } else if (type === 'win') {
+    [[523,0],[659,0.13],[784,0.26],[659,0.39],[784,0.52],[1047,0.65]].forEach(([f,d]) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'triangle'; o.frequency.setValueAtTime(f, ctx.currentTime+d);
+      g.gain.setValueAtTime(0.18, ctx.currentTime+d);
+      g.gain.linearRampToValueAtTime(0, ctx.currentTime+d+0.3);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(ctx.currentTime+d); o.stop(ctx.currentTime+d+0.35);
+    });
+  } else if (type === 'lose') {
+    [[400,0],[350,0.18],[300,0.36]].forEach(([f,d]) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'sine'; o.frequency.setValueAtTime(f, ctx.currentTime+d);
+      g.gain.setValueAtTime(0.12, ctx.currentTime+d);
+      g.gain.linearRampToValueAtTime(0, ctx.currentTime+d+0.3);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(ctx.currentTime+d); o.stop(ctx.currentTime+d+0.35);
+    });
+  }
+}
+
+function startBgMusic() {
+  if (!musicEnabled || bgPlaying) return;
+  bgPlaying = true;
+  const ctx = getCtx();
+  bgGain = ctx.createGain();
+  bgGain.gain.setValueAtTime(0.05, ctx.currentTime);
+  bgGain.connect(ctx.destination);
+  const notes = [523,659,784,659,523,392,440,523,659,784,880,784];
+  let t = ctx.currentTime;
+  function loop() {
+    if (!bgPlaying) return;
+    notes.forEach((freq,i) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'sine'; o.frequency.setValueAtTime(freq, t+i*0.4);
+      g.gain.setValueAtTime(0, t+i*0.4);
+      g.gain.linearRampToValueAtTime(0.05, t+i*0.4+0.04);
+      g.gain.linearRampToValueAtTime(0, t+i*0.4+0.36);
+      o.connect(g); g.connect(bgGain);
+      o.start(t+i*0.4); o.stop(t+i*0.4+0.4);
+    });
+    setTimeout(() => { t = getCtx().currentTime; loop(); }, notes.length*0.4*1000 - 80);
+  }
+  loop();
+}
+
+function stopBgMusic() {
+  bgPlaying = false;
+  if (bgGain) bgGain.gain.setValueAtTime(0, getCtx().currentTime);
+}
+
+function toggleMusic() {
+  musicEnabled = !musicEnabled;
+  const btn = document.getElementById('musicBtn');
+  if (musicEnabled) { btn.textContent = '🔊'; startBgMusic(); }
+  else { btn.textContent = '🔇'; stopBgMusic(); }
+}
+
+// ===================== THEME =====================
+let light = false;
+function toggleTheme() {
+  light = !light;
+  document.body.classList.toggle('light', light);
+  document.getElementById('themeBtn').textContent = light ? '☀️' : '🌙';
+  try { localStorage.setItem('bhds_theme_map', light?'light':'dark'); } catch(e){}
+}
+try { if (localStorage.getItem('bhds_theme_map') === 'light') toggleTheme(); } catch(e){}
+
+// ===================== CONFETTI =====================
+function confetti() {
+  const cols = ['#a78bfa','#60a5fa','#34d399','#fbbf24','#f472b6','#fb923c'];
+  for (let i=0;i<35;i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.left = Math.random()*100+'vw';
+    el.style.background = cols[Math.floor(Math.random()*cols.length)];
+    el.style.animationDelay = Math.random()*0.6+'s';
+    el.style.borderRadius = Math.random()>0.5?'50%':'3px';
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),2200);
+  }
+}
+
+// ===================== INIT =====================
+document.addEventListener('click', () => { if (!bgPlaying) startBgMusic(); }, { once: true });
+renderMap();
+updateGlobalScore();
+</script>
+<!-- Service Worker PWA -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js')
+      .then(reg => console.log('[KaramokoBHDS] SW enregistré:', reg.scope))
+      .catch(err => console.log('[KaramokoBHDS] SW erreur:', err));
+  });
+}
+</script>
+</body>
+</html>
