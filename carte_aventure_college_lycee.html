@@ -161,6 +161,8 @@ body::before {
   gap: 8px;
   justify-content: center;
   margin: 14px 0;
+  position: relative;
+  z-index: 10;
 }
 .tab-btn {
   padding: 9px 22px;
@@ -172,6 +174,12 @@ body::before {
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.25s;
+  position: relative;
+  z-index: 10;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(255,255,255,0.2);
+  user-select: none;
+  -webkit-user-select: none;
 }
 .tab-btn.primaire { border-color: var(--green); }
 .tab-btn.college { border-color: var(--blue); }
