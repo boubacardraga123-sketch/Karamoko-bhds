@@ -239,28 +239,30 @@ body::before {
 /* Sprite joueur */
 .player-sprite {
   position: absolute;
-  font-size: 1.6rem;
+  font-size: 2.6rem;
   z-index: 5;
   pointer-events: none;
   transform: translate(-50%, -50%);
   transition: left 0.9s cubic-bezier(0.4, 0, 0.2, 1), top 0.9s cubic-bezier(0.4, 0, 0.2, 1);
-  filter: drop-shadow(0 3px 8px rgba(0,0,0,0.7));
-  animation: playerBob 1.2s ease-in-out infinite;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.8));
+  animation: playerBob 1.4s ease-in-out infinite;
 }
 @keyframes playerBob {
   0%,100% { margin-top: 0px; }
-  50% { margin-top: -5px; }
+  25%     { margin-top: -3px; }
+  50%     { margin-top: -6px; }
+  75%     { margin-top: -3px; }
 }
-/* Animation de marche : oscillation rapide pendant le déplacement */
+/* Animation de course pendant le déplacement */
 .player-sprite.walking {
-  animation: playerWalk 0.25s ease-in-out infinite;
+  animation: playerRun 0.28s ease-in-out infinite;
 }
-@keyframes playerWalk {
-  0%   { margin-top: 0px;  font-size: 1.6rem; }
-  25%  { margin-top: -6px; font-size: 1.65rem; }
-  50%  { margin-top: 0px;  font-size: 1.6rem; }
-  75%  { margin-top: -4px; font-size: 1.58rem; }
-  100% { margin-top: 0px;  font-size: 1.6rem; }
+@keyframes playerRun {
+  0%   { margin-top: -2px;  font-size: 2.5rem; }
+  25%  { margin-top: -12px; font-size: 2.7rem; }
+  50%  { margin-top: -2px;  font-size: 2.5rem; }
+  75%  { margin-top: -8px;  font-size: 2.65rem; }
+  100% { margin-top: -2px;  font-size: 2.5rem; }
 }
 
 /* Bulle de dialogue */
@@ -1112,11 +1114,10 @@ body.light .score-pill { background: rgba(0,0,0,0.06); border-color: rgba(0,0,0,
         <div class="subtitle">Carte Aventure · Collection BHDS</div>
       </div>
       <div class="header-controls">
-        <button class="ctrl-btn" onclick="window.location.href='index.html'" title="Accueil plateforme">🏠</button>
-        <button class="ctrl-btn" onclick="showClassement()" title="Classement">🏆</button>
-        <button class="ctrl-btn" id="persoBtn" onclick="showPersoModal()" title="Choisir personnage">🧒🏿</button>
-        <button class="ctrl-btn" id="themeBtn" onclick="toggleTheme()" title="Thème">🌙</button>
-        <button class="ctrl-btn" id="musicBtn" onclick="toggleMusic()" title="Son">🔊</button>
+        <button class="ctrl-btn" onclick="playButtonSound();window.location.href='index.html'" title="Accueil plateforme">🏠</button>
+        <button class="ctrl-btn" onclick="playButtonSound();showClassement()" title="Classement">🏆</button>
+        <button class="ctrl-btn" id="persoBtn" onclick="playButtonSound();showPersoModal()" title="Choisir personnage">🧒🏿</button>
+        <button class="ctrl-btn" id="themeBtn" onclick="playButtonSound();toggleTheme()" title="Thème">🌙</button>
       </div>
     </div>
 
@@ -1149,13 +1150,13 @@ body.light .score-pill { background: rgba(0,0,0,0.06); border-color: rgba(0,0,0,
 
   <!-- TABS -->
   <div class="tabs">
-    <button class="tab-btn primaire" id="tabPrimaire" onclick="switchTab('primaire')">
+    <button class="tab-btn primaire" id="tabPrimaire" onclick="playButtonSound();switchTab('primaire')">
       🌟 Primaire
     </button>
-    <button class="tab-btn college active" id="tabCollege" onclick="switchTab('college')">
+    <button class="tab-btn college active" id="tabCollege" onclick="playButtonSound();switchTab('college')">
       🎓 Collège
     </button>
-    <button class="tab-btn lycee" id="tabLycee" onclick="switchTab('lycee')">
+    <button class="tab-btn lycee" id="tabLycee" onclick="playButtonSound();switchTab('lycee')">
       🏫 Lycée
     </button>
   </div>
@@ -2808,6 +2809,7 @@ function showResult() {
   }
 
   playSound(win ? 'win' : 'lose');
+  if (!win) playRateSound();
   if (win) {
     confetti();
     if (mission.roi) setTimeout(confetti, 600);
@@ -2932,10 +2934,6 @@ function updateGlobalScore() {
 // ===================== AUDIO =====================
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
 let actx = null;
-let musicEnabled = true;
-let bgPlaying = false;
-let bgGain = null;
-let bgLoopTimer = null;
 
 function getCtx() { if (!actx) actx = new AudioCtx(); return actx; }
 
@@ -2981,169 +2979,113 @@ function makeShaker(ctx, start, dur, vol, dest) {
   src.start(start); src.stop(start + dur + 0.01);
 }
 
+// Son clic bouton (pop léger)
+function playButtonSound() {
+  try {
+    const ctx = getCtx();
+    const now = ctx.currentTime;
+    const master = ctx.createGain();
+    master.connect(ctx.destination);
+    makeOsc(ctx, 'sine', 880, now, 0.06, 0.12, master);
+    makeOsc(ctx, 'sine', 1100, now + 0.03, 0.05, 0.07, master);
+  } catch(e) {}
+}
+
+// Son félicitation (fanfare courte + confettis sonores)
+function playFelicitationSound() {
+  try {
+    const ctx = getCtx();
+    const now = ctx.currentTime;
+    const master = ctx.createGain();
+    master.connect(ctx.destination);
+    // Arpège montant festif
+    const notes = [523, 659, 784, 1047, 1319, 1568];
+    notes.forEach((f, i) => {
+      makeOsc(ctx, 'triangle', f, now + i*0.08, 0.25, 0.2, master);
+      makeOsc(ctx, 'sine', f * 2, now + i*0.08, 0.18, 0.05, master);
+    });
+    // Percus festives
+    [0, 0.18, 0.36, 0.54, 0.72].forEach(d => {
+      makeDrum(ctx, 160, now + d, 0.13, 0.2, master);
+      makeShaker(ctx, now + d + 0.09, 0.06, 0.1, master);
+    });
+    // Accord final brillant
+    [523, 659, 784, 1047].forEach((f, i) => {
+      makeOsc(ctx, 'triangle', f, now + 0.55, 0.4, 0.12, master);
+    });
+  } catch(e) {}
+}
+
 // Sons d'effets
 function playSound(type) {
-  if (!musicEnabled) return;
-  const ctx = getCtx();
-  const now = ctx.currentTime;
-  const master = ctx.createGain();
-  master.connect(ctx.destination);
+  try {
+    const ctx = getCtx();
+    const now = ctx.currentTime;
+    const master = ctx.createGain();
+    master.connect(ctx.destination);
 
-  if (type === 'correct') {
-    // Arpège balafon montant joyeux
-    const scale = [523, 659, 784, 1047, 1319];
-    scale.forEach((f, i) => {
-      makeOsc(ctx, 'triangle', f, now + i*0.09, 0.22, 0.18, master);
-      makeOsc(ctx, 'sine', f * 2, now + i*0.09, 0.15, 0.04, master);
-    });
-    // Petite percussion
-    makeDrum(ctx, 180, now, 0.12, 0.15, master);
+    if (type === 'correct') {
+      // Arpège balafon montant joyeux
+      const scale = [523, 659, 784, 1047, 1319];
+      scale.forEach((f, i) => {
+        makeOsc(ctx, 'triangle', f, now + i*0.09, 0.22, 0.18, master);
+        makeOsc(ctx, 'sine', f * 2, now + i*0.09, 0.15, 0.04, master);
+      });
+      // Petite percussion
+      makeDrum(ctx, 180, now, 0.12, 0.15, master);
 
-  } else if (type === 'wrong') {
-    // Descente dissonante
-    makeOsc(ctx, 'sawtooth', 320, now, 0.14, 0.08, master);
-    makeOsc(ctx, 'sawtooth', 290, now + 0.12, 0.18, 0.09, master);
-    makeOsc(ctx, 'square', 240, now + 0.25, 0.2, 0.06, master);
-    makeDrum(ctx, 80, now, 0.18, 0.2, master);
+    } else if (type === 'wrong') {
+      // Descente dissonante
+      makeOsc(ctx, 'sawtooth', 320, now, 0.14, 0.08, master);
+      makeOsc(ctx, 'sawtooth', 290, now + 0.12, 0.18, 0.09, master);
+      makeOsc(ctx, 'square', 240, now + 0.25, 0.2, 0.06, master);
+      makeDrum(ctx, 80, now, 0.18, 0.2, master);
 
-  } else if (type === 'win') {
-    // Fanfare victoire africaine : montée triomphante + percus
-    const fanfare = [392, 523, 659, 784, 659, 784, 1047, 784, 1047, 1319];
-    fanfare.forEach((f, i) => {
-      makeOsc(ctx, 'triangle', f, now + i*0.11, 0.22, 0.18, master);
-      if (i % 2 === 0) makeOsc(ctx, 'sine', f/2, now + i*0.11, 0.3, 0.05, master);
-    });
-    [0, 0.22, 0.44, 0.66, 0.88].forEach(d => {
-      makeDrum(ctx, 150, now + d, 0.15, 0.22, master);
-      makeShaker(ctx, now + d + 0.11, 0.06, 0.12, master);
-    });
+    } else if (type === 'win') {
+      // Fanfare victoire africaine : montée triomphante + percus
+      const fanfare = [392, 523, 659, 784, 659, 784, 1047, 784, 1047, 1319];
+      fanfare.forEach((f, i) => {
+        makeOsc(ctx, 'triangle', f, now + i*0.11, 0.22, 0.18, master);
+        if (i % 2 === 0) makeOsc(ctx, 'sine', f/2, now + i*0.11, 0.3, 0.05, master);
+      });
+      [0, 0.22, 0.44, 0.66, 0.88].forEach(d => {
+        makeDrum(ctx, 150, now + d, 0.15, 0.22, master);
+        makeShaker(ctx, now + d + 0.11, 0.06, 0.12, master);
+      });
 
-  } else if (type === 'lose') {
-    // Descente triste + tambour sourd
-    const sad = [440, 392, 349, 294];
+    } else if (type === 'lose') {
+      // Descente triste + tambour sourd
+      const sad = [440, 392, 349, 294];
+      sad.forEach((f, i) => {
+        makeOsc(ctx, 'sine', f, now + i*0.2, 0.28, 0.12, master);
+        makeOsc(ctx, 'triangle', f * 0.5, now + i*0.2, 0.28, 0.04, master);
+      });
+      makeDrum(ctx, 70, now, 0.4, 0.18, master);
+      makeDrum(ctx, 60, now + 0.5, 0.5, 0.14, master);
+    }
+  } catch(e) {}
+}
+
+// Son mission ratée (descente grave + grognement + tambour lourd)
+function playRateSound() {
+  try {
+    const ctx = getCtx();
+    const now = ctx.currentTime;
+    const master = ctx.createGain();
+    master.connect(ctx.destination);
+    // Descente grave lente
+    const sad = [330, 277, 247, 220, 196];
     sad.forEach((f, i) => {
-      makeOsc(ctx, 'sine', f, now + i*0.2, 0.28, 0.12, master);
-      makeOsc(ctx, 'triangle', f * 0.5, now + i*0.2, 0.28, 0.04, master);
+      makeOsc(ctx, 'sawtooth', f, now + i*0.22, 0.32, 0.09, master);
+      makeOsc(ctx, 'sine', f * 0.5, now + i*0.22, 0.35, 0.05, master);
     });
-    makeDrum(ctx, 70, now, 0.4, 0.18, master);
-    makeDrum(ctx, 60, now + 0.5, 0.5, 0.14, master);
-  }
-}
-
-// --- MUSIQUE DE FOND : ambiance aventure africaine ---
-// Gamme pentatonique africaine (Sol majeur pentatonique)
-// G4=392 A4=440 B4=494 D5=587 E5=659 G5=784 A5=880 B5=988
-
-function startBgMusic() {
-  if (!musicEnabled || bgPlaying) return;
-  bgPlaying = true;
-  const ctx = getCtx();
-
-  // Gain master musique de fond
-  bgGain = ctx.createGain();
-  bgGain.gain.setValueAtTime(0, ctx.currentTime);
-  bgGain.gain.linearRampToValueAtTime(1, ctx.currentTime + 2); // fondu entrée
-  bgGain.connect(ctx.destination);
-
-  // Compresseur doux pour équilibrer
-  const comp = ctx.createDynamicsCompressor();
-  comp.threshold.value = -18; comp.knee.value = 10;
-  comp.ratio.value = 3; comp.attack.value = 0.02; comp.release.value = 0.3;
-  comp.connect(bgGain);
-
-  // Reverb simple (convolution simulée par delay)
-  const delay = ctx.createDelay(0.06);
-  delay.delayTime.value = 0.055;
-  const delayGain = ctx.createGain(); delayGain.gain.value = 0.18;
-  delay.connect(delayGain); delayGain.connect(comp);
-
-  // --- Mélodie principale (balafon/xylophone) ---
-  const MELODY = [
-    // Phrase A (8 temps × 0.35s = 2.8s)
-    [784,0],[784,1],[880,2],[784,3],[659,4],[784,5],[659,6],[587,7],
-    // Phrase B
-    [659,8],[659,9],[784,10],[659,11],[587,12],[494,13],[587,14],[659,15],
-    // Phrase C montante
-    [392,16],[494,17],[587,18],[659,19],[784,20],[880,21],[784,22],[659,23],
-    // Phrase D retour
-    [784,24],[659,25],[587,26],[494,27],[440,28],[392,29],[440,30],[494,31],
-  ];
-
-  // --- Basse (kora / bass balafon) ---
-  const BASS = [
-    [196,0],[196,4],[220,8],[196,12],[196,16],[220,20],[196,24],[196,28],
-  ];
-
-  // --- Percussions djembé ---
-  // Pattern : [type(0=grave,1=médium,2=aigu), temps]
-  const DRUMS = [
-    [0,0],[2,1],[1,2],[2,3],[0,4],[1,5],[2,6],[2,7],
-    [0,8],[2,9],[1,10],[0,11],[2,12],[1,13],[2,14],[0,15],
-    [0,16],[2,17],[0,18],[2,19],[1,20],[2,21],[0,22],[2,23],
-    [0,24],[1,25],[2,26],[0,27],[2,28],[1,29],[2,30],[2,31],
-  ];
-
-  // --- Shaker (calebasse) sur les croches ---
-  const SHAKER = [0.5,1,1.5,2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,
-                   8.5,9,9.5,10,10.5,11,11.5,12,12.5,13,13.5,14,14.5,15,15.5,
-                   16.5,17,17.5,18,18.5,19,19.5,20,20.5,21,21.5,22,22.5,23,23.5,
-                   24.5,25,25.5,26,26.5,27,27.5,28,28.5,29,29.5,30,30.5,31,31.5];
-
-  const STEP = 0.32; // durée d'un temps (s)
-  const LOOP_DUR = 32 * STEP; // durée d'une boucle complète
-
-  function scheduleBgLoop(startTime) {
-    if (!bgPlaying) return;
-
-    // Mélodie
-    MELODY.forEach(([f, t]) => {
-      const s = startTime + t * STEP;
-      makeOsc(ctx, 'triangle', f, s, STEP * 0.78, 0.07, comp);
-      makeOsc(ctx, 'sine', f * 2, s, STEP * 0.5, 0.02, comp);
-      // Envoi sur delay pour reverb légère
-      makeOsc(ctx, 'triangle', f, s, STEP * 0.78, 0.025, delay);
-    });
-
-    // Basse
-    BASS.forEach(([f, t]) => {
-      const s = startTime + t * STEP;
-      makeOsc(ctx, 'sine', f, s, STEP * 3.5, 0.06, comp);
-      makeOsc(ctx, 'triangle', f * 1.5, s, STEP * 2, 0.02, comp);
-    });
-
-    // Djembé
-    DRUMS.forEach(([type, t]) => {
-      const s = startTime + t * STEP;
-      if (type === 0) makeDrum(ctx, 90,  s, 0.22, 0.14, comp); // grave (frappe ouverte)
-      if (type === 1) makeDrum(ctx, 180, s, 0.14, 0.11, comp); // médium (ton)
-      if (type === 2) makeDrum(ctx, 280, s, 0.09, 0.09, comp); // aigu (claque)
-    });
-
-    // Shaker calebasse
-    SHAKER.forEach(t => makeShaker(ctx, startTime + t * STEP, 0.055, 0.055, comp));
-
-    // Programmer la prochaine boucle
-    bgLoopTimer = setTimeout(() => scheduleBgLoop(startTime + LOOP_DUR), (LOOP_DUR - 0.15) * 1000);
-  }
-
-  scheduleBgLoop(ctx.currentTime + 0.1);
-}
-
-function stopBgMusic() {
-  bgPlaying = false;
-  clearTimeout(bgLoopTimer);
-  if (bgGain) {
-    try {
-      bgGain.gain.linearRampToValueAtTime(0, getCtx().currentTime + 0.8);
-    } catch(e) {}
-  }
-}
-
-function toggleMusic() {
-  musicEnabled = !musicEnabled;
-  const btn = document.getElementById('musicBtn');
-  if (musicEnabled) { btn.textContent = '🔊'; startBgMusic(); }
-  else { btn.textContent = '🔇'; stopBgMusic(); }
+    // Tambours lourds
+    makeDrum(ctx, 65, now, 0.5, 0.22, master);
+    makeDrum(ctx, 55, now + 0.35, 0.6, 0.18, master);
+    makeDrum(ctx, 50, now + 0.8, 0.7, 0.15, master);
+    // Note finale basse sombre
+    makeOsc(ctx, 'triangle', 110, now + 0.9, 0.6, 0.1, master);
+  } catch(e) {}
 }
 
 // ===================== CLASSEMENT =====================
@@ -3288,6 +3230,7 @@ try { if (localStorage.getItem('bhds_theme_map') === 'light') toggleTheme(); } c
 
 // ===================== CONFETTI =====================
 function confetti() {
+  playFelicitationSound();
   const cols = ['#a78bfa','#60a5fa','#34d399','#fbbf24','#f472b6','#fb923c'];
   for (let i=0;i<35;i++) {
     const el = document.createElement('div');
@@ -3302,7 +3245,6 @@ function confetti() {
 }
 
 // ===================== INIT =====================
-document.addEventListener('click', () => { if (!bgPlaying) startBgMusic(); }, { once: true });
 renderMap();
 updateGlobalScore();
 renderHearts();
