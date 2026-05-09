@@ -2,15 +2,13 @@
 // Version du cache — incrémente à chaque mise à jour
 const CACHE_NAME = 'karamoko-bhds-v1';
 
-// Fichiers à mettre en cache pour le mode hors-ligne
 const ASSETS = [
-  './',
-  './karamoko_accueil.html',
-  './carte_aventure_college_lycee.html',
-  './manifest.json',
-  './icons/icon-192.png',
-  './icons/icon-512.png',
-  'https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&family=Playfair+Display:ital,wght@0,700;1,400&display=swap'
+  '/Karamoko-bhds/',
+  '/Karamoko-bhds/index.html',
+  '/Karamoko-bhds/carte_aventure_college_lycee.html',
+  '/Karamoko-bhds/manifest.json',
+  '/Karamoko-bhds/icons/icon-192.png',
+  '/Karamoko-bhds/icons/icon-512.png',
 ];
 
 // ===== INSTALLATION =====
