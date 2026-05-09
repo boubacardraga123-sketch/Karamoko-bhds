@@ -1916,31 +1916,6 @@ const LYCEES = [
     ]
   },
   {
-    id:'l_interferences',
-    nom:'Prisme des Interférences',
-    emoji:'🌈',
-    matiere:'Interférences Lumineuses',
-    niveau:'Terminale',
-    desc:'Cohérence, déphasage, fentes de Young, interfranges, anneaux de Newton et applications des interférences.',
-    tags:[{t:'Optique',c:'var(--teal)'},{t:'Interférences',c:'var(--accent)'}],
-    diff:'⭐⭐⭐⭐',
-    questions:10,
-    prerequis:['l_physique'],
-    x:32, y:80,
-    data:[
-      { q:"Deux sources sont cohérentes si elles ont :", opts:["La même amplitude uniquement","La même fréquence et une différence de phase constante","La même couleur uniquement","Des amplitudes différentes"], ans:1, fact:"La cohérence (temporelle et spatiale) est indispensable pour observer des interférences stables. Une source étendue ordinaire est incohérente." },
-      { q:"La condition d'interférence constructive (frange brillante) est :", opts:["δ = (2k+1)·λ/2","δ = k·λ (k entier)","δ = k·λ/2","δ = k·λ/4"], ans:1, fact:"Frange brillante si le chemin optique δ = k·λ (k = 0, ±1, ±2…). Les deux ondes arrivent en phase et s'amplifient." },
-      { q:"La condition d'interférence destructive (frange sombre) est :", opts:["δ = k·λ","δ = (2k+1)·λ/2","δ = k·λ/4","δ = 2k·λ"], ans:1, fact:"Frange sombre si δ = (2k+1)·λ/2 = (k+½)·λ. Les ondes sont en opposition de phase et s'annulent." },
-      { q:"Dans l'expérience des fentes de Young, l'interfrange i est :", opts:["i = d·λ/D","i = λ·D/d","i = D·d/λ","i = λ/d"], ans:1, fact:"i = λ·D/d, où D est la distance fentes-écran, d l'écart entre les fentes, λ la longueur d'onde. Plus D est grand ou d petit, plus les franges sont larges." },
-      { q:"Que se passe-t-il si on augmente l'écart d entre les fentes de Young ?", opts:["L'interfrange augmente","L'interfrange diminue","L'interfrange ne change pas","Les franges disparaissent"], ans:1, fact:"i = λD/d : si d augmente, i diminue (franges plus serrées). Si d diminue, i augmente (franges plus larges)." },
-      { q:"La différence de marche δ en un point M de l'écran (fentes de Young) est :", opts:["δ = d·x/D","δ = D·x/d","δ = λ·x/D","δ = x·D"], ans:0, fact:"δ = d·x/D, où x est l'abscisse du point M par rapport à la frange centrale O. La frange centrale (x=0) est toujours brillante." },
-      { q:"Lorsqu'on éclaire les fentes de Young avec une lumière blanche, on observe :", opts:["Des franges noires et blanches uniquement","Une frange centrale blanche et des franges colorées irisées de part et d'autre","Une seule couleur","Aucune frange"], ans:1, fact:"En lumière blanche : frange centrale blanche (δ=0 pour toutes λ), puis irisations car i varie avec λ. Les couleurs extrêmes se brouillent vite." },
-      { q:"Dans une lame d'air entre deux lentilles (anneaux de Newton), les anneaux sombres sont dus à :", opts:["Des interférences constructives","Une réflexion sur une surface dure (déphasage π) + épaisseur nulle au centre","Des défauts de la lentille","La diffraction"], ans:1, fact:"Au contact (e=0) : réflexion sur le verre dense → déphasage λ/2 → interférence destructive → tache centrale noire. Anneaux alternés." },
-      { q:"Le rayon r_k du k-ième anneau sombre de Newton est :", opts:["r_k = k·λ·R","r_k = √(k·λ·R)","r_k = k²·λ·R","r_k = √(k²·λ·R)"], ans:1, fact:"r_k = √(k·λ·R), où R est le rayon de courbure de la lentille. Les anneaux sont d'autant plus serrés que k est grand." },
-      { q:"Les interférences lumineuses ont une application directe dans :", opts:["Les microscopes électroniques","Les traitements antireflet des lentilles et le contrôle de planéité des surfaces optiques","Les accélérateurs de particules","Les fibres optiques en propagation"], ans:1, fact:"Les couches antireflet (λ/4) exploitent les interférences destructives. Le contrôle interférométrique vérifie le polissage des optiques à λ/10 près." },
-    ]
-  },
-  {
     id:'l_examen_roi',
     nom:'Trône des Trois Royaumes',
     emoji:'👑',
@@ -2960,79 +2935,208 @@ let actx = null;
 let musicEnabled = true;
 let bgPlaying = false;
 let bgGain = null;
+let bgLoopTimer = null;
 
 function getCtx() { if (!actx) actx = new AudioCtx(); return actx; }
 
+// --- Utilitaires synthèse ---
+function makeOsc(ctx, type, freq, start, dur, vol, dest) {
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = type;
+  o.frequency.setValueAtTime(freq, start);
+  g.gain.setValueAtTime(0, start);
+  g.gain.linearRampToValueAtTime(vol, start + 0.015);
+  g.gain.linearRampToValueAtTime(vol * 0.6, start + dur * 0.5);
+  g.gain.linearRampToValueAtTime(0, start + dur);
+  o.connect(g); g.connect(dest);
+  o.start(start); o.stop(start + dur + 0.02);
+}
+
+// Percussion synthétique (djembé / balafon)
+function makeDrum(ctx, freq, start, decay, vol, dest) {
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = 'sine';
+  o.frequency.setValueAtTime(freq * 2.5, start);
+  o.frequency.exponentialRampToValueAtTime(freq, start + decay * 0.3);
+  g.gain.setValueAtTime(vol, start);
+  g.gain.exponentialRampToValueAtTime(0.001, start + decay);
+  o.connect(g); g.connect(dest);
+  o.start(start); o.stop(start + decay + 0.02);
+}
+
+// Bruit filtré (shaker / calebasse)
+function makeShaker(ctx, start, dur, vol, dest) {
+  const buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * dur), ctx.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1);
+  const src = ctx.createBufferSource();
+  src.buffer = buf;
+  const filt = ctx.createBiquadFilter();
+  filt.type = 'bandpass'; filt.frequency.value = 4000; filt.Q.value = 2;
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0, start);
+  g.gain.linearRampToValueAtTime(vol, start + 0.008);
+  g.gain.linearRampToValueAtTime(0, start + dur);
+  src.connect(filt); filt.connect(g); g.connect(dest);
+  src.start(start); src.stop(start + dur + 0.01);
+}
+
+// Sons d'effets
 function playSound(type) {
   if (!musicEnabled) return;
   const ctx = getCtx();
+  const now = ctx.currentTime;
+  const master = ctx.createGain();
+  master.connect(ctx.destination);
+
   if (type === 'correct') {
-    [[523,0],[659,0.1],[784,0.2],[1047,0.32]].forEach(([f,d]) => {
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.type = 'triangle'; o.frequency.setValueAtTime(f, ctx.currentTime+d);
-      g.gain.setValueAtTime(0.15, ctx.currentTime+d);
-      g.gain.linearRampToValueAtTime(0, ctx.currentTime+d+0.28);
-      o.connect(g); g.connect(ctx.destination);
-      o.start(ctx.currentTime+d); o.stop(ctx.currentTime+d+0.32);
+    // Arpège balafon montant joyeux
+    const scale = [523, 659, 784, 1047, 1319];
+    scale.forEach((f, i) => {
+      makeOsc(ctx, 'triangle', f, now + i*0.09, 0.22, 0.18, master);
+      makeOsc(ctx, 'sine', f * 2, now + i*0.09, 0.15, 0.04, master);
     });
+    // Petite percussion
+    makeDrum(ctx, 180, now, 0.12, 0.15, master);
+
   } else if (type === 'wrong') {
-    [[300,0],[250,0.14]].forEach(([f,d]) => {
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.type = 'sawtooth'; o.frequency.setValueAtTime(f, ctx.currentTime+d);
-      g.gain.setValueAtTime(0.1, ctx.currentTime+d);
-      g.gain.linearRampToValueAtTime(0, ctx.currentTime+d+0.22);
-      o.connect(g); g.connect(ctx.destination);
-      o.start(ctx.currentTime+d); o.stop(ctx.currentTime+d+0.26);
-    });
+    // Descente dissonante
+    makeOsc(ctx, 'sawtooth', 320, now, 0.14, 0.08, master);
+    makeOsc(ctx, 'sawtooth', 290, now + 0.12, 0.18, 0.09, master);
+    makeOsc(ctx, 'square', 240, now + 0.25, 0.2, 0.06, master);
+    makeDrum(ctx, 80, now, 0.18, 0.2, master);
+
   } else if (type === 'win') {
-    [[523,0],[659,0.13],[784,0.26],[659,0.39],[784,0.52],[1047,0.65]].forEach(([f,d]) => {
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.type = 'triangle'; o.frequency.setValueAtTime(f, ctx.currentTime+d);
-      g.gain.setValueAtTime(0.18, ctx.currentTime+d);
-      g.gain.linearRampToValueAtTime(0, ctx.currentTime+d+0.3);
-      o.connect(g); g.connect(ctx.destination);
-      o.start(ctx.currentTime+d); o.stop(ctx.currentTime+d+0.35);
+    // Fanfare victoire africaine : montée triomphante + percus
+    const fanfare = [392, 523, 659, 784, 659, 784, 1047, 784, 1047, 1319];
+    fanfare.forEach((f, i) => {
+      makeOsc(ctx, 'triangle', f, now + i*0.11, 0.22, 0.18, master);
+      if (i % 2 === 0) makeOsc(ctx, 'sine', f/2, now + i*0.11, 0.3, 0.05, master);
     });
+    [0, 0.22, 0.44, 0.66, 0.88].forEach(d => {
+      makeDrum(ctx, 150, now + d, 0.15, 0.22, master);
+      makeShaker(ctx, now + d + 0.11, 0.06, 0.12, master);
+    });
+
   } else if (type === 'lose') {
-    [[400,0],[350,0.18],[300,0.36]].forEach(([f,d]) => {
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.type = 'sine'; o.frequency.setValueAtTime(f, ctx.currentTime+d);
-      g.gain.setValueAtTime(0.12, ctx.currentTime+d);
-      g.gain.linearRampToValueAtTime(0, ctx.currentTime+d+0.3);
-      o.connect(g); g.connect(ctx.destination);
-      o.start(ctx.currentTime+d); o.stop(ctx.currentTime+d+0.35);
+    // Descente triste + tambour sourd
+    const sad = [440, 392, 349, 294];
+    sad.forEach((f, i) => {
+      makeOsc(ctx, 'sine', f, now + i*0.2, 0.28, 0.12, master);
+      makeOsc(ctx, 'triangle', f * 0.5, now + i*0.2, 0.28, 0.04, master);
     });
+    makeDrum(ctx, 70, now, 0.4, 0.18, master);
+    makeDrum(ctx, 60, now + 0.5, 0.5, 0.14, master);
   }
 }
+
+// --- MUSIQUE DE FOND : ambiance aventure africaine ---
+// Gamme pentatonique africaine (Sol majeur pentatonique)
+// G4=392 A4=440 B4=494 D5=587 E5=659 G5=784 A5=880 B5=988
 
 function startBgMusic() {
   if (!musicEnabled || bgPlaying) return;
   bgPlaying = true;
   const ctx = getCtx();
+
+  // Gain master musique de fond
   bgGain = ctx.createGain();
-  bgGain.gain.setValueAtTime(0.05, ctx.currentTime);
+  bgGain.gain.setValueAtTime(0, ctx.currentTime);
+  bgGain.gain.linearRampToValueAtTime(1, ctx.currentTime + 2); // fondu entrée
   bgGain.connect(ctx.destination);
-  const notes = [523,659,784,659,523,392,440,523,659,784,880,784];
-  let t = ctx.currentTime;
-  function loop() {
+
+  // Compresseur doux pour équilibrer
+  const comp = ctx.createDynamicsCompressor();
+  comp.threshold.value = -18; comp.knee.value = 10;
+  comp.ratio.value = 3; comp.attack.value = 0.02; comp.release.value = 0.3;
+  comp.connect(bgGain);
+
+  // Reverb simple (convolution simulée par delay)
+  const delay = ctx.createDelay(0.06);
+  delay.delayTime.value = 0.055;
+  const delayGain = ctx.createGain(); delayGain.gain.value = 0.18;
+  delay.connect(delayGain); delayGain.connect(comp);
+
+  // --- Mélodie principale (balafon/xylophone) ---
+  const MELODY = [
+    // Phrase A (8 temps × 0.35s = 2.8s)
+    [784,0],[784,1],[880,2],[784,3],[659,4],[784,5],[659,6],[587,7],
+    // Phrase B
+    [659,8],[659,9],[784,10],[659,11],[587,12],[494,13],[587,14],[659,15],
+    // Phrase C montante
+    [392,16],[494,17],[587,18],[659,19],[784,20],[880,21],[784,22],[659,23],
+    // Phrase D retour
+    [784,24],[659,25],[587,26],[494,27],[440,28],[392,29],[440,30],[494,31],
+  ];
+
+  // --- Basse (kora / bass balafon) ---
+  const BASS = [
+    [196,0],[196,4],[220,8],[196,12],[196,16],[220,20],[196,24],[196,28],
+  ];
+
+  // --- Percussions djembé ---
+  // Pattern : [type(0=grave,1=médium,2=aigu), temps]
+  const DRUMS = [
+    [0,0],[2,1],[1,2],[2,3],[0,4],[1,5],[2,6],[2,7],
+    [0,8],[2,9],[1,10],[0,11],[2,12],[1,13],[2,14],[0,15],
+    [0,16],[2,17],[0,18],[2,19],[1,20],[2,21],[0,22],[2,23],
+    [0,24],[1,25],[2,26],[0,27],[2,28],[1,29],[2,30],[2,31],
+  ];
+
+  // --- Shaker (calebasse) sur les croches ---
+  const SHAKER = [0.5,1,1.5,2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,
+                   8.5,9,9.5,10,10.5,11,11.5,12,12.5,13,13.5,14,14.5,15,15.5,
+                   16.5,17,17.5,18,18.5,19,19.5,20,20.5,21,21.5,22,22.5,23,23.5,
+                   24.5,25,25.5,26,26.5,27,27.5,28,28.5,29,29.5,30,30.5,31,31.5];
+
+  const STEP = 0.32; // durée d'un temps (s)
+  const LOOP_DUR = 32 * STEP; // durée d'une boucle complète
+
+  function scheduleBgLoop(startTime) {
     if (!bgPlaying) return;
-    notes.forEach((freq,i) => {
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.type = 'sine'; o.frequency.setValueAtTime(freq, t+i*0.4);
-      g.gain.setValueAtTime(0, t+i*0.4);
-      g.gain.linearRampToValueAtTime(0.05, t+i*0.4+0.04);
-      g.gain.linearRampToValueAtTime(0, t+i*0.4+0.36);
-      o.connect(g); g.connect(bgGain);
-      o.start(t+i*0.4); o.stop(t+i*0.4+0.4);
+
+    // Mélodie
+    MELODY.forEach(([f, t]) => {
+      const s = startTime + t * STEP;
+      makeOsc(ctx, 'triangle', f, s, STEP * 0.78, 0.07, comp);
+      makeOsc(ctx, 'sine', f * 2, s, STEP * 0.5, 0.02, comp);
+      // Envoi sur delay pour reverb légère
+      makeOsc(ctx, 'triangle', f, s, STEP * 0.78, 0.025, delay);
     });
-    setTimeout(() => { t = getCtx().currentTime; loop(); }, notes.length*0.4*1000 - 80);
+
+    // Basse
+    BASS.forEach(([f, t]) => {
+      const s = startTime + t * STEP;
+      makeOsc(ctx, 'sine', f, s, STEP * 3.5, 0.06, comp);
+      makeOsc(ctx, 'triangle', f * 1.5, s, STEP * 2, 0.02, comp);
+    });
+
+    // Djembé
+    DRUMS.forEach(([type, t]) => {
+      const s = startTime + t * STEP;
+      if (type === 0) makeDrum(ctx, 90,  s, 0.22, 0.14, comp); // grave (frappe ouverte)
+      if (type === 1) makeDrum(ctx, 180, s, 0.14, 0.11, comp); // médium (ton)
+      if (type === 2) makeDrum(ctx, 280, s, 0.09, 0.09, comp); // aigu (claque)
+    });
+
+    // Shaker calebasse
+    SHAKER.forEach(t => makeShaker(ctx, startTime + t * STEP, 0.055, 0.055, comp));
+
+    // Programmer la prochaine boucle
+    bgLoopTimer = setTimeout(() => scheduleBgLoop(startTime + LOOP_DUR), (LOOP_DUR - 0.15) * 1000);
   }
-  loop();
+
+  scheduleBgLoop(ctx.currentTime + 0.1);
 }
 
 function stopBgMusic() {
   bgPlaying = false;
-  if (bgGain) bgGain.gain.setValueAtTime(0, getCtx().currentTime);
+  clearTimeout(bgLoopTimer);
+  if (bgGain) {
+    try {
+      bgGain.gain.linearRampToValueAtTime(0, getCtx().currentTime + 0.8);
+    } catch(e) {}
+  }
 }
 
 function toggleMusic() {
