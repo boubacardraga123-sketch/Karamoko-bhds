@@ -501,6 +501,61 @@ body::before {
   margin-bottom: 14px;
   font-weight: 800;
 }
+
+/* CHRONO */
+.chrono-bar-wrap {
+  width: 100%;
+  height: 8px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 20px;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+.chrono-bar {
+  height: 100%;
+  border-radius: 20px;
+  transition: width 1s linear, background 0.5s;
+  background: #10b981;
+}
+.chrono-bar.danger { background: #ef4444; }
+.chrono-num {
+  text-align: center;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+  transition: color 0.3s;
+}
+.chrono-num.danger { color: #ef4444; }
+
+/* VILLE EXAMEN */
+.examen-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: linear-gradient(135deg, #ef4444, #f59e0b);
+  color: white;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.8rem;
+  padding: 4px 14px;
+  border-radius: 20px;
+  margin-bottom: 8px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+.roi-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: linear-gradient(135deg, #f59e0b, #a78bfa, #10b981);
+  color: white;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.85rem;
+  padding: 5px 16px;
+  border-radius: 20px;
+  margin-bottom: 10px;
+  animation: shimmerBadge 2s ease infinite;
+  background-size: 200% auto;
+}
+@keyframes shimmerBadge {
+  0%,100%{background-position:0% center}
+  50%{background-position:100% center}
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.85;transform:scale(1.03)} }
 .q-text {
   font-family: 'Fredoka One', cursive;
   font-size: 1.7rem;
@@ -709,7 +764,8 @@ body.light .score-pill { background: rgba(0,0,0,0.06); border-color: rgba(0,0,0,
         <div class="subtitle">Carte Aventure · Collection BHDS</div>
       </div>
       <div class="header-controls">
-        <button class="ctrl-btn" onclick="window.location.href='karamoko_accueil.html'" title="Accueil">🏠</button>
+        <button class="ctrl-btn" onclick="window.location.href='index.html'" title="Accueil plateforme">🏠</button>
+        <button class="ctrl-btn" onclick="showClassement()" title="Classement">🏆</button>
         <button class="ctrl-btn" id="themeBtn" onclick="toggleTheme()" title="Thème">🌙</button>
         <button class="ctrl-btn" id="musicBtn" onclick="toggleMusic()" title="Son">🔊</button>
       </div>
@@ -734,6 +790,38 @@ body.light .score-pill { background: rgba(0,0,0,0.06); border-color: rgba(0,0,0,
     <button class="tab-btn lycee" id="tabLycee" onclick="switchTab('lycee')">
       🏫 Lycée
     </button>
+  </div>
+
+  <!-- CLASSEMENT MODAL -->
+  <div id="classementModal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);overflow-y:auto;">
+    <div style="max-width:480px;margin:20px auto;padding:20px;">
+      <div style="background:linear-gradient(135deg,#0e1420,#111827);border:1px solid rgba(167,139,250,0.3);border-radius:24px;padding:24px;">
+        <!-- Header classement -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+          <div style="font-family:'Fredoka One',cursive;font-size:1.5rem;background:linear-gradient(135deg,#f59e0b,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">🏆 Classement</div>
+          <button onclick="hideClassement()" style="background:rgba(255,255,255,0.1);border:none;color:white;font-size:1.3rem;width:36px;height:36px;border-radius:50%;cursor:pointer;touch-action:manipulation;">✕</button>
+        </div>
+
+        <!-- Score global -->
+        <div id="clScoreGlobal" style="background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(245,158,11,0.1));border:1px solid rgba(16,185,129,0.3);border-radius:16px;padding:16px;margin-bottom:16px;text-align:center;">
+        </div>
+
+        <!-- Badges -->
+        <div style="font-family:'Fredoka One',cursive;font-size:1rem;color:#a78bfa;margin-bottom:10px;">🎖️ Badges débloqués</div>
+        <div id="clBadges" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;"></div>
+
+        <!-- Progression par cycle -->
+        <div style="font-family:'Fredoka One',cursive;font-size:1rem;color:#a78bfa;margin-bottom:10px;">📊 Progression par cycle</div>
+        <div id="clCycles" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;"></div>
+
+        <!-- Meilleures étapes -->
+        <div style="font-family:'Fredoka One',cursive;font-size:1rem;color:#a78bfa;margin-bottom:10px;">⭐ Meilleures performances</div>
+        <div id="clMeilleures" style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;"></div>
+
+        <!-- Bouton reset -->
+        <button onclick="resetScores()" style="width:100%;padding:12px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);border-radius:12px;color:#f87171;font-family:'Fredoka One',cursive;font-size:0.95rem;cursor:pointer;touch-action:manipulation;">🗑️ Réinitialiser les scores</button>
+      </div>
+    </div>
   </div>
 
   <!-- MAP VIEW -->
@@ -984,6 +1072,33 @@ const PRIMAIRES = [
       { q:"Qui est Soundiata Keïta ?", opts:["Un président guinéen","Le fondateur de l'Empire du Mali","Un chanteur célèbre","Un général français"], ans:1, fact:"Soundiata Keïta (XIIIe siècle) est le fondateur légendaire de l'Empire du Mali, dont l'épopée est chantée par les griots." },
     ]
   },
+  {
+    id:'p_examen_college',
+    nom:'Porte du Royaume Collège',
+    emoji:'🏰',
+    matiere:'Examen',
+    niveau:'Concours d\'entrée Collège',
+    desc:'L\'examen final du Primaire ! Réponds vite et bien pour entrer dans le Royaume du Collège. Chrono activé — 20 secondes par question !',
+    tags:[{t:'⏱️ CHRONO',c:'#ef4444'},{t:'EXAMEN',c:'#f59e0b'},{t:'Toutes matières',c:'#a78bfa'}],
+    diff:'⭐⭐⭐⭐⭐',
+    questions:10,
+    prerequis:['p_histoire_guinee','p_calcul_avance'],
+    x:50, y:92,
+    chrono: 20,
+    examen: true,
+    data:[
+      { q:"Combien font 144 ÷ 12 ?", opts:["11","12","13","14"], ans:1 },
+      { q:"Quelle est la capitale de la Guinée ?", opts:["Kindia","Kankan","Conakry","Labé"], ans:2 },
+      { q:"Dans 'Le soleil brille', quel est le sujet ?", opts:["brille","Le","soleil","—"], ans:2 },
+      { q:"L'eau bout à quelle température ?", opts:["90°C","95°C","100°C","110°C"], ans:2 },
+      { q:"Combien font 7 × 8 ?", opts:["54","56","58","60"], ans:1 },
+      { q:"En quelle année la Guinée est devenue indépendante ?", opts:["1956","1958","1960","1962"], ans:1 },
+      { q:"L'aire d'un carré de côté 9 cm est :", opts:["18 cm²","36 cm²","72 cm²","81 cm²"], ans:3 },
+      { q:"Quel fleuve prend sa source en Guinée ?", opts:["Le Congo","Le Nil","Le Niger","La Volta"], ans:2 },
+      { q:"Quel est le pluriel de 'œil' ?", opts:["œils","yeux","oeils","œes"], ans:1 },
+      { q:"Combien d'os a le corps humain adulte ?", opts:["106","206","306","406"], ans:1 },
+    ]
+  },
 ];
 
 const COLLEGES = [
@@ -1185,6 +1300,33 @@ const COLLEGES = [
       { q:"Quel est le discriminant de x² - 4x + 4 ?", opts:["0","4","8","16"], ans:0 },
       { q:"Quel théorème permet de calculer un côté d'un triangle à partir de deux côtés et l'angle entre eux ?", opts:["Pythagore","Al-Kashi","Thalès","Euclide"], ans:1 },
       { q:"L'écriture en base 2 de 13 est :", opts:["1101","1011","1110","1001"], ans:0 },
+    ]
+  },
+  {
+    id:'c_examen_lycee',
+    nom:'Porte du Royaume Lycée',
+    emoji:'🏯',
+    matiere:'Examen',
+    niveau:'Concours d\'entrée Lycée',
+    desc:'L\'examen final du Collège ! Prouve que tu mérites d\'entrer dans le Royaume du Lycée. Chrono activé — 20 secondes par question !',
+    tags:[{t:'⏱️ CHRONO',c:'#ef4444'},{t:'EXAMEN',c:'#f59e0b'},{t:'Toutes matières',c:'#3b82f6'}],
+    diff:'⭐⭐⭐⭐⭐',
+    questions:10,
+    prerequis:['c_maths_3','c_civique'],
+    x:65, y:88,
+    chrono: 20,
+    examen: true,
+    data:[
+      { q:"Résoudre : 2x + 6 = 14. x vaut :", opts:["3","4","5","8"], ans:1 },
+      { q:"La photosynthèse produit :", opts:["CO₂ et eau","Oxygène et glucose","Azote et glucose","Eau et azote"], ans:1 },
+      { q:"La Révolution française a eu lieu en :", opts:["1689","1776","1789","1815"], ans:2 },
+      { q:"La formule de l'eau est :", opts:["HO","H₂O","H₃O","H₂O₂"], ans:1 },
+      { q:"cos(60°) vaut :", opts:["0","1/2","√3/2","√2/2"], ans:1 },
+      { q:"Dans un triangle, la somme des angles est :", opts:["90°","180°","270°","360°"], ans:1 },
+      { q:"Qui a fondé l'Empire du Mali ?", opts:["Samory Touré","Sékou Touré","Soundiata Keïta","Sundiata Kouyaté"], ans:2 },
+      { q:"Le proton a une charge :", opts:["Négative","Nulle","Positive","Variable"], ans:2 },
+      { q:"Un citoyen guinéen peut voter à partir de :", opts:["16 ans","18 ans","21 ans","25 ans"], ans:1 },
+      { q:"√256 vaut :", opts:["14","15","16","17"], ans:2 },
     ]
   },
 ];
@@ -1392,6 +1534,39 @@ const LYCEES = [
       { q:"La démocratie délibérative (Habermas) repose sur :", opts:["Le vote seul","La discussion rationnelle et le consensus argumenté","La force du marché","L'autorité des experts"], ans:1, fact:"Habermas défend une démocratie où les décisions légitimes émergent d'un débat public rationnel, ouvert et inclusif." },
     ]
   },
+  {
+    id:'l_examen_roi',
+    nom:'Trône des Trois Royaumes',
+    emoji:'👑',
+    matiere:'Examen Royal',
+    niveau:'Épreuve Suprême',
+    desc:'L\'épreuve ultime ! Réponds à 15 questions difficiles sur tous les cycles pour conquérir les 3 Royaumes et devenir ROI ! Chrono — 15 secondes par question !',
+    tags:[{t:'⏱️ CHRONO',c:'#ef4444'},{t:'👑 ROI',c:'#f59e0b'},{t:'ULTIME',c:'#a78bfa'}],
+    diff:'⭐⭐⭐⭐⭐',
+    questions:15,
+    prerequis:['l_culture','l_philo'],
+    x:50, y:90,
+    chrono: 15,
+    examen: true,
+    roi: true,
+    data:[
+      { q:"La réaction nucléaire du Soleil est une :", opts:["Fission","Fusion","Combustion","Radioactivité α"], ans:1 },
+      { q:"Le théorème de Pythagore s'applique dans :", opts:["Tout triangle","Un triangle isocèle","Un triangle rectangle","Un triangle équilatéral"], ans:2 },
+      { q:"La formule de la vitesse est :", opts:["v = m × a","v = d ÷ t","v = F ÷ m","v = t × d"], ans:1 },
+      { q:"Le PIB mesure :", opts:["La population d'un pays","La richesse produite en un an","Le nombre d'entreprises","Les exportations"], ans:1 },
+      { q:"Quel philosophe a dit 'Je pense donc je suis' ?", opts:["Platon","Kant","Descartes","Aristote"], ans:2 },
+      { q:"La Guinée produit environ quel % des réserves mondiales de bauxite ?", opts:["10%","25%","40%","60%"], ans:1 },
+      { q:"En chimie, le pH d'une solution neutre est :", opts:["0","7","10","14"], ans:1 },
+      { q:"La loi d'Ohm s'écrit :", opts:["U = R ÷ I","U = R × I","I = U × R","R = U × I"], ans:1 },
+      { q:"Le concept d'État de droit signifie :", opts:["L'État est au-dessus des lois","Tous sont égaux devant la loi","Seuls les riches ont des droits","L'armée gouverne"], ans:1 },
+      { q:"Quel est le noyau de l'atome composé de :", opts:["Protons et neutrons","Électrons et protons","Neutrons et électrons","Protons seuls"], ans:0 },
+      { q:"La dérivée de f(x) = x³ est :", opts:["x²","2x²","3x²","3x³"], ans:2 },
+      { q:"Le 28 septembre 2009 en Guinée :", opts:["L'indépendance fut proclamée","Un massacre eut lieu au stade de Conakry","Une constitution fut adoptée","Des élections eurent lieu"], ans:1 },
+      { q:"L'énergie cinétique s'écrit :", opts:["Ec = mv","Ec = ½mv²","Ec = mgh","Ec = mv²"], ans:1 },
+      { q:"Soundiata Keïta est célèbre pour :", opts:["Avoir résisté aux Français","Avoir fondé l'Empire du Mali au XIIIe siècle","Avoir découvert la Guinée","Avoir été le premier président"], ans:1 },
+      { q:"La mondialisation désigne :", opts:["L'uniformisation des cultures","L'interdépendance croissante des économies et sociétés","La fin des nations","La domination américaine"], ans:1 },
+    ]
+  },
 ];
 
 // ===================== STATE =====================
@@ -1402,6 +1577,8 @@ let mission = null;
 let missionQIdx = 0;
 let mOk = 0, mKo = 0, mPts = 0;
 let answered = false;
+let chronoInterval = null;
+let chronoLeft = 0;
 let totalOk = 0, totalKo = 0, totalPts = 0;
 
 // Load save
@@ -1560,6 +1737,7 @@ function startMission() {
   missionQIdx = 0;
   mOk = 0; mKo = 0; mPts = 0;
   answered = false;
+  stopChrono();
 
   document.getElementById('mapView').style.display = 'none';
   document.getElementById('gameView').classList.add('show');
@@ -1568,6 +1746,7 @@ function startMission() {
 }
 
 function backToMap() {
+  stopChrono();
   mission = null;
   document.getElementById('mapView').style.display = 'block';
   document.getElementById('gameView').classList.remove('show');
@@ -1590,12 +1769,20 @@ function nextQ() {
   const q = data[idx];
 
   renderQ(q);
+  if (mission.chrono) startChrono(mission.chrono, q);
 }
 
 function renderQ(q) {
   const card = document.getElementById('gameCard');
+  const isExamen = mission.examen;
+  const isRoi = mission.roi;
   card.innerHTML = `
+    ${isRoi ? '<div class="roi-badge">👑 Épreuve du Roi des 3 Royaumes</div>' : isExamen ? '<div class="examen-badge">⏱️ EXAMEN — Réponds vite !</div>' : ''}
     <div class="q-label">${mission.emoji} Question ${missionQIdx} / ${mission.questions}</div>
+    ${mission.chrono ? `
+      <div class="chrono-num" id="chronoNum">${mission.chrono}s</div>
+      <div class="chrono-bar-wrap"><div class="chrono-bar" id="chronoBar" style="width:100%"></div></div>
+    ` : ''}
     <div class="q-text">${q.q}</div>
     <div class="opts-grid">
       ${q.opts.map((o,i) => `
@@ -1610,9 +1797,45 @@ function renderQ(q) {
   `;
 }
 
+// ===== CHRONO =====
+function startChrono(seconds, q) {
+  stopChrono();
+  chronoLeft = seconds;
+  updateChronoDisplay();
+  chronoInterval = setInterval(() => {
+    chronoLeft--;
+    updateChronoDisplay();
+    if (chronoLeft <= 0) {
+      stopChrono();
+      if (!answered) {
+        // Temps écoulé → mauvaise réponse forcée
+        checkQ(-1, q.ans, q);
+      }
+    }
+  }, 1000);
+}
+
+function stopChrono() {
+  if (chronoInterval) { clearInterval(chronoInterval); chronoInterval = null; }
+}
+
+function updateChronoDisplay() {
+  const num = document.getElementById('chronoNum');
+  const bar = document.getElementById('chronoBar');
+  if (!num || !bar) return;
+  const total = mission.chrono;
+  const pct = (chronoLeft / total) * 100;
+  num.textContent = chronoLeft + 's';
+  bar.style.width = pct + '%';
+  const danger = chronoLeft <= 5;
+  num.className = 'chrono-num' + (danger ? ' danger' : '');
+  bar.className = 'chrono-bar' + (danger ? ' danger' : '');
+}
+
 function checkQ(chosen, correct, q) {
   if (answered) return;
   answered = true;
+  stopChrono();
 
   const btns = document.querySelectorAll('.opt-btn');
   btns.forEach(b => b.disabled = true);
@@ -1645,6 +1868,9 @@ function checkQ(chosen, correct, q) {
 
   next.classList.add('show');
   updateGlobalScore();
+
+  // Question suivante automatique après 1.5s
+  setTimeout(() => { if (answered) nextQ(); }, 1500);
 }
 
 // ===================== RESULT =====================
@@ -1661,7 +1887,7 @@ function showResult() {
   }
 
   playSound(win ? 'win' : 'lose');
-  if (win) confetti();
+  if (win) { confetti(); if (mission.roi) setTimeout(confetti, 600); }
 
   const list = getList();
   const nextCity = list.find(c =>
@@ -1673,30 +1899,82 @@ function showResult() {
 
   const starsHtml = ['⭐','⭐','⭐'].map((s,i) => i<stars?s:'☆').join('');
 
-  overlay.innerHTML = `
-    <div class="result-card">
-      <div class="result-emoji">${win ? mission.emoji : '😓'}</div>
-      <div class="result-title" style="color:${win?'var(--green)':'var(--red)'};">
-        ${win ? mission.nom + ' !' : 'Pas encore...'}
+  // Écran spécial ROI
+  if (mission.roi && win) {
+    overlay.innerHTML = `
+      <div class="result-card" style="border-color:rgba(245,158,11,0.5);background:linear-gradient(135deg,#0e1420,#1a1200);">
+        <div style="font-size:3.5rem;margin-bottom:8px;animation:bounce 1s infinite;">👑</div>
+        <div class="result-title" style="color:#f59e0b;font-size:1.8rem;">FÉLICITATIONS !</div>
+        <div style="font-family:'Fredoka One',cursive;font-size:1.1rem;color:#a78bfa;margin:8px 0;">Tu es le ROI des Trois Royaumes !</div>
+        <div class="result-stars" style="font-size:2rem;">${starsHtml}</div>
+        <div style="font-family:'Fredoka One',cursive;font-size:0.85rem;color:rgba(240,244,255,0.6);margin:12px 0;line-height:1.6;">
+          🌟 Royaume Primaire · 🎓 Royaume Collège · 🏫 Royaume Lycée<br>
+          <span style="color:#f59e0b;">Tu as conquis les Trois Royaumes !</span>
+        </div>
+        <div class="result-stats">
+          ✅ ${mOk}/${mission.questions} &nbsp;|&nbsp; 🏆 ${mPts} points · ${Math.round(ratio*100)}%
+        </div>
+        <div class="result-btns">
+          <button class="btn-start" style="background:rgba(255,255,255,0.1);box-shadow:none;" onclick="closeResult(false)">🗺️ Retour carte</button>
+          <button class="btn-start" style="background:linear-gradient(135deg,#f59e0b,#a78bfa);" onclick="closeResult(true)">👑 Rejouer</button>
+        </div>
       </div>
-      <div class="result-stars">${starsHtml}</div>
-      <div class="result-stats">
-        ✅ ${mOk} bonne(s) &nbsp;|&nbsp; ❌ ${mKo} erreur(s)<br>
-        🏆 ${mPts} points · ${Math.round(ratio*100)}% de réussite
+    `;
+  } else if (mission.examen && win) {
+    overlay.innerHTML = `
+      <div class="result-card">
+        <div style="font-size:3rem;margin-bottom:8px;">🏰</div>
+        <div class="result-title" style="color:#10b981;">Examen réussi !</div>
+        <div style="font-family:'Fredoka One',cursive;font-size:0.95rem;color:#a78bfa;margin:6px 0;">
+          ${mission.id === 'p_examen_college' ? '🎓 Tu peux entrer au Royaume du Collège !' : '🏫 Tu peux entrer au Royaume du Lycée !'}
+        </div>
+        <div class="result-stars">${starsHtml}</div>
+        <div class="result-stats">
+          ✅ ${mOk} bonne(s) &nbsp;|&nbsp; ❌ ${mKo} erreur(s)<br>
+          🏆 ${mPts} points · ${Math.round(ratio*100)}%
+        </div>
+        ${nextCity ? `<div class="result-unlock">🔓 ${nextCity.nom} est maintenant débloquée !</div>` : ''}
+        <div class="result-btns">
+          <button class="btn-start" style="background:rgba(255,255,255,0.1);box-shadow:none;" onclick="closeResult(false)">🗺️ Retour carte</button>
+          <button class="btn-start" onclick="closeResult(true)">🔄 Rejouer</button>
+        </div>
       </div>
-      ${nextCity && win ? `<div class="result-unlock">🔓 ${nextCity.nom} est maintenant débloquée !</div>` : ''}
-      <div class="result-btns">
-        <button class="btn-start" style="background:rgba(255,255,255,0.1);box-shadow:none;" onclick="closeResult(false)">
-          🗺️ Retour carte
-        </button>
-        <button class="btn-start" style="${win?'':'background:linear-gradient(135deg,var(--red),#b91c1c);'}" onclick="closeResult(true)">
-          ${win ? '🔄 Rejouer' : '💪 Réessayer'}
-        </button>
+    `;
+  } else {
+    overlay.innerHTML = `
+      <div class="result-card">
+        <div class="result-emoji">${win ? mission.emoji : '😓'}</div>
+        <div class="result-title" style="color:${win?'var(--green)':'var(--red)'};">
+          ${win ? mission.nom + ' !' : 'Pas encore...'}
+        </div>
+        <div class="result-stars">${starsHtml}</div>
+        <div class="result-stats">
+          ✅ ${mOk} bonne(s) &nbsp;|&nbsp; ❌ ${mKo} erreur(s)<br>
+          🏆 ${mPts} points · ${Math.round(ratio*100)}% de réussite
+        </div>
+        ${nextCity && win ? `<div class="result-unlock">🔓 ${nextCity.nom} est maintenant débloquée !</div>` : ''}
+        <div class="result-btns">
+          <button class="btn-start" style="background:rgba(255,255,255,0.1);box-shadow:none;" onclick="closeResult(false)">
+            🗺️ Retour carte
+          </button>
+          <button class="btn-start" style="${win?'':'background:linear-gradient(135deg,var(--red),#b91c1c);'}" onclick="closeResult(true)">
+            ${win ? '🔄 Rejouer' : '💪 Réessayer'}
+          </button>
+        </div>
       </div>
-    </div>
-  `;
+    `;
+  }
 
   document.body.appendChild(overlay);
+
+  // Ville suivante automatique après 3s si victoire
+  if (win && nextCity && !mission.roi) {
+    setTimeout(() => {
+      document.querySelector('.result-overlay')?.remove();
+      selectedCity = nextCity;
+      startMission();
+    }, 3000);
+  }
 }
 
 function closeResult(replay) {
@@ -1805,6 +2083,136 @@ function toggleMusic() {
   const btn = document.getElementById('musicBtn');
   if (musicEnabled) { btn.textContent = '🔊'; startBgMusic(); }
   else { btn.textContent = '🔇'; stopBgMusic(); }
+}
+
+// ===================== CLASSEMENT =====================
+function showClassement() {
+  const modal = document.getElementById('classementModal');
+  modal.style.display = 'block';
+  renderClassement();
+}
+
+function hideClassement() {
+  document.getElementById('classementModal').style.display = 'none';
+}
+
+function resetScores() {
+  if (!confirm('Effacer tous les scores ?')) return;
+  try {
+    Object.keys(localStorage).filter(k => k.startsWith('bhds_')).forEach(k => {
+      if (k !== 'bhds_theme_map') localStorage.removeItem(k);
+    });
+  } catch(e){}
+  hideClassement();
+  renderMap();
+  updateGlobalScore();
+}
+
+function renderClassement() {
+  const allLists = { primaire: PRIMAIRES, college: COLLEGES, lycee: LYCEES };
+  const cycleNames = { primaire: '🌟 Primaire', college: '🎓 Collège', lycee: '🏫 Lycée' };
+  const cycleColors = { primaire: '#10b981', college: '#3b82f6', lycee: '#ea580c' };
+
+  // Score global
+  let totalEtoiles = 0, totalPts = 0, totalCompleted = 0, totalSteps = 0;
+  const topSteps = [];
+
+  Object.entries(allLists).forEach(([cycle, list]) => {
+    list.forEach(city => {
+      totalSteps++;
+      const saved = getSaved(city.id);
+      if (saved) {
+        totalCompleted++;
+        const etoiles = getStars(city.id);
+        totalEtoiles += etoiles;
+        totalPts += (saved.pts || 0);
+        topSteps.push({ city, etoiles, pts: saved.pts || 0, cycle });
+      }
+    });
+  });
+
+  // Score global
+  document.getElementById('clScoreGlobal').innerHTML = `
+    <div style="font-family:'Fredoka One',cursive;font-size:2rem;background:linear-gradient(135deg,#f59e0b,#10b981);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">${totalPts} pts</div>
+    <div style="color:rgba(240,244,255,0.7);font-size:0.85rem;margin:4px 0;">${totalCompleted} / ${totalSteps} étapes complétées</div>
+    <div style="font-size:1.2rem;margin-top:6px;">${'⭐'.repeat(Math.min(totalEtoiles,10))} ${totalEtoiles > 10 ? '+' : ''}</div>
+    <div style="color:rgba(240,244,255,0.5);font-size:0.75rem;">${totalEtoiles} étoile${totalEtoiles > 1 ? 's' : ''} au total</div>
+  `;
+
+  // Badges
+  const badges = [];
+  if (totalCompleted >= 1) badges.push({ icon: '🌱', label: 'Premier pas' });
+  if (totalCompleted >= 5) badges.push({ icon: '📚', label: 'Studieux' });
+  if (totalCompleted >= 10) badges.push({ icon: '🔥', label: 'En feu' });
+  if (totalCompleted >= 20) badges.push({ icon: '🦁', label: 'Champion' });
+  if (totalCompleted === totalSteps) badges.push({ icon: '👑', label: 'Maître' });
+  if (totalEtoiles >= 10) badges.push({ icon: '⭐', label: '10 étoiles' });
+  if (totalEtoiles >= 25) badges.push({ icon: '🌟', label: '25 étoiles' });
+  if (totalPts >= 500) badges.push({ icon: '💎', label: '500 pts' });
+  if (totalPts >= 1000) badges.push({ icon: '🏅', label: '1000 pts' });
+  if (PRIMAIRES.every(c => isCompleted(c))) badges.push({ icon: '🌍', label: 'Primaire ✓' });
+  if (COLLEGES.every(c => isCompleted(c))) badges.push({ icon: '🎓', label: 'Collège ✓' });
+  if (LYCEES.every(c => isCompleted(c))) badges.push({ icon: '🏫', label: 'Lycée ✓' });
+
+  const badgesEl = document.getElementById('clBadges');
+  if (badges.length === 0) {
+    badgesEl.innerHTML = '<div style="color:rgba(240,244,255,0.4);font-size:0.82rem;">Complete des étapes pour débloquer des badges !</div>';
+  } else {
+    badgesEl.innerHTML = badges.map(b => `
+      <div style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);border-radius:20px;padding:6px 14px;font-size:0.82rem;color:#fbbf24;font-weight:700;">
+        ${b.icon} ${b.label}
+      </div>
+    `).join('');
+  }
+
+  // Progression par cycle
+  const cyclesEl = document.getElementById('clCycles');
+  cyclesEl.innerHTML = Object.entries(allLists).map(([cycle, list]) => {
+    const done = list.filter(c => isCompleted(c)).length;
+    const pct = Math.round((done / list.length) * 100);
+    const etoiles = list.reduce((s, c) => s + getStars(c.id), 0);
+    return `
+      <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:12px 16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <span style="font-family:'Fredoka One',cursive;font-size:0.95rem;">${cycleNames[cycle]}</span>
+          <span style="font-size:0.8rem;color:rgba(240,244,255,0.6);">${done}/${list.length} · ${etoiles}⭐</span>
+        </div>
+        <div style="background:rgba(255,255,255,0.08);border-radius:20px;height:8px;overflow:hidden;">
+          <div style="height:100%;width:${pct}%;background:${cycleColors[cycle]};border-radius:20px;transition:width 0.5s;"></div>
+        </div>
+        <div style="text-align:right;font-size:0.72rem;color:rgba(240,244,255,0.4);margin-top:4px;">${pct}%</div>
+      </div>
+    `;
+  }).join('');
+
+  // Meilleures étapes
+  const meillEl = document.getElementById('clMeilleures');
+  const sorted = topSteps.sort((a, b) => b.etoiles - a.etoiles || b.pts - a.pts).slice(0, 5);
+  if (sorted.length === 0) {
+    meillEl.innerHTML = '<div style="color:rgba(240,244,255,0.4);font-size:0.82rem;">Aucune étape complétée pour l\'instant.</div>';
+  } else {
+    meillEl.innerHTML = sorted.map((s, i) => `
+      <div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.04);border-radius:12px;padding:10px 14px;">
+        <div style="font-size:1.3rem;width:32px;text-align:center;">${['🥇','🥈','🥉','4️⃣','5️⃣'][i]}</div>
+        <div style="flex:1;">
+          <div style="font-family:'Fredoka One',cursive;font-size:0.9rem;">${s.city.emoji} ${s.city.nom}</div>
+          <div style="font-size:0.72rem;color:rgba(240,244,255,0.5);">${cycleNames[s.cycle]}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="color:#fbbf24;font-size:0.85rem;">${'⭐'.repeat(s.etoiles)}</div>
+          <div style="font-size:0.72rem;color:rgba(240,244,255,0.5);">${s.pts} pts</div>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+function getStars(id) {
+  return (saveData[id] && saveData[id].stars) ? saveData[id].stars : 0;
+}
+
+function getSaved(id) {
+  return saveData[id] || null;
 }
 
 // ===================== THEME =====================
