@@ -201,16 +201,120 @@ body::before {
 
 .map-bg {
   position: absolute; inset: 0;
-  background: radial-gradient(ellipse at 30% 20%, #0d2a1e 0%, #071411 50%, #050d0a 100%);
+  background:
+    radial-gradient(ellipse at 15% 70%, #1a5c2a 0%, transparent 35%),
+    radial-gradient(ellipse at 80% 30%, #1e4d1a 0%, transparent 30%),
+    radial-gradient(ellipse at 55% 80%, #2a6b20 0%, transparent 25%),
+    radial-gradient(ellipse at 40% 45%, #3a7a28 0%, transparent 20%),
+    radial-gradient(ellipse at 70% 60%, #1a4a12 0%, transparent 28%),
+    linear-gradient(170deg, #1a3d0f 0%, #22520e 25%, #2d6b15 50%, #1e4d0a 75%, #162e09 100%);
   z-index: 0;
+}
+
+/* Map texture — grain parchemin */
+.map-bg::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(ellipse 2px 1px at 12% 8%, rgba(255,220,100,0.06) 0%, transparent 100%),
+    radial-gradient(ellipse 1px 2px at 34% 22%, rgba(255,220,100,0.04) 0%, transparent 100%),
+    radial-gradient(ellipse 3px 1px at 67% 11%, rgba(255,220,100,0.05) 0%, transparent 100%),
+    radial-gradient(ellipse 2px 2px at 88% 35%, rgba(255,220,100,0.04) 0%, transparent 100%),
+    radial-gradient(ellipse 1px 3px at 23% 58%, rgba(255,220,100,0.05) 0%, transparent 100%),
+    radial-gradient(ellipse 2px 1px at 75% 72%, rgba(255,220,100,0.04) 0%, transparent 100%),
+    radial-gradient(ellipse 1px 2px at 50% 90%, rgba(255,220,100,0.05) 0%, transparent 100%);
+  z-index: 0;
+  pointer-events: none;
 }
 
 /* Map texture dots */
 .map-bg::after {
   content: '';
   position: absolute; inset: 0;
-  background-image: radial-gradient(circle, rgba(255,255,255,0.015) 1px, transparent 1px);
-  background-size: 28px 28px;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.012) 1px, transparent 1px);
+  background-size: 22px 22px;
+  z-index: 0;
+}
+
+/* Sprite joueur */
+.player-sprite {
+  position: absolute;
+  font-size: 1.6rem;
+  z-index: 5;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: left 0.9s cubic-bezier(0.4, 0, 0.2, 1), top 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: drop-shadow(0 3px 8px rgba(0,0,0,0.7));
+  animation: playerBob 1.2s ease-in-out infinite;
+}
+@keyframes playerBob {
+  0%,100% { margin-top: 0px; }
+  50% { margin-top: -5px; }
+}
+/* Animation de marche : oscillation rapide pendant le déplacement */
+.player-sprite.walking {
+  animation: playerWalk 0.25s ease-in-out infinite;
+}
+@keyframes playerWalk {
+  0%   { margin-top: 0px;  font-size: 1.6rem; }
+  25%  { margin-top: -6px; font-size: 1.65rem; }
+  50%  { margin-top: 0px;  font-size: 1.6rem; }
+  75%  { margin-top: -4px; font-size: 1.58rem; }
+  100% { margin-top: 0px;  font-size: 1.6rem; }
+}
+
+/* Bulle de dialogue */
+.player-bubble {
+  position: absolute;
+  z-index: 6;
+  pointer-events: none;
+  background: rgba(20, 20, 40, 0.92);
+  border: 1.5px solid rgba(167,139,250,0.6);
+  border-radius: 12px;
+  padding: 5px 10px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.7rem;
+  color: #e0d4ff;
+  white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  transform: translate(-50%, -100%) translateY(-14px);
+  transition: left 0.9s cubic-bezier(0.4,0,0.2,1), top 0.9s cubic-bezier(0.4,0,0.2,1);
+  animation: bubblePop 0.3s ease;
+}
+.player-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -7px; left: 50%;
+  transform: translateX(-50%);
+  border: 7px solid transparent;
+  border-top-color: rgba(167,139,250,0.6);
+  border-bottom: none;
+}
+.player-bubble.hide {
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+@keyframes bubblePop {
+  0%   { transform: translate(-50%,-100%) translateY(-14px) scale(0.7); opacity:0; }
+  60%  { transform: translate(-50%,-100%) translateY(-14px) scale(1.05); opacity:1; }
+  100% { transform: translate(-50%,-100%) translateY(-14px) scale(1); opacity:1; }
+}
+
+/* Trace de pas */
+.footprint {
+  position: absolute;
+  font-size: 0.7rem;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  animation: footAppear 2.5s ease forwards;
+}
+@keyframes footAppear {
+  0%   { opacity: 0; transform: translate(-50%,-50%) scale(0.5); }
+  20%  { opacity: 0.7; transform: translate(-50%,-50%) scale(1); }
+  80%  { opacity: 0.5; }
+  100% { opacity: 0.25; }
 }
 
 .map-title-bar {
@@ -240,9 +344,11 @@ body::before {
 /* ===== PATHS (SVG) ===== */
 .map-svg {
   position: absolute; inset: 0;
-  width: 100%; height: 100%;
+  width: 100%;
+  height: 100%;
   z-index: 1;
   pointer-events: none;
+  overflow: visible;
 }
 
 /* ===== GRID ===== */
@@ -311,6 +417,15 @@ body::before {
   letter-spacing: 0.5px;
 }
 .city-node.locked .city-name { opacity: 0.3; }
+
+.city-building {
+  font-size: 0.75rem;
+  margin: 1px auto 0;
+  text-align: center;
+  line-height: 1;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8));
+  min-height: 14px;
+}
 
 .city-stars {
   font-size: 0.6rem;
@@ -742,7 +857,167 @@ body.light .map-bg { background: radial-gradient(ellipse at 30% 20%, #c8e6c9 0%,
 body.light .opt-btn { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.12); color: #1a1a2e; }
 body.light .score-pill { background: rgba(0,0,0,0.06); border-color: rgba(0,0,0,0.1); }
 
-/* ===== RESPONSIVE ===== */
+/* ===== VIES / CŒURS ===== */
+.hearts-display {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+}
+.heart-item {
+  transition: transform 0.3s, opacity 0.3s;
+}
+.heart-item.lost {
+  opacity: 0.25;
+  filter: grayscale(1);
+  transform: scale(0.85);
+}
+@keyframes heartShake {
+  0%,100%{transform:scale(1)}
+  25%{transform:scale(1.4) rotate(-8deg)}
+  50%{transform:scale(0.8)}
+  75%{transform:scale(1.2) rotate(5deg)}
+}
+.heart-item.shake { animation: heartShake 0.5s ease; }
+
+@keyframes heartRestore {
+  0%{transform:scale(0);opacity:0}
+  60%{transform:scale(1.3);opacity:1}
+  100%{transform:scale(1);opacity:1}
+}
+.heart-item.restore { animation: heartRestore 0.5s ease; }
+
+.no-lives-banner {
+  background: linear-gradient(135deg, rgba(239,68,68,0.15), rgba(185,28,28,0.1));
+  border: 1px solid rgba(239,68,68,0.4);
+  border-radius: 12px;
+  padding: 10px 16px;
+  margin-bottom: 10px;
+  text-align: center;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.9rem;
+  color: #f87171;
+  display: none;
+}
+.no-lives-banner.show { display: block; }
+
+/* ===== BOUSSOLE ===== */
+.compass {
+  position: absolute;
+  bottom: 14px;
+  right: 14px;
+  z-index: 4;
+  width: 44px;
+  height: 44px;
+  pointer-events: none;
+}
+.compass-ring {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: rgba(10,12,25,0.85);
+  border: 2px solid rgba(167,139,250,0.5);
+  box-shadow: 0 0 14px rgba(167,139,250,0.25), inset 0 0 8px rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.compass-ring::before {
+  content: 'N';
+  position: absolute;
+  top: 2px; left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.5rem;
+  color: #f87171;
+  letter-spacing: 0;
+}
+.compass-ring::after {
+  content: 'S';
+  position: absolute;
+  bottom: 2px; left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.5rem;
+  color: rgba(255,255,255,0.4);
+}
+.compass-needle {
+  width: 3px;
+  height: 26px;
+  position: relative;
+  animation: compassSpin 8s ease-in-out infinite;
+  transform-origin: 50% 50%;
+}
+.compass-needle::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px; height: 13px;
+  background: linear-gradient(to bottom, #f87171, #ef4444);
+  border-radius: 2px 2px 0 0;
+}
+.compass-needle::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 3px; height: 13px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 0 0 2px 2px;
+}
+@keyframes compassSpin {
+  0%,100% { transform: rotate(0deg); }
+  20%      { transform: rotate(8deg); }
+  40%      { transform: rotate(-5deg); }
+  60%      { transform: rotate(12deg); }
+  80%      { transform: rotate(-3deg); }
+}
+
+/* ===== COMPTEUR CONQUÊTE ===== */
+.conquest-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px 4px;
+  position: relative;
+  z-index: 2;
+}
+.conquest-label {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.65rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  white-space: nowrap;
+}
+.conquest-track {
+  flex: 1;
+  height: 6px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 20px;
+  overflow: hidden;
+}
+.conquest-fill {
+  height: 100%;
+  border-radius: 20px;
+  transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+  background: linear-gradient(90deg, #34d399, #a78bfa);
+}
+.conquest-pct {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.72rem;
+  color: var(--accent);
+  min-width: 34px;
+  text-align: right;
+}
+
+/* ===== ZOOM CHANGEMENT D'ONGLET ===== */
+@keyframes mapZoomIn {
+  0%   { transform: scale(0.93); opacity: 0.5; }
+  60%  { transform: scale(1.02); opacity: 1; }
+  100% { transform: scale(1);    opacity: 1; }
+}
+.map-grid.zoom-in {
+  animation: mapZoomIn 0.5s cubic-bezier(0.4,0,0.2,1) forwards;
+}
 @media(max-width:500px) {
   .title { font-size: 1.8rem; }
   .q-text { font-size: 1.35rem; }
@@ -750,6 +1025,79 @@ body.light .score-pill { background: rgba(0,0,0,0.06); border-color: rgba(0,0,0,
   .map-grid { min-height: 380px; }
   .info-stats { grid-template-columns: 1fr 1fr; }
 }
+
+/* ===== MODAL CHOIX PERSONNAGE ===== */
+.perso-modal {
+  display: none;
+  position: fixed; inset: 0; z-index: 2000;
+  background: rgba(0,0,0,0.88);
+  backdrop-filter: blur(10px);
+  align-items: center;
+  justify-content: center;
+}
+.perso-modal.show { display: flex; }
+.perso-box {
+  background: linear-gradient(135deg, #0e1420, #111827);
+  border: 1px solid rgba(167,139,250,0.35);
+  border-radius: 24px;
+  padding: 28px 24px;
+  max-width: 360px;
+  width: 92%;
+  text-align: center;
+}
+.perso-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.3rem;
+  background: linear-gradient(135deg, #a78bfa, #34d399);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 6px;
+}
+.perso-subtitle {
+  font-size: 0.78rem;
+  opacity: 0.5;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.perso-group-label {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.78rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  opacity: 0.45;
+  margin: 14px 0 8px;
+}
+.perso-grid {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.perso-card {
+  background: rgba(255,255,255,0.05);
+  border: 2px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 10px 8px;
+  cursor: pointer;
+  transition: all 0.22s;
+  min-width: 68px;
+}
+.perso-card:hover { background: rgba(167,139,250,0.15); border-color: rgba(167,139,250,0.5); transform: translateY(-3px); }
+.perso-card.selected { background: rgba(167,139,250,0.22); border-color: var(--accent); box-shadow: 0 0 16px rgba(167,139,250,0.4); }
+.perso-emoji { font-size: 2.2rem; display: block; }
+.perso-name { font-size: 0.62rem; opacity: 0.6; margin-top: 4px; font-weight: 700; }
+.perso-close {
+  margin-top: 20px;
+  background: linear-gradient(135deg, var(--accent), #7c3aed);
+  border: none; border-radius: 12px;
+  color: white; cursor: pointer;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1rem; padding: 10px 32px;
+  transition: all 0.2s;
+}
+.perso-close:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(167,139,250,0.4); }
 </style>
 </head>
 <body>
@@ -766,6 +1114,7 @@ body.light .score-pill { background: rgba(0,0,0,0.06); border-color: rgba(0,0,0,
       <div class="header-controls">
         <button class="ctrl-btn" onclick="window.location.href='index.html'" title="Accueil plateforme">🏠</button>
         <button class="ctrl-btn" onclick="showClassement()" title="Classement">🏆</button>
+        <button class="ctrl-btn" id="persoBtn" onclick="showPersoModal()" title="Choisir personnage">🧒🏿</button>
         <button class="ctrl-btn" id="themeBtn" onclick="toggleTheme()" title="Thème">🌙</button>
         <button class="ctrl-btn" id="musicBtn" onclick="toggleMusic()" title="Son">🔊</button>
       </div>
@@ -776,8 +1125,27 @@ body.light .score-pill { background: rgba(0,0,0,0.06); border-color: rgba(0,0,0,
       <div class="score-pill">❌ <span id="sKo">0</span></div>
       <div class="score-pill">🏆 <span id="sPts">0</span> pts</div>
       <div class="score-pill">🏙️ <span id="sVilles">0</span>/<span id="sTotal">0</span> étapes</div>
+      <div class="score-pill" id="heartsPill">
+        <div class="hearts-display" id="heartsDisplay"></div>
+      </div>
     </div>
   </header>
+
+  <!-- MODAL CHOIX PERSONNAGE -->
+  <div class="perso-modal" id="persoModal" onclick="if(event.target===this)hidePersoModal()">
+    <div class="perso-box">
+      <div class="perso-title">👑 Choisis ton aventurier</div>
+      <div class="perso-subtitle">Joueur ou joueuse africain(e)</div>
+
+      <div class="perso-group-label">👦🏿 Garçons</div>
+      <div class="perso-grid" id="persoGridG"></div>
+
+      <div class="perso-group-label">👧🏿 Filles</div>
+      <div class="perso-grid" id="persoGridF"></div>
+
+      <button class="perso-close" onclick="hidePersoModal()">✅ Confirmer</button>
+    </div>
+  </div>
 
   <!-- TABS -->
   <div class="tabs">
@@ -833,7 +1201,19 @@ body.light .score-pill { background: rgba(0,0,0,0.06); border-color: rgba(0,0,0,
         <div class="map-region-label" id="mapLabel">Royaume du Collège</div>
         <div class="map-progress-info" id="mapProgressInfo">0 / 8 étapes</div>
       </div>
+      <!-- Barre de conquête -->
+      <div class="conquest-bar">
+        <div class="conquest-label">⚔️ Conquête</div>
+        <div class="conquest-track"><div class="conquest-fill" id="conquestFill" style="width:0%"></div></div>
+        <div class="conquest-pct" id="conquestPct">0%</div>
+      </div>
       <div class="map-grid" id="mapGrid"></div>
+      <!-- Boussole -->
+      <div class="compass">
+        <div class="compass-ring">
+          <div class="compass-needle"></div>
+        </div>
+      </div>
     </div>
 
     <div class="info-panel" id="infoPanel">
@@ -867,6 +1247,7 @@ body.light .score-pill { background: rgba(0,0,0,0.06); border-color: rgba(0,0,0,
   <!-- GAME VIEW -->
   <div class="game-wrap" id="gameView">
     <button class="btn-back" onclick="backToMap()">← Retour carte</button>
+    <div class="no-lives-banner" id="noLivesBanner">💔 Plus de cœurs ! Attends <span id="rechargeTimer">30:00</span> ou retourne à la carte.</div>
     <div class="mission-banner">
       <span>🎯 Mission :</span>
       <span class="mission-city" id="missionLabel">—</span>
@@ -1535,6 +1916,31 @@ const LYCEES = [
     ]
   },
   {
+    id:'l_interferences',
+    nom:'Prisme des Interférences',
+    emoji:'🌈',
+    matiere:'Interférences Lumineuses',
+    niveau:'Terminale',
+    desc:'Cohérence, déphasage, fentes de Young, interfranges, anneaux de Newton et applications des interférences.',
+    tags:[{t:'Optique',c:'var(--teal)'},{t:'Interférences',c:'var(--accent)'}],
+    diff:'⭐⭐⭐⭐',
+    questions:10,
+    prerequis:['l_physique'],
+    x:32, y:80,
+    data:[
+      { q:"Deux sources sont cohérentes si elles ont :", opts:["La même amplitude uniquement","La même fréquence et une différence de phase constante","La même couleur uniquement","Des amplitudes différentes"], ans:1, fact:"La cohérence (temporelle et spatiale) est indispensable pour observer des interférences stables. Une source étendue ordinaire est incohérente." },
+      { q:"La condition d'interférence constructive (frange brillante) est :", opts:["δ = (2k+1)·λ/2","δ = k·λ (k entier)","δ = k·λ/2","δ = k·λ/4"], ans:1, fact:"Frange brillante si le chemin optique δ = k·λ (k = 0, ±1, ±2…). Les deux ondes arrivent en phase et s'amplifient." },
+      { q:"La condition d'interférence destructive (frange sombre) est :", opts:["δ = k·λ","δ = (2k+1)·λ/2","δ = k·λ/4","δ = 2k·λ"], ans:1, fact:"Frange sombre si δ = (2k+1)·λ/2 = (k+½)·λ. Les ondes sont en opposition de phase et s'annulent." },
+      { q:"Dans l'expérience des fentes de Young, l'interfrange i est :", opts:["i = d·λ/D","i = λ·D/d","i = D·d/λ","i = λ/d"], ans:1, fact:"i = λ·D/d, où D est la distance fentes-écran, d l'écart entre les fentes, λ la longueur d'onde. Plus D est grand ou d petit, plus les franges sont larges." },
+      { q:"Que se passe-t-il si on augmente l'écart d entre les fentes de Young ?", opts:["L'interfrange augmente","L'interfrange diminue","L'interfrange ne change pas","Les franges disparaissent"], ans:1, fact:"i = λD/d : si d augmente, i diminue (franges plus serrées). Si d diminue, i augmente (franges plus larges)." },
+      { q:"La différence de marche δ en un point M de l'écran (fentes de Young) est :", opts:["δ = d·x/D","δ = D·x/d","δ = λ·x/D","δ = x·D"], ans:0, fact:"δ = d·x/D, où x est l'abscisse du point M par rapport à la frange centrale O. La frange centrale (x=0) est toujours brillante." },
+      { q:"Lorsqu'on éclaire les fentes de Young avec une lumière blanche, on observe :", opts:["Des franges noires et blanches uniquement","Une frange centrale blanche et des franges colorées irisées de part et d'autre","Une seule couleur","Aucune frange"], ans:1, fact:"En lumière blanche : frange centrale blanche (δ=0 pour toutes λ), puis irisations car i varie avec λ. Les couleurs extrêmes se brouillent vite." },
+      { q:"Dans une lame d'air entre deux lentilles (anneaux de Newton), les anneaux sombres sont dus à :", opts:["Des interférences constructives","Une réflexion sur une surface dure (déphasage π) + épaisseur nulle au centre","Des défauts de la lentille","La diffraction"], ans:1, fact:"Au contact (e=0) : réflexion sur le verre dense → déphasage λ/2 → interférence destructive → tache centrale noire. Anneaux alternés." },
+      { q:"Le rayon r_k du k-ième anneau sombre de Newton est :", opts:["r_k = k·λ·R","r_k = √(k·λ·R)","r_k = k²·λ·R","r_k = √(k²·λ·R)"], ans:1, fact:"r_k = √(k·λ·R), où R est le rayon de courbure de la lentille. Les anneaux sont d'autant plus serrés que k est grand." },
+      { q:"Les interférences lumineuses ont une application directe dans :", opts:["Les microscopes électroniques","Les traitements antireflet des lentilles et le contrôle de planéité des surfaces optiques","Les accélérateurs de particules","Les fibres optiques en propagation"], ans:1, fact:"Les couches antireflet (λ/4) exploitent les interférences destructives. Le contrôle interférométrique vérifie le polissage des optiques à λ/10 près." },
+    ]
+  },
+  {
     id:'l_examen_roi',
     nom:'Trône des Trois Royaumes',
     emoji:'👑',
@@ -1573,6 +1979,72 @@ const LYCEES = [
 let currentTab = 'college';
 let saveData = {};
 let selectedCity = null;
+let currentPlayer = '🧒🏿'; // joueur par défaut — enfant africain
+
+// ===================== PERSONNAGES =====================
+const PERSO_GARCONS = [
+  { emoji:'🧒🏿', nom:'Élève' },
+  { emoji:'👦🏿', nom:'Garçon' },
+  { emoji:'🧑🏿‍🎓', nom:'Étudiant' },
+  { emoji:'👨🏿‍🎓', nom:'Bachelier' },
+  { emoji:'🧑🏿‍🏫', nom:'Prof' },
+  { emoji:'🦸🏿‍♂️', nom:'Héros' },
+];
+const PERSO_FILLES = [
+  { emoji:'👧🏿', nom:'Fille' },
+  { emoji:'🧒🏿', nom:'Élève' },
+  { emoji:'👩🏿‍🎓', nom:'Étudiante' },
+  { emoji:'🧑🏿‍🎓', nom:'Bachelière' },
+  { emoji:'👩🏿‍🏫', nom:'Prof' },
+  { emoji:'🦸🏿‍♀️', nom:'Héroïne' },
+];
+
+function showPersoModal() {
+  renderPersoGrid('persoGridG', PERSO_GARCONS);
+  renderPersoGrid('persoGridF', PERSO_FILLES);
+  document.getElementById('persoModal').classList.add('show');
+}
+
+function hidePersoModal() {
+  document.getElementById('persoModal').classList.remove('show');
+}
+
+function renderPersoGrid(containerId, list) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = list.map((p, i) => `
+    <div class="perso-card ${p.emoji === currentPlayer ? 'selected' : ''}"
+         onclick="selectPlayer('${p.emoji}', '${containerId}', ${i})">
+      <span class="perso-emoji">${p.emoji}</span>
+      <div class="perso-name">${p.nom}</div>
+    </div>
+  `).join('');
+}
+
+function selectPlayer(emoji, containerId, idx) {
+  currentPlayer = emoji;
+  // Mettre à jour les deux grilles
+  renderPersoGrid('persoGridG', PERSO_GARCONS);
+  renderPersoGrid('persoGridF', PERSO_FILLES);
+  // Mettre à jour le bouton header
+  document.getElementById('persoBtn').textContent = emoji;
+  // Mettre à jour le sprite sur la carte si visible
+  const sprite = document.getElementById('playerSprite');
+  if (sprite) sprite.textContent = emoji;
+  // Sauvegarder le choix
+  try { localStorage.setItem('bhds_player', emoji); } catch(e) {}
+}
+
+// Restaurer le personnage sauvegardé
+try {
+  const saved = localStorage.getItem('bhds_player');
+  if (saved) {
+    currentPlayer = saved;
+    document.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('persoBtn');
+      if (btn) btn.textContent = saved;
+    });
+  }
+} catch(e) {}
 let mission = null;
 let missionQIdx = 0;
 let mOk = 0, mKo = 0, mPts = 0;
@@ -1580,6 +2052,121 @@ let answered = false;
 let chronoInterval = null;
 let chronoLeft = 0;
 let totalOk = 0, totalKo = 0, totalPts = 0;
+
+// ===== SYSTÈME DE VIES =====
+const MAX_LIVES = 3;
+const RECHARGE_MS = 30 * 60 * 1000; // 30 minutes
+let livesRechargeTimer = null;
+
+function getLivesData() {
+  try {
+    const d = JSON.parse(localStorage.getItem('bhds_lives') || 'null');
+    if (!d) return { lives: MAX_LIVES, lostAt: null };
+    return d;
+  } catch(e) { return { lives: MAX_LIVES, lostAt: null }; }
+}
+
+function saveLivesData(d) {
+  try { localStorage.setItem('bhds_lives', JSON.stringify(d)); } catch(e) {}
+}
+
+function getCurrentLives() {
+  const d = getLivesData();
+  // Recharge automatique basée sur le temps
+  if (d.lives < MAX_LIVES && d.lostAt) {
+    const elapsed = Date.now() - d.lostAt;
+    const restored = Math.floor(elapsed / RECHARGE_MS);
+    if (restored > 0) {
+      d.lives = Math.min(MAX_LIVES, d.lives + restored);
+      d.lostAt = d.lives < MAX_LIVES ? d.lostAt + restored * RECHARGE_MS : null;
+      saveLivesData(d);
+    }
+  }
+  return d.lives;
+}
+
+function loseLife() {
+  const d = getLivesData();
+  if (d.lives > 0) {
+    d.lives--;
+    if (d.lives < MAX_LIVES && !d.lostAt) d.lostAt = Date.now();
+    saveLivesData(d);
+  }
+  renderHearts();
+}
+
+function renderHearts() {
+  const lives = getCurrentLives();
+  const el = document.getElementById('heartsDisplay');
+  if (!el) return;
+  el.innerHTML = '';
+  for (let i = 0; i < MAX_LIVES; i++) {
+    const h = document.createElement('span');
+    h.className = 'heart-item' + (i >= lives ? ' lost' : '');
+    h.id = 'heart-' + i;
+    h.textContent = '❤️';
+    el.appendChild(h);
+  }
+  // Bannière si 0 vies
+  updateNoLivesBanner();
+}
+
+function animateHeartLost() {
+  const lives = getCurrentLives();
+  const h = document.getElementById('heart-' + lives);
+  if (h) {
+    h.classList.add('shake');
+    setTimeout(() => { h.classList.remove('shake'); h.classList.add('lost'); }, 500);
+  }
+}
+
+function animateHeartRestore(idx) {
+  const h = document.getElementById('heart-' + idx);
+  if (h) {
+    h.classList.remove('lost');
+    h.classList.add('restore');
+    setTimeout(() => h.classList.remove('restore'), 500);
+  }
+}
+
+function updateNoLivesBanner() {
+  const banner = document.getElementById('noLivesBanner');
+  if (!banner) return;
+  const lives = getCurrentLives();
+  if (lives <= 0) {
+    banner.classList.add('show');
+    startRechargeCountdown();
+  } else {
+    banner.classList.remove('show');
+    stopRechargeCountdown();
+  }
+}
+
+function startRechargeCountdown() {
+  stopRechargeCountdown();
+  const d = getLivesData();
+  if (!d.lostAt) return;
+  livesRechargeTimer = setInterval(() => {
+    const remaining = RECHARGE_MS - (Date.now() - d.lostAt);
+    if (remaining <= 0) {
+      // Recharge ! Relire les données
+      const newLives = getCurrentLives();
+      if (newLives > 0) {
+        stopRechargeCountdown();
+        renderHearts();
+        return;
+      }
+    }
+    const mins = Math.floor(Math.max(0, remaining) / 60000);
+    const secs = Math.floor((Math.max(0, remaining) % 60000) / 1000);
+    const el = document.getElementById('rechargeTimer');
+    if (el) el.textContent = mins + ':' + String(secs).padStart(2, '0');
+  }, 1000);
+}
+
+function stopRechargeCountdown() {
+  if (livesRechargeTimer) { clearInterval(livesRechargeTimer); livesRechargeTimer = null; }
+}
 
 // Load save
 try { saveData = JSON.parse(localStorage.getItem('bhds_aventure_v2') || '{}'); } catch(e) { saveData = {}; }
@@ -1606,6 +2193,12 @@ function switchTab(tab) {
   selectedCity = null;
   document.getElementById('infoPanel').classList.remove('show');
   renderMap();
+  // Zoom animation sur le mapGrid au changement d'onglet
+  const grid = document.getElementById('mapGrid');
+  grid.classList.remove('zoom-in');
+  void grid.offsetWidth; // reflow pour relancer l'animation
+  grid.classList.add('zoom-in');
+  setTimeout(() => grid.classList.remove('zoom-in'), 520);
 }
 
 // ===================== MAP RENDER =====================
@@ -1623,7 +2216,164 @@ function renderMap() {
   const completed = list.filter(c => isCompleted(c)).length;
   info.textContent = `${completed} / ${list.length} étapes`;
 
+  // Compteur de conquête
+  const pct = list.length > 0 ? Math.round((completed / list.length) * 100) : 0;
+  const fillEl = document.getElementById('conquestFill');
+  const pctEl  = document.getElementById('conquestPct');
+  if (fillEl) fillEl.style.width = pct + '%';
+  if (pctEl)  pctEl.textContent  = pct + '%';
+
+  // ===== DÉCORS SVG AVENTURE =====
+  // Le SVG a viewBox="0 0 100 100" — on dessine dans cet espace normalisé
+  const NS = 'http://www.w3.org/2000/svg';
+
+  // --- FLEUVES ---
+  const rivers = [
+    // Fleuve principal (sinueux de gauche à droite)
+    { d:'M -2,28 C 8,30 14,22 22,26 C 32,31 38,35 48,32 C 58,29 64,34 72,38 C 80,42 88,36 102,40', color:'#1a6fa8', opacity:0.55, w:'1.2' },
+    // Petit affluent
+    { d:'M 58,10 C 60,18 56,24 52,30 C 50,33 49,33 48,32', color:'#2281be', opacity:0.4, w:'0.6' },
+    // Fleuve secondaire bas
+    { d:'M -2,72 C 12,68 20,74 30,70 C 42,66 50,72 60,68 C 70,64 80,70 102,66', color:'#1a6fa8', opacity:0.45, w:'0.9' },
+  ];
+  rivers.forEach(r => {
+    const path = document.createElementNS(NS, 'path');
+    path.setAttribute('d', r.d);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', r.color);
+    path.setAttribute('stroke-width', r.w);
+    path.setAttribute('stroke-linecap', 'round');
+    path.setAttribute('opacity', r.opacity);
+    svg.appendChild(path);
+    // reflet eau
+    const path2 = document.createElementNS(NS, 'path');
+    path2.setAttribute('d', r.d);
+    path2.setAttribute('fill', 'none');
+    path2.setAttribute('stroke', 'rgba(100,200,255,0.25)');
+    path2.setAttribute('stroke-width', parseFloat(r.w)*0.4);
+    path2.setAttribute('stroke-dasharray', '1,2');
+    path2.setAttribute('opacity', '0.5');
+    svg.appendChild(path2);
+  });
+
+  // --- MONTAGNES ---
+  const mountains = [
+    // Chaîne gauche
+    { pts:'4,55 8,44 12,55', fill:'#4a3520', stroke:'#6b5030' },
+    { pts:'10,55 14,42 18,55', fill:'#3d2d18', stroke:'#5c4428' },
+    { pts:'13,55 17,38 21,55', fill:'#563d22', stroke:'#7a5a32' },
+    // Neige sommet
+    { pts:'15,44 17,38 19,44', fill:'rgba(230,230,255,0.7)', stroke:'none' },
+    // Chaîne droite
+    { pts:'72,48 76,36 80,48', fill:'#4a3520', stroke:'#6b5030' },
+    { pts:'78,48 82,40 86,48', fill:'#3d2d18', stroke:'#5c4428' },
+    { pts:'75,48 78,34 81,48', fill:'#563d22', stroke:'#7a5a32' },
+    // Neige
+    { pts:'76,40 78,34 80,40', fill:'rgba(230,230,255,0.7)', stroke:'none' },
+    // Petites collines centre-haut
+    { pts:'40,20 44,14 48,20', fill:'#3d5218', stroke:'#506a20' },
+    { pts:'44,20 48,12 52,20', fill:'#324515', stroke:'#426018' },
+  ];
+  mountains.forEach(m => {
+    const poly = document.createElementNS(NS, 'polygon');
+    poly.setAttribute('points', m.pts);
+    poly.setAttribute('fill', m.fill);
+    if (m.stroke !== 'none') poly.setAttribute('stroke', m.stroke);
+    poly.setAttribute('stroke-width', '0.3');
+    poly.setAttribute('opacity', '0.75');
+    svg.appendChild(poly);
+  });
+
+  // --- FORÊTS (petits arbres stylisés) ---
+  const forests = [
+    // Forêt gauche-bas
+    [28,62],[30,65],[32,60],[34,64],[26,65],
+    // Forêt droite-milieu
+    [60,55],[62,58],[64,52],[66,56],
+    // Forêt haut-droite
+    [82,18],[84,22],[86,16],[88,20],
+    // Quelques arbres épars
+    [10,80],[12,76],[55,85],[58,82],[42,78],
+  ];
+  forests.forEach(([fx,fy]) => {
+    // Tronc
+    const trunk = document.createElementNS(NS,'rect');
+    trunk.setAttribute('x', fx-0.4); trunk.setAttribute('y', fy+1.2);
+    trunk.setAttribute('width','0.8'); trunk.setAttribute('height','2');
+    trunk.setAttribute('fill','#5c3d1a'); trunk.setAttribute('opacity','0.6');
+    svg.appendChild(trunk);
+    // Feuillage (triangle)
+    const tree = document.createElementNS(NS,'polygon');
+    tree.setAttribute('points', `${fx},${fy-2} ${fx-2.2},${fy+1.5} ${fx+2.2},${fy+1.5}`);
+    tree.setAttribute('fill','#2d7a1e');
+    tree.setAttribute('stroke','#1e5c14');
+    tree.setAttribute('stroke-width','0.2');
+    tree.setAttribute('opacity','0.7');
+    svg.appendChild(tree);
+    // Couche 2
+    const tree2 = document.createElementNS(NS,'polygon');
+    tree2.setAttribute('points', `${fx},${fy-4} ${fx-1.6},${fy-1} ${fx+1.6},${fy-1}`);
+    tree2.setAttribute('fill','#369e22');
+    tree2.setAttribute('opacity','0.65');
+    svg.appendChild(tree2);
+  });
+
+  // --- NOMS DE RÉGIONS GUINÉENNES ---
+  // Chaque région : position x/y en % du viewBox (0-100), texte, couleur, rotation optionnelle
+  const regions = [
+    // Fouta-Djalon — zone montagneuse gauche/centre
+    { x:14, y:47, label:'Fouta-Djalon', size:2.8, color:'rgba(255,210,120,0.55)', rot:-18, italic:true },
+    // Basse-Guinée — zone côtière haut
+    { x:46, y:8,  label:'Basse-Guinée', size:2.6, color:'rgba(100,210,255,0.45)', rot:0,   italic:true },
+    // Haute-Guinée — zone droite milieu
+    { x:74, y:42, label:'Haute-Guinée', size:2.7, color:'rgba(255,180,80,0.45)',  rot:10,  italic:true },
+    // Guinée Forestière — zone basse droite
+    { x:62, y:78, label:'Guinée Forestière', size:2.5, color:'rgba(80,220,120,0.45)', rot:-8, italic:true },
+    // Fleuve Niger (label fleuve)
+    { x:36, y:31, label:'Niger ›', size:1.8, color:'rgba(100,180,255,0.5)', rot:-6, italic:false },
+    // Fleuve Gambie
+    { x:22, y:68, label:'Gambie ›', size:1.7, color:'rgba(100,180,255,0.45)', rot:4, italic:false },
+  ];
+
+  regions.forEach(r => {
+    const g = document.createElementNS(NS, 'g');
+    g.setAttribute('transform', `rotate(${r.rot}, ${r.x}, ${r.y})`);
+
+    // Halo derrière le texte pour lisibilité
+    const shadow = document.createElementNS(NS, 'text');
+    shadow.setAttribute('x', r.x + '%');
+    shadow.setAttribute('y', r.y + '%');
+    shadow.setAttribute('text-anchor', 'middle');
+    shadow.setAttribute('font-size', r.size + '%');
+    shadow.setAttribute('font-family', r.italic ? 'Georgia, serif' : 'Georgia, serif');
+    shadow.setAttribute('font-style', r.italic ? 'italic' : 'normal');
+    shadow.setAttribute('font-weight', '700');
+    shadow.setAttribute('fill', 'rgba(0,0,0,0.7)');
+    shadow.setAttribute('stroke', 'rgba(0,0,0,0.8)');
+    shadow.setAttribute('stroke-width', '0.6');
+    shadow.setAttribute('letter-spacing', '0.3');
+    shadow.textContent = r.label;
+    g.appendChild(shadow);
+
+    // Texte principal
+    const txt = document.createElementNS(NS, 'text');
+    txt.setAttribute('x', r.x + '%');
+    txt.setAttribute('y', r.y + '%');
+    txt.setAttribute('text-anchor', 'middle');
+    txt.setAttribute('font-size', r.size + '%');
+    txt.setAttribute('font-family', 'Georgia, serif');
+    txt.setAttribute('font-style', r.italic ? 'italic' : 'normal');
+    txt.setAttribute('font-weight', '700');
+    txt.setAttribute('fill', r.color);
+    txt.setAttribute('letter-spacing', '0.3');
+    txt.textContent = r.label;
+    g.appendChild(txt);
+
+    svg.appendChild(g);
+  });
+
   // Draw paths
+  const PX_PER_PCT = 6;
   list.forEach(city => {
     city.prerequis.forEach(prereqId => {
       const prereq = list.find(c => c.id === prereqId);
@@ -1632,8 +2382,8 @@ function renderMap() {
       const x2 = city.x, y2 = city.y;
       const done = isCompleted(prereq) && isCompleted(city);
       const line = document.createElementNS('http://www.w3.org/2000/svg','line');
-      line.setAttribute('x1', x1+'%'); line.setAttribute('y1', y1+'%');
-      line.setAttribute('x2', x2+'%'); line.setAttribute('y2', y2+'%');
+      line.setAttribute('x1', x1+'%'); line.setAttribute('y1', (y1 * PX_PER_PCT)+'px');
+      line.setAttribute('x2', x2+'%'); line.setAttribute('y2', (y2 * PX_PER_PCT)+'px');
       line.setAttribute('stroke', done ? 'rgba(52,211,153,0.5)' : 'rgba(255,215,0,0.2)');
       line.setAttribute('stroke-width', '0.8');
       line.setAttribute('stroke-dasharray', done ? '0' : '2,2');
@@ -1641,11 +2391,10 @@ function renderMap() {
     });
   });
 
-  // Compute grid height
+  // Compute grid height — hauteur fixe en px pour que les % de y soient significatifs
   const maxY = Math.max(...list.map(c => c.y));
-  grid.style.minHeight = (maxY + 15) + '%';
-  // Normalize to pixel
-  const GH = grid.offsetHeight || 440;
+  const GH = (maxY + 15) * PX_PER_PCT;
+  grid.style.minHeight = GH + 'px';
 
   list.forEach(city => {
     const unlocked = isUnlocked(city);
@@ -1655,7 +2404,7 @@ function renderMap() {
     const node = document.createElement('div');
     node.className = `city-node ${state}`;
     node.style.left = city.x + '%';
-    node.style.top = city.y + '%';
+    node.style.top = (city.y * PX_PER_PCT) + 'px';
 
     const starsData = saveData[city.id];
     const starsHtml = starsData
@@ -1676,6 +2425,7 @@ function renderMap() {
         ${state === 'locked' ? '🔒' : city.emoji}
         ${state !== 'locked' ? `<div class="city-badge">${city.diff}</div>` : ''}
       </div>
+      <div class="city-building" title="${city.matiere}">${state === 'locked' ? '' : getBuildingIcon(city.matiere)}</div>
       <div class="city-name">${city.nom}</div>
       <div class="city-stars">${starsHtml}</div>
     `;
@@ -1685,6 +2435,39 @@ function renderMap() {
     }
     grid.appendChild(node);
   });
+
+  // ===== SPRITE JOUEUR =====
+  // Position : dernière ville complétée, ou première ville déverrouillée
+  let playerX = 15, playerY = 60;
+  const completedCities = list.filter(c => isCompleted(c));
+  const unlockedCities = list.filter(c => isUnlocked(c));
+  if (completedCities.length > 0) {
+    const last = completedCities[completedCities.length - 1];
+    playerX = last.x; playerY = last.y * PX_PER_PCT;
+  } else if (unlockedCities.length > 0) {
+    playerX = unlockedCities[0].x; playerY = unlockedCities[0].y * PX_PER_PCT;
+  }
+  const existingSprite = document.getElementById('playerSprite');
+  if (existingSprite) existingSprite.remove();
+  const existingBubble = document.getElementById('playerBubble');
+  if (existingBubble) existingBubble.remove();
+
+  const sprite = document.createElement('div');
+  sprite.id = 'playerSprite';
+  sprite.className = 'player-sprite';
+  sprite.textContent = currentPlayer;
+  sprite.style.left = playerX + '%';
+  sprite.style.top = playerY + 'px';
+  grid.appendChild(sprite);
+
+  // Bulle de dialogue
+  const bubble = document.createElement('div');
+  bubble.id = 'playerBubble';
+  bubble.className = 'player-bubble hide';
+  bubble.style.left = playerX + '%';
+  bubble.style.top = playerY + 'px';
+  bubble.textContent = '🗺️ Prêt à partir !';
+  grid.appendChild(bubble);
 
   // Update global counters
   updateGlobalScore();
@@ -1701,8 +2484,95 @@ function getComputedColor(matiere) {
   return map[matiere] || '#a78bfa';
 }
 
+function getBuildingIcon(matiere) {
+  const map = {
+    'Calcul'         : '🏰', // Château des chiffres
+    'Lecture'        : '📜', // Parchemin
+    'Français'       : '🏯', // Palais des lettres
+    'Multiplication' : '🗼', // Tour des tables
+    'Sciences'       : '🔬', // Laboratoire
+    'Géographie'     : '🗺️', // Carte
+    'Histoire'       : '🏛️', // Temple antique
+    'Maths'          : '⚗️', // Tour de formules
+    'Physique'       : '⚡', // Labo physique
+    'Chimie'         : '🧪', // Labo chimie
+    'Biologie'       : '🌿', // Forêt vivante
+    'Bio-Géologie'   : '🪨', // Grotte
+    'Civique'        : '🏟️', // Forum civique
+    'Philosophie'    : '🏺', // Académie antique
+    'Économie'       : '🏦', // Banque du savoir
+    'Culture Générale': '🎭', // Théâtre
+    'Examen Royal'   : '👑', // Trône
+  };
+  return map[matiere] || '🏠';
+}
+
 function selectCity(city) {
   selectedCity = city;
+
+  // Déplacer le sprite joueur vers la ville sélectionnée
+  const sprite = document.getElementById('playerSprite');
+  const bubble = document.getElementById('playerBubble');
+  const grid   = document.getElementById('mapGrid');
+
+  if (sprite) {
+    const PX = 6;
+    const currentLeft = parseFloat(sprite.style.left) || 0;
+    const currentTop  = parseFloat(sprite.style.top)  || 0;
+    const destLeft = city.x;
+    const destTop  = city.y * PX;
+    const goingLeft = destLeft < currentLeft;
+
+    // --- TRACES DE PAS sur le trajet ---
+    const steps = 5;
+    for (let i = 1; i <= steps; i++) {
+      const t = i / (steps + 1);
+      const fx = currentLeft + (destLeft - currentLeft) * t;
+      const fy = currentTop  + (destTop  - currentTop)  * t;
+      const fp = document.createElement('div');
+      fp.className = 'footprint';
+      fp.textContent = '👣';
+      fp.style.left = fx + '%';
+      fp.style.top  = fy + 'px';
+      fp.style.animationDelay = (i * 0.12) + 's';
+      fp.style.transform = goingLeft
+        ? 'translate(-50%,-50%) scaleX(-1)'
+        : 'translate(-50%,-50%) scaleX(1)';
+      grid.appendChild(fp);
+      // Supprimer les traces après 4s
+      setTimeout(() => fp.remove(), 4200 + i * 120);
+    }
+
+    // --- ANIMATION DE MARCHE pendant le déplacement (0.9s) ---
+    sprite.classList.add('walking');
+    setTimeout(() => sprite.classList.remove('walking'), 950);
+
+    // --- RETOURNEMENT selon direction ---
+    sprite.style.transform = goingLeft
+      ? 'translate(-50%, -50%) scaleX(-1)'
+      : 'translate(-50%, -50%) scaleX(1)';
+
+    // --- DÉPLACEMENT ---
+    sprite.style.left = destLeft + '%';
+    sprite.style.top  = destTop  + 'px';
+
+    // --- BULLE DE DIALOGUE ---
+    if (bubble) {
+      const messages = [
+        '🚀 En avant !', '⭐ Allons-y !', '📚 À l\'aventure !',
+        '💪 Je peux le faire !', '🔥 En route !', '🏆 Objectif en vue !',
+        '✨ C\'est parti !', '🎯 Bonne direction !', '🌟 Courage !',
+      ];
+      const msg = messages[Math.floor(Math.random() * messages.length)];
+      bubble.textContent = msg;
+      bubble.style.left = destLeft + '%';
+      bubble.style.top  = destTop  + 'px';
+      bubble.classList.remove('hide');
+      // Cacher la bulle après 2.5s
+      setTimeout(() => bubble.classList.add('hide'), 2500);
+    }
+  }
+
   const panel = document.getElementById('infoPanel');
   panel.classList.add('show');
   panel.scrollIntoView({ behavior:'smooth', block:'nearest' });
@@ -1733,6 +2603,13 @@ function selectCity(city) {
 // ===================== MISSION =====================
 function startMission() {
   if (!selectedCity) return;
+  if (getCurrentLives() <= 0) {
+    updateNoLivesBanner();
+    document.getElementById('mapView').style.display = 'none';
+    document.getElementById('gameView').classList.add('show');
+    document.getElementById('missionLabel').textContent = `${selectedCity.emoji} ${selectedCity.nom}`;
+    return;
+  }
   mission = selectedCity;
   missionQIdx = 0;
   mOk = 0; mKo = 0; mPts = 0;
@@ -1859,6 +2736,17 @@ function checkQ(chosen, correct, q) {
     mKo++;
     totalKo++;
     playSound('wrong');
+    // Perdre un cœur
+    animateHeartLost();
+    loseLife();
+    // Si plus de cœurs → stopper la mission après feedback
+    if (getCurrentLives() <= 0) {
+      if (q.fact) { const fact = document.getElementById('factBox'); fact.textContent = '💡 ' + q.fact; fact.classList.add('show'); }
+      next.classList.add('show');
+      updateGlobalScore();
+      setTimeout(() => { showNoLivesResult(); }, 1800);
+      return;
+    }
   }
 
   if (q.fact) {
@@ -1871,6 +2759,64 @@ function checkQ(chosen, correct, q) {
 
   // Question suivante automatique après 1.5s
   setTimeout(() => { if (answered) nextQ(); }, 1500);
+}
+
+// ===================== RÉSULTAT PLUS DE VIES =====================
+function showNoLivesResult() {
+  stopChrono();
+  document.querySelector('.result-overlay')?.remove();
+  const d = getLivesData();
+  const remaining = d.lostAt ? Math.max(0, RECHARGE_MS - (Date.now() - d.lostAt)) : RECHARGE_MS;
+  const mins = Math.floor(remaining / 60000);
+  const secs = Math.floor((remaining % 60000) / 1000);
+
+  playSound('lose');
+  const overlay = document.createElement('div');
+  overlay.className = 'result-overlay';
+  overlay.innerHTML = `
+    <div class="result-card" style="border-color:rgba(239,68,68,0.4);">
+      <div class="result-emoji">💔</div>
+      <div class="result-title" style="color:var(--red);">Plus de cœurs !</div>
+      <div style="font-size:0.88rem;opacity:0.7;margin-bottom:12px;line-height:1.6;">
+        Tu as utilisé tous tes cœurs.<br>
+        Ils se rechargent automatiquement !
+      </div>
+      <div style="font-family:'Fredoka One',cursive;font-size:1.1rem;color:var(--accent);margin-bottom:6px;">
+        ⏳ Prochain cœur dans :
+      </div>
+      <div id="noLivesCountdown" style="font-family:'Fredoka One',cursive;font-size:2rem;color:#fbbf24;margin-bottom:18px;">
+        ${mins}:${String(secs).padStart(2,'0')}
+      </div>
+      <div style="font-size:0.75rem;opacity:0.5;margin-bottom:18px;">
+        (${MAX_LIVES} cœurs rechargés en ${MAX_LIVES * 30} minutes)
+      </div>
+      <div class="result-btns">
+        <button class="btn-start" style="background:rgba(255,255,255,0.1);box-shadow:none;" onclick="closeNoLivesResult()">🗺️ Retour carte</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  // Countdown dans la modale
+  const cdTimer = setInterval(() => {
+    const dl = getLivesData();
+    const rem = dl.lostAt ? Math.max(0, RECHARGE_MS - (Date.now() - dl.lostAt)) : 0;
+    const m = Math.floor(rem / 60000);
+    const s = Math.floor((rem % 60000) / 1000);
+    const el = document.getElementById('noLivesCountdown');
+    if (el) el.textContent = m + ':' + String(s).padStart(2,'0');
+    if (rem <= 0) {
+      clearInterval(cdTimer);
+      document.querySelector('.result-overlay')?.remove();
+      renderHearts();
+      backToMap();
+    }
+  }, 1000);
+}
+
+function closeNoLivesResult() {
+  document.querySelector('.result-overlay')?.remove();
+  backToMap();
 }
 
 // ===================== RESULT =====================
@@ -1887,7 +2833,18 @@ function showResult() {
   }
 
   playSound(win ? 'win' : 'lose');
-  if (win) { confetti(); if (mission.roi) setTimeout(confetti, 600); }
+  if (win) {
+    confetti();
+    if (mission.roi) setTimeout(confetti, 600);
+    // Bonus : recharger 1 cœur si victoire et pas au max
+    const ld = getLivesData();
+    if (ld.lives < MAX_LIVES) {
+      ld.lives = Math.min(MAX_LIVES, ld.lives + 1);
+      if (ld.lives >= MAX_LIVES) ld.lostAt = null;
+      saveLivesData(ld);
+      renderHearts();
+    }
+  }
 
   const list = getList();
   const nextCity = list.find(c =>
@@ -2244,6 +3201,9 @@ function confetti() {
 document.addEventListener('click', () => { if (!bgPlaying) startBgMusic(); }, { once: true });
 renderMap();
 updateGlobalScore();
+renderHearts();
+// Sync bouton personnage avec la valeur chargée
+try { const btn = document.getElementById('persoBtn'); if (btn) btn.textContent = currentPlayer; } catch(e) {}
 </script>
 <!-- Service Worker PWA -->
 <script>
