@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KaramokoBHDS — Le savoir à portée de tous</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+  <!-- PWA -->
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#10b981">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="KaramokoBHDS">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+<style>
+:root {
+  --bg: #07090f;
+  --surface: #0e1420;
+  --card: #111827;
+  --border: rgba(255,255,255,0.07);
+  --text: #f0f4ff;
+  --muted: rgba(240,244,255,0.5);
+  --green: #10b981;
+  --gold: #f59e0b;
+  --red: #CE1126;
+  --accent: #a78bfa;
+  --blue: #60a5fa;
+  --teal: #2dd4bf;
+  --glow-green: rgba(16,185,129,0.3);
+  --glow-gold: rgba(245,158,11,0.3);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  cursor: default;
+}
+
+/* ===== BACKGROUND ATMOSPHERE ===== */
+.bg-mesh {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 50% at 10% 20%, rgba(16,185,129,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 90% 70%, rgba(206,17,38,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 60% at 50% 50%, rgba(245,158,11,0.04) 0%, transparent 70%);
+}
+
+.stars {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    radial-gradient(1px 1px at 8% 12%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 22% 38%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 36% 7%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(2px 2px at 52% 55%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 68% 25%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 78% 72%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 90% 15%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(2px 2px at 14% 80%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 45% 90%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 95% 48%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 60% 42%, rgba(255,255,255,0.4) 0%, transparent 100%);
+}
+
+/* ===== WRAPPER ===== */
+.wrap { position: relative; z-index: 1; max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+
+/* ===== NAV ===== */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  padding: 14px 0;
+  background: rgba(7,9,15,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  max-width: 1000px; margin: 0 auto; padding: 0 20px;
+}
+
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+}
+
+.flag-mini {
+  display: flex; width: 32px; height: 20px;
+  border-radius: 3px; overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+.flag-mini div { flex: 1; }
+.flag-mini .r { background: #CE1126; }
+.flag-mini .y { background: #FCD116; }
+.flag-mini .g { background: #009460; }
+
+.nav-brand {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.3rem;
+  background: linear-gradient(135deg, var(--green), var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.nav-links {
+  display: flex; gap: 6px; align-items: center;
+}
+
+.nav-link {
+  color: var(--muted); text-decoration: none;
+  font-weight: 700; font-size: 0.85rem;
+  padding: 7px 14px; border-radius: 30px;
+  transition: all 0.2s;
+}
+.nav-link:hover { color: var(--text); background: rgba(255,255,255,0.07); }
+
+.nav-cta {
+  background: linear-gradient(135deg, var(--green), #059669);
+  color: white; text-decoration: none;
+  font-weight: 800; font-size: 0.85rem;
+  padding: 8px 18px; border-radius: 30px;
+  transition: all 0.25s;
+  box-shadow: 0 4px 16px var(--glow-green);
+}
+.nav-cta:hover { transform: translateY(-1px); box-shadow: 0 6px 22px var(--glow-green); }
+
+/* ===== HERO ===== */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  text-align: center;
+  padding: 80px 20px 60px;
+  position: relative;
+}
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(16,185,129,0.1);
+  border: 1px solid rgba(16,185,129,0.3);
+  border-radius: 30px;
+  padding: 6px 18px;
+  font-size: 0.8rem; font-weight: 800;
+  color: var(--green);
+  letter-spacing: 1.5px; text-transform: uppercase;
+  margin-bottom: 28px;
+  animation: fadeUp 0.6s ease both;
+}
+
+.hero-icon { font-size: 1rem; }
+
+.hero-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(2.2rem, 6vw, 5.5rem);
+  line-height: 1.1;
+  margin-bottom: 16px;
+  animation: fadeUp 0.6s 0.1s ease both;
+}
+
+.hero-title .line1 {
+  display: block;
+  background: linear-gradient(135deg, #f0f4ff, #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-title .line2 {
+  display: block;
+  background: linear-gradient(135deg, var(--green), var(--gold), var(--red));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 4s ease-in-out infinite;
+  background-size: 200% auto;
+}
+
+@keyframes shimmer {
+  0%,100% { background-position: 0% center; }
+  50% { background-position: 100% center; }
+}
+
+.hero-sub {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  color: var(--muted);
+  max-width: 560px;
+  line-height: 1.7;
+  margin: 0 auto 40px;
+  font-weight: 600;
+  animation: fadeUp 0.6s 0.2s ease both;
+}
+
+.hero-sub em {
+  color: var(--gold);
+  font-style: italic;
+  font-family: 'Playfair Display', serif;
+}
+
+.hero-actions {
+  display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+  animation: fadeUp 0.6s 0.3s ease both;
+  margin-bottom: 60px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--green), #059669);
+  color: white; text-decoration: none;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.1rem;
+  padding: 14px 32px; border-radius: 14px;
+  transition: all 0.25s;
+  box-shadow: 0 6px 24px var(--glow-green);
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-primary:hover { transform: translateY(-3px); box-shadow: 0 10px 32px var(--glow-green); }
+
+.btn-secondary {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: var(--text); text-decoration: none;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.1rem;
+  padding: 14px 32px; border-radius: 14px;
+  transition: all 0.25s;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-secondary:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
+
+/* ===== STATS ROW ===== */
+.stats-row {
+  display: flex; gap: 0;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  animation: fadeUp 0.6s 0.4s ease both;
+  max-width: 680px; margin: 0 auto;
+}
+
+.stat-item {
+  flex: 1;
+  padding: 20px 16px;
+  text-align: center;
+  border-right: 1px solid var(--border);
+  transition: background 0.2s;
+}
+.stat-item:last-child { border-right: none; }
+.stat-item:hover { background: rgba(255,255,255,0.04); }
+
+.stat-num {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.9rem;
+  background: linear-gradient(135deg, var(--green), var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: block;
+}
+.stat-lbl {
+  font-size: 0.72rem;
+  color: var(--muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ===== SECTION COMMON ===== */
+section { padding: 80px 0; }
+
+.section-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--green);
+  margin-bottom: 12px;
+}
+
+.section-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  line-height: 1.1;
+  margin-bottom: 16px;
+}
+
+.section-desc {
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.7;
+  max-width: 560px;
+  font-weight: 600;
+}
+
+/* ===== NIVEAUX ===== */
+.niveaux-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 48px;
+}
+
+.niveau-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 28px 22px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.35s;
+  cursor: default;
+}
+
+.niveau-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  border-radius: 22px 22px 0 0;
+}
+
+.niveau-card.primaire::before { background: linear-gradient(90deg, #10b981, #34d399); }
+.niveau-card.college::before { background: linear-gradient(90deg, #3b82f6, #7c3aed); }
+.niveau-card.lycee::before { background: linear-gradient(90deg, #ea580c, #d97706); }
+
+.niveau-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(255,255,255,0.14);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+}
+
+.niveau-emoji {
+  font-size: 2.4rem;
+  margin-bottom: 14px;
+  display: block;
+}
+
+.niveau-label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.primaire .niveau-label { color: var(--green); }
+.college .niveau-label { color: var(--blue); }
+.lycee .niveau-label { color: var(--gold); }
+
+.niveau-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+}
+
+.niveau-desc {
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.6;
+  font-weight: 600;
+  margin-bottom: 18px;
+}
+
+.niveau-etapes {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+
+.etape-tag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--muted);
+}
+
+/* ===== FEATURES ===== */
+.features-section { background: rgba(255,255,255,0.02); }
+
+.features-header { text-align: center; margin-bottom: 56px; }
+.features-header .section-desc { margin: 0 auto; }
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.feature-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 26px 22px;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.feature-card:hover {
+  border-color: rgba(255,255,255,0.12);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+}
+
+.feature-icon {
+  font-size: 2rem;
+  margin-bottom: 14px;
+  display: block;
+  filter: drop-shadow(0 0 12px rgba(16,185,129,0.4));
+}
+
+.feature-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.feature-desc {
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.6;
+  font-weight: 600;
+}
+
+/* ===== MATIERES ===== */
+.matieres-section { overflow: hidden; }
+
+.matieres-track {
+  display: flex; gap: 12px;
+  margin-top: 40px;
+  animation: scrollTrack 28s linear infinite;
+  width: max-content;
+}
+
+.matieres-track:hover { animation-play-state: paused; }
+
+@keyframes scrollTrack {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.matiere-pill {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 20px;
+  border-radius: 50px;
+  border: 1px solid;
+  white-space: nowrap;
+  font-weight: 700;
+  font-size: 0.88rem;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+.matiere-pill:hover { transform: scale(1.05); }
+
+/* ===== QUOTE ===== */
+.quote-section {
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.quote-wrap {
+  position: relative;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 48px 40px;
+  background: linear-gradient(135deg, rgba(16,185,129,0.06), rgba(245,158,11,0.04));
+  border: 1px solid rgba(16,185,129,0.2);
+  border-radius: 28px;
+}
+
+.quote-marks {
+  font-family: 'Playfair Display', serif;
+  font-size: 6rem;
+  color: var(--green);
+  opacity: 0.3;
+  position: absolute;
+  top: -20px; left: 24px;
+  line-height: 1;
+}
+
+.quote-text {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  line-height: 1.7;
+  font-style: italic;
+  color: var(--text);
+  margin-bottom: 20px;
+  position: relative; z-index: 1;
+}
+
+.quote-author {
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--green);
+}
+
+/* ===== CTA FINAL ===== */
+.cta-section {
+  text-align: center;
+  padding: 80px 20px 100px;
+}
+
+.cta-box {
+  max-width: 640px; margin: 0 auto;
+  background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(206,17,38,0.06), rgba(245,158,11,0.08));
+  border: 1px solid rgba(16,185,129,0.25);
+  border-radius: 32px;
+  padding: 56px 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-box::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 60% at 50% 0%, rgba(16,185,129,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.cta-emoji { font-size: 3.5rem; margin-bottom: 16px; display: block; }
+
+.cta-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  margin-bottom: 12px;
+}
+
+.cta-sub {
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  font-weight: 600;
+  margin-bottom: 32px;
+}
+
+.cta-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: linear-gradient(135deg, var(--green), #059669);
+  color: white; text-decoration: none;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.2rem;
+  padding: 16px 40px; border-radius: 16px;
+  transition: all 0.3s;
+  box-shadow: 0 8px 30px var(--glow-green);
+}
+.cta-btn:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 14px 40px var(--glow-green); }
+
+/* ===== FOOTER ===== */
+footer {
+  background: rgba(255,255,255,0.02);
+  border-top: 1px solid var(--border);
+  padding: 32px 20px;
+  text-align: center;
+}
+
+.footer-logo {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.4rem;
+  background: linear-gradient(135deg, var(--green), var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+
+.footer-sub {
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.footer-flag {
+  display: inline-flex; width: 24px; height: 15px;
+  border-radius: 2px; overflow: hidden;
+  vertical-align: middle; margin: 0 4px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+}
+.footer-flag div { flex: 1; }
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.reveal {
+  opacity: 0; transform: translateY(28px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 700px) {
+  .niveaux-grid { grid-template-columns: 1fr; }
+  .features-grid { grid-template-columns: 1fr 1fr; }
+  .nav-links { display: none; }
+  .nav-cta { font-size: 0.78rem; padding: 7px 13px; }
+  .stats-row { flex-direction: row; flex-wrap: wrap; }
+  .stat-item { flex: 1 1 45%; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .stat-item:nth-child(2) { border-right: none; }
+  .stat-item:nth-child(3) { border-bottom: none; }
+  .stat-item:last-child { border-bottom: none; border-right: none; }
+  .cta-box { padding: 36px 24px; }
+  .quote-wrap { padding: 36px 24px; }
+  .hero { padding: 60px 20px 40px; min-height: auto; }
+  .hero-badge { font-size: 0.7rem; padding: 5px 14px; }
+  .hero-sub { font-size: 0.92rem; margin-bottom: 28px; }
+  .hero-actions { margin-bottom: 36px; }
+  section { padding: 56px 0; }
+}
+
+@media (max-width: 480px) {
+  .features-grid { grid-template-columns: 1fr; }
+  .hero-actions { flex-direction: column; align-items: center; }
+  .btn-primary, .btn-secondary { width: 100%; justify-content: center; font-size: 1rem; padding: 13px 24px; }
+  .hero-title { font-size: clamp(1.9rem, 10vw, 2.8rem); }
+  .stat-num { font-size: 1.5rem; }
+  .stat-lbl { font-size: 0.62rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-mesh"></div>
+<div class="stars"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">
+      <div class="flag-mini">
+        <div class="r"></div>
+        <div class="y"></div>
+        <div class="g"></div>
+      </div>
+      <span class="nav-brand">KaramokoBHDS</span>
+    </div>
+    <div class="nav-links">
+      <a href="#niveaux" class="nav-link">Niveaux</a>
+      <a href="#fonctionnalites" class="nav-link">Fonctionnalités</a>
+      <a href="#matieres" class="nav-link">Matières</a>
+    </div>
+    <a href="carte_aventure_college_lycee.html" class="nav-cta">🚀 Jouer maintenant</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-badge">
+      <span class="hero-icon">🎓</span>
+      Plateforme éducative guinéenne · Collection BHDS
+    </div>
+
+    <h1 class="hero-title">
+      <span class="line1">Apprends.</span>
+      <span class="line2">Progresse. Réussis.</span>
+    </h1>
+
+    <p class="hero-sub">
+      La plateforme de quiz interactif conçue pour les élèves de Guinée.
+      Du <em>Primaire</em> jusqu'au <em>Lycée</em>, chaque étape est une aventure.
+    </p>
+
+    <div class="hero-actions">
+      <a href="carte_aventure_college_lycee.html" class="btn-primary">
+        🗺️ Commencer l'aventure
+      </a>
+      <a href="#niveaux" class="btn-secondary">
+        📚 Voir les niveaux
+      </a>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-item">
+        <span class="stat-num">3</span>
+        <span class="stat-lbl">Cycles scolaires</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">26</span>
+        <span class="stat-lbl">Étapes d'aventure</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">260+</span>
+        <span class="stat-lbl">Questions interactives</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">12</span>
+        <span class="stat-lbl">Matières couvertes</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NIVEAUX -->
+<section id="niveaux">
+  <div class="wrap">
+    <p class="section-eyebrow reveal">Parcours éducatif</p>
+    <h2 class="section-title reveal">Trois cycles,<br>une seule aventure</h2>
+    <p class="section-desc reveal">Chaque niveau est une carte à explorer. Débloquez les étapes, gagnez des étoiles et progressez vers le sommet.</p>
+
+    <div class="niveaux-grid">
+      <div class="niveau-card primaire reveal">
+        <span class="niveau-emoji">🌟</span>
+        <div class="niveau-label">Cycle Primaire</div>
+        <div class="niveau-title">Le Royaume du Primaire</div>
+        <div class="niveau-desc">8 étapes ludiques pour maîtriser les bases du calcul, de la lecture, des sciences et de la géographie guinéenne.</div>
+        <div class="niveau-etapes">
+          <span class="etape-tag">🔢 Calcul</span>
+          <span class="etape-tag">📖 Lecture</span>
+          <span class="etape-tag">🔬 Sciences</span>
+          <span class="etape-tag">🌍 Guinée</span>
+          <span class="etape-tag">✍️ Grammaire</span>
+          <span class="etape-tag">🏛️ Histoire</span>
+        </div>
+      </div>
+
+      <div class="niveau-card college reveal">
+        <span class="niveau-emoji">🎓</span>
+        <div class="niveau-label">Cycle Collège</div>
+        <div class="niveau-title">Le Royaume du Collège</div>
+        <div class="niveau-desc">8 étapes progressives de la 7ème à la 10ème. Maths, Physique, Français, Bio, Histoire et Géo de Guinée.</div>
+        <div class="niveau-etapes">
+          <span class="etape-tag">📐 Maths</span>
+          <span class="etape-tag">⚡ Physique</span>
+          <span class="etape-tag">📖 Français</span>
+          <span class="etape-tag">🌿 Biologie</span>
+          <span class="etape-tag">🏛️ Histoire</span>
+          <span class="etape-tag">⚖️ Civique</span>
+        </div>
+      </div>
+
+      <div class="niveau-card lycee reveal">
+        <span class="niveau-emoji">🏫</span>
+        <div class="niveau-label">Cycle Lycée</div>
+        <div class="niveau-title">Le Royaume du Lycée</div>
+        <div class="niveau-desc">10 étapes exigeantes pour la Terminale. Maths avancées, Physique, Chimie, Philo, Éco et Culture Générale.</div>
+        <div class="niveau-etapes">
+          <span class="etape-tag">📊 Maths</span>
+          <span class="etape-tag">🔭 Physique</span>
+          <span class="etape-tag">🧪 Chimie</span>
+          <span class="etape-tag">🧬 Bio</span>
+          <span class="etape-tag">🏺 Philo</span>
+          <span class="etape-tag">📈 Économie</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="fonctionnalites" class="features-section">
+  <div class="wrap">
+    <div class="features-header">
+      <p class="section-eyebrow reveal">Pourquoi KaramokoBHDS ?</p>
+      <h2 class="section-title reveal">Apprendre autrement</h2>
+      <p class="section-desc reveal">Un environnement conçu pour garder les élèves motivés et engagés tout au long de leur parcours scolaire.</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <span class="feature-icon">🗺️</span>
+        <div class="feature-title">Carte d'aventure</div>
+        <div class="feature-desc">Progresse sur une carte interactive en débloquant des villes-étapes. Chaque victoire ouvre de nouvelles destinations.</div>
+      </div>
+      <div class="feature-card reveal">
+        <span class="feature-icon">⭐</span>
+        <div class="feature-title">Système d'étoiles</div>
+        <div class="feature-desc">Gagne jusqu'à 3 étoiles par étape selon ton score. Rejoue pour améliorer tes performances et battre tes records.</div>
+      </div>
+      <div class="feature-card reveal">
+        <span class="feature-icon">💡</span>
+        <div class="feature-title">Faits culturels</div>
+        <div class="feature-desc">Après chaque réponse, découvre une anecdote sur la Guinée, l'Afrique et le monde. Apprendre, c'est aussi s'émerveiller.</div>
+      </div>
+      <div class="feature-card reveal">
+        <span class="feature-icon">🔊</span>
+        <div class="feature-title">Sons et musique</div>
+        <div class="feature-desc">Des effets sonores et une musique de fond créent une ambiance immersive qui rend chaque session mémorable.</div>
+      </div>
+      <div class="feature-card reveal">
+        <span class="feature-icon">💾</span>
+        <div class="feature-title">Progression sauvegardée</div>
+        <div class="feature-desc">Tes étoiles et points sont conservés entre les sessions. Reviens chaque jour et continue là où tu t'es arrêté.</div>
+      </div>
+      <div class="feature-card reveal">
+        <span class="feature-icon">📱</span>
+        <div class="feature-title">100 % accessible</div>
+        <div class="feature-desc">Fonctionne sur téléphone, tablette et ordinateur, même avec une connexion limitée. Fait pour la réalité guinéenne.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MATIERES -->
+<section id="matieres" class="matieres-section">
+  <div class="wrap">
+    <p class="section-eyebrow reveal">Programme complet</p>
+    <h2 class="section-title reveal">Toutes les matières,<br>tous les niveaux</h2>
+  </div>
+  <div class="matieres-track">
+    <div class="matiere-pill" style="color:#34d399;border-color:#34d39933;background:rgba(52,211,153,0.07);">📐 Mathématiques</div>
+    <div class="matiere-pill" style="color:#4ecdc4;border-color:#4ecdc433;background:rgba(78,205,196,0.07);">⚡ Physique</div>
+    <div class="matiere-pill" style="color:#a78bfa;border-color:#a78bfa33;background:rgba(167,139,250,0.07);">🧪 Chimie</div>
+    <div class="matiere-pill" style="color:#f472b6;border-color:#f472b633;background:rgba(244,114,182,0.07);">📖 Français</div>
+    <div class="matiere-pill" style="color:#34d399;border-color:#34d39933;background:rgba(52,211,153,0.07);">🌿 Biologie</div>
+    <div class="matiere-pill" style="color:#fbbf24;border-color:#fbbf2433;background:rgba(251,191,36,0.07);">🌍 Géographie</div>
+    <div class="matiere-pill" style="color:#fb923c;border-color:#fb923c33;background:rgba(251,146,60,0.07);">🏛️ Histoire</div>
+    <div class="matiere-pill" style="color:#f87171;border-color:#f8717133;background:rgba(248,113,113,0.07);">⚖️ Éducation Civique</div>
+    <div class="matiere-pill" style="color:#c084fc;border-color:#c084fc33;background:rgba(192,132,252,0.07);">🏺 Philosophie</div>
+    <div class="matiere-pill" style="color:#6ee7b7;border-color:#6ee7b733;background:rgba(110,231,183,0.07);">📈 Économie</div>
+    <div class="matiere-pill" style="color:#93c5fd;border-color:#93c5fd33;background:rgba(147,197,253,0.07);">🌐 Culture Générale</div>
+    <div class="matiere-pill" style="color:#fbbf24;border-color:#fbbf2433;background:rgba(251,191,36,0.07);">🔬 Sciences</div>
+    <!-- Duplicate for seamless loop -->
+    <div class="matiere-pill" style="color:#34d399;border-color:#34d39933;background:rgba(52,211,153,0.07);">📐 Mathématiques</div>
+    <div class="matiere-pill" style="color:#4ecdc4;border-color:#4ecdc433;background:rgba(78,205,196,0.07);">⚡ Physique</div>
+    <div class="matiere-pill" style="color:#a78bfa;border-color:#a78bfa33;background:rgba(167,139,250,0.07);">🧪 Chimie</div>
+    <div class="matiere-pill" style="color:#f472b6;border-color:#f472b633;background:rgba(244,114,182,0.07);">📖 Français</div>
+    <div class="matiere-pill" style="color:#34d399;border-color:#34d39933;background:rgba(52,211,153,0.07);">🌿 Biologie</div>
+    <div class="matiere-pill" style="color:#fbbf24;border-color:#fbbf2433;background:rgba(251,191,36,0.07);">🌍 Géographie</div>
+    <div class="matiere-pill" style="color:#fb923c;border-color:#fb923c33;background:rgba(251,146,60,0.07);">🏛️ Histoire</div>
+    <div class="matiere-pill" style="color:#f87171;border-color:#f8717133;background:rgba(248,113,113,0.07);">⚖️ Éducation Civique</div>
+    <div class="matiere-pill" style="color:#c084fc;border-color:#c084fc33;background:rgba(192,132,252,0.07);">🏺 Philosophie</div>
+    <div class="matiere-pill" style="color:#6ee7b7;border-color:#6ee7b733;background:rgba(110,231,183,0.07);">📈 Économie</div>
+    <div class="matiere-pill" style="color:#93c5fd;border-color:#93c5fd33;background:rgba(147,197,253,0.07);">🌐 Culture Générale</div>
+    <div class="matiere-pill" style="color:#fbbf24;border-color:#fbbf2433;background:rgba(251,191,36,0.07);">🔬 Sciences</div>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<section class="quote-section">
+  <div class="wrap">
+    <div class="quote-wrap reveal">
+      <div class="quote-marks">"</div>
+      <p class="quote-text">Le savoir est comme un jardin : si tu ne le cultives pas, tu ne peux pas le récolter.</p>
+      <div class="quote-author">📚 Proverbe africain · KaramokoBHDS</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="wrap">
+    <div class="cta-box reveal">
+      <span class="cta-emoji">🚀</span>
+      <h2 class="cta-title">Prêt à commencer<br>l'aventure ?</h2>
+      <p class="cta-sub">Rejoins les élèves de Guinée qui apprennent autrement.<br>Gratuit, sans inscription, accessible partout.</p>
+      <a href="carte_aventure_college_lycee.html" class="cta-btn">
+        🗺️ Lancer la Carte Aventure
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">KaramokoBHDS</div>
+  <div class="footer-sub">
+    Fait avec ❤️ en Guinée Conakry
+    <span class="footer-flag">
+      <div style="flex:1;background:#CE1126;"></div>
+      <div style="flex:1;background:#FCD116;"></div>
+      <div style="flex:1;background:#009460;"></div>
+    </span>
+    · Boubacar Diallo Édition 2026 · Collection BHDS
+  </div>
+</footer>
+
+<script>
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 80);
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+<!-- Service Worker PWA -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js')
+      .then(reg => console.log('[KaramokoBHDS] SW enregistré:', reg.scope))
+      .catch(err => console.log('[KaramokoBHDS] SW erreur:', err));
+  });
+}
+</script>
+</body>
+</html>
