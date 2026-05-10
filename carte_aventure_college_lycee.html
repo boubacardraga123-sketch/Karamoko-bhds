@@ -201,29 +201,17 @@ body::before {
 
 .map-bg {
   position: absolute; inset: 0;
-  background:
-    radial-gradient(ellipse at 15% 70%, #1a5c2a 0%, transparent 35%),
-    radial-gradient(ellipse at 80% 30%, #1e4d1a 0%, transparent 30%),
-    radial-gradient(ellipse at 55% 80%, #2a6b20 0%, transparent 25%),
-    radial-gradient(ellipse at 40% 45%, #3a7a28 0%, transparent 20%),
-    radial-gradient(ellipse at 70% 60%, #1a4a12 0%, transparent 28%),
-    linear-gradient(170deg, #1a3d0f 0%, #22520e 25%, #2d6b15 50%, #1e4d0a 75%, #162e09 100%);
+  background: linear-gradient(160deg, #0a1628 0%, #0d2040 40%, #0a1a35 70%, #081428 100%);
   z-index: 0;
+  overflow: hidden;
 }
 
-/* Map texture — grain parchemin */
+/* Map overlay — vignette bords */
 .map-bg::before {
   content: '';
   position: absolute; inset: 0;
-  background-image:
-    radial-gradient(ellipse 2px 1px at 12% 8%, rgba(255,220,100,0.06) 0%, transparent 100%),
-    radial-gradient(ellipse 1px 2px at 34% 22%, rgba(255,220,100,0.04) 0%, transparent 100%),
-    radial-gradient(ellipse 3px 1px at 67% 11%, rgba(255,220,100,0.05) 0%, transparent 100%),
-    radial-gradient(ellipse 2px 2px at 88% 35%, rgba(255,220,100,0.04) 0%, transparent 100%),
-    radial-gradient(ellipse 1px 3px at 23% 58%, rgba(255,220,100,0.05) 0%, transparent 100%),
-    radial-gradient(ellipse 2px 1px at 75% 72%, rgba(255,220,100,0.04) 0%, transparent 100%),
-    radial-gradient(ellipse 1px 2px at 50% 90%, rgba(255,220,100,0.05) 0%, transparent 100%);
-  z-index: 0;
+  background: radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(0,0,0,0.45) 100%);
+  z-index: 1;
   pointer-events: none;
 }
 
@@ -231,9 +219,10 @@ body::before {
 .map-bg::after {
   content: '';
   position: absolute; inset: 0;
-  background-image: radial-gradient(circle, rgba(255,255,255,0.012) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(255,255,255,0.008) 1px, transparent 1px);
   background-size: 22px 22px;
-  z-index: 0;
+  z-index: 1;
+  pointer-events: none;
 }
 
 /* Sprite joueur */
@@ -1317,6 +1306,138 @@ body.light .score-pill { background: rgba(0,0,0,0.06); border-color: rgba(0,0,0,
   z-index: 50;
   animation: bossLightning 3s ease-in-out infinite;
 }
+
+/* ===== BIOME OVERLAY ===== */
+.biome-overlay {
+  position: absolute; inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  transition: opacity 1.2s ease;
+  opacity: 0;
+}
+.biome-overlay.show { opacity: 1; }
+
+/* ===== ARTEFACT UNLOCK TOAST ===== */
+@keyframes artefactIn {
+  0%   { transform: translateY(60px) scale(0.7); opacity: 0; }
+  60%  { transform: translateY(-8px) scale(1.05); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+@keyframes artefactOut {
+  0%   { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.85) translateY(30px); }
+}
+.artefact-toast {
+  position: fixed;
+  bottom: 90px; left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  background: linear-gradient(135deg, #1a0e2e, #12081e);
+  border: 2px solid rgba(251,191,36,0.6);
+  border-radius: 22px;
+  padding: 20px 28px;
+  text-align: center;
+  box-shadow: 0 0 40px rgba(251,191,36,0.25), 0 16px 50px rgba(0,0,0,0.7);
+  animation: artefactIn 0.6s cubic-bezier(0.4,0,0.2,1) forwards;
+  min-width: 280px; max-width: 340px;
+}
+.artefact-toast.out { animation: artefactOut 0.5s ease forwards; }
+.artefact-toast-glow {
+  font-size: 3.5rem;
+  margin-bottom: 6px;
+  filter: drop-shadow(0 0 12px rgba(251,191,36,0.8));
+  animation: bounce 0.8s ease infinite;
+}
+.artefact-toast-label {
+  font-size: 0.65rem; letter-spacing: 3px; text-transform: uppercase;
+  color: rgba(251,191,36,0.7); font-weight: 800; margin-bottom: 4px;
+}
+.artefact-toast-name {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.2rem;
+  background: linear-gradient(135deg, #fbbf24, #f472b6, #a78bfa);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  margin-bottom: 6px;
+}
+.artefact-toast-fact {
+  font-size: 0.78rem; opacity: 0.7; line-height: 1.5;
+  color: var(--text);
+}
+
+/* ===== ARTEFACT MODAL ===== */
+.artefact-modal {
+  display: none; position: fixed; inset: 0; z-index: 1000;
+  background: rgba(0,0,0,0.88); backdrop-filter: blur(8px);
+  overflow-y: auto;
+}
+.artefact-modal.show { display: block; }
+.artefact-modal-inner {
+  max-width: 500px; margin: 24px auto; padding: 16px;
+}
+.artefact-modal-box {
+  background: linear-gradient(135deg, #0e0a1e, #12091a);
+  border: 1px solid rgba(251,191,36,0.3);
+  border-radius: 26px; padding: 26px 22px;
+}
+.artefact-modal-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 18px;
+}
+.artefact-modal-title {
+  font-family: 'Fredoka One', cursive; font-size: 1.5rem;
+  background: linear-gradient(135deg, #fbbf24, #f472b6);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.artefact-count {
+  font-family: 'Fredoka One', cursive; font-size: 0.9rem;
+  color: rgba(251,191,36,0.7);
+  background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.25);
+  padding: 4px 14px; border-radius: 20px;
+}
+.artefact-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+}
+.artefact-card {
+  background: rgba(255,255,255,0.04);
+  border: 1.5px solid rgba(255,255,255,0.08);
+  border-radius: 16px; padding: 14px 10px; text-align: center;
+  cursor: pointer; transition: all 0.25s;
+  position: relative; overflow: hidden;
+}
+.artefact-card.unlocked {
+  border-color: rgba(251,191,36,0.45);
+  background: linear-gradient(135deg, rgba(251,191,36,0.07), rgba(167,139,250,0.05));
+}
+.artefact-card.unlocked:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 8px 24px rgba(251,191,36,0.2); }
+.artefact-card.locked { filter: grayscale(1); opacity: 0.4; cursor: default; }
+.artefact-card-emoji { font-size: 2.2rem; margin-bottom: 5px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6)); }
+.artefact-card-name {
+  font-family: 'Fredoka One', cursive; font-size: 0.68rem;
+  color: rgba(240,244,255,0.85); line-height: 1.3;
+}
+.artefact-card-biome {
+  font-size: 0.58rem; opacity: 0.5; margin-top: 3px;
+  text-transform: uppercase; letter-spacing: 1px;
+}
+.artefact-new-badge {
+  position: absolute; top: 5px; right: 5px;
+  background: #ef4444; color: white; font-size: 0.42rem;
+  font-weight: 900; border-radius: 6px; padding: 2px 5px;
+  font-family: 'Nunito', sans-serif;
+}
+
+/* Artefact detail panel (shown on click) */
+.artefact-detail {
+  display: none; margin-top: 18px;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(251,191,36,0.2);
+  border-radius: 18px; padding: 18px 16px;
+  animation: fadeSlide 0.3s ease;
+}
+.artefact-detail.show { display: block; }
+.artefact-detail-emoji { font-size: 3.5rem; text-align: center; margin-bottom: 8px; filter: drop-shadow(0 0 14px rgba(251,191,36,0.6)); }
+.artefact-detail-name { font-family: 'Fredoka One', cursive; font-size: 1.3rem; color: #fbbf24; text-align: center; margin-bottom: 4px; }
+.artefact-detail-origin { font-size: 0.75rem; opacity: 0.55; text-align: center; margin-bottom: 12px; letter-spacing: 1px; }
+.artefact-detail-fact { font-size: 0.82rem; line-height: 1.65; opacity: 0.82; }
 </style>
 </head>
 <body>
@@ -1333,6 +1454,7 @@ body.light .score-pill { background: rgba(0,0,0,0.06); border-color: rgba(0,0,0,
       <div class="header-controls">
         <button class="ctrl-btn" onclick="playButtonSound();window.location.href='index.html'" title="Accueil plateforme">🏠</button>
         <button class="ctrl-btn" onclick="playButtonSound();showClassement()" title="Classement">🏆</button>
+        <button class="ctrl-btn" onclick="playButtonSound();showArtefacts()" title="Collection d'artefacts" id="artefactBtn">🏺</button>
         <button class="ctrl-btn" id="persoBtn" onclick="playButtonSound();showPersoModal()" title="Choisir personnage">🧒🏿</button>
         <button class="ctrl-btn" id="themeBtn" onclick="playButtonSound();toggleTheme()" title="Thème">🌙</button>
       </div>
@@ -1413,7 +1535,302 @@ body.light .score-pill { background: rgba(0,0,0,0.06); border-color: rgba(0,0,0,
   <!-- MAP VIEW -->
   <div id="mapView">
     <div class="map-wrapper">
-      <div class="map-bg"></div>
+      <div class="map-bg">
+        <!-- Vraie carte SVG de l'Afrique -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1100" preserveAspectRatio="xMidYMid meet"
+             style="position:absolute;inset:0;width:100%;height:100%;opacity:0.92;">
+          <defs>
+            <!-- Gradient continent -->
+            <radialGradient id="africaGrad" cx="50%" cy="45%" r="55%">
+              <stop offset="0%"   stop-color="#2d6e1a"/>
+              <stop offset="35%"  stop-color="#3a7d20"/>
+              <stop offset="65%"  stop-color="#c9a227"/>
+              <stop offset="85%"  stop-color="#b8861a"/>
+              <stop offset="100%" stop-color="#8a5c10"/>
+            </radialGradient>
+            <!-- Gradient océan -->
+            <linearGradient id="oceanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%"   stop-color="#0a1a35"/>
+              <stop offset="100%" stop-color="#0d2a50"/>
+            </linearGradient>
+            <!-- Texture désert sahara -->
+            <radialGradient id="saharaGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%"   stop-color="#d4a827" stop-opacity="0.6"/>
+              <stop offset="100%" stop-color="#b8861a" stop-opacity="0.1"/>
+            </radialGradient>
+            <!-- Forêt équatoriale -->
+            <radialGradient id="forestGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%"   stop-color="#1e5c0a" stop-opacity="0.7"/>
+              <stop offset="100%" stop-color="#2d7a15" stop-opacity="0.1"/>
+            </radialGradient>
+            <!-- Ombre intérieure continent -->
+            <filter id="continentShadow">
+              <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="rgba(0,0,0,0.5)"/>
+            </filter>
+            <!-- Glow côtes -->
+            <filter id="coastGlow">
+              <feGaussianBlur stdDeviation="3" result="blur"/>
+              <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+            </filter>
+          </defs>
+
+          <!-- FOND OCÉAN -->
+          <rect width="1000" height="1100" fill="url(#oceanGrad)"/>
+          <!-- Vagues océan subtiles -->
+          <ellipse cx="120" cy="200" rx="180" ry="40" fill="none" stroke="rgba(100,180,255,0.06)" stroke-width="1.5"/>
+          <ellipse cx="880" cy="400" rx="160" ry="35" fill="none" stroke="rgba(100,180,255,0.05)" stroke-width="1"/>
+          <ellipse cx="150" cy="700" rx="140" ry="30" fill="none" stroke="rgba(100,180,255,0.06)" stroke-width="1"/>
+          <ellipse cx="870" cy="900" rx="170" ry="38" fill="none" stroke="rgba(100,180,255,0.05)" stroke-width="1"/>
+
+          <!-- CONTINENT AFRIQUE — contour précis -->
+          <path d="
+            M 445,18
+            C 430,16 410,18 395,22
+            C 375,27 355,30 338,38
+            C 318,47 300,58 285,72
+            C 268,88 255,106 248,126
+            C 240,148 238,172 232,194
+            C 225,218 212,238 202,260
+            C 192,282 185,306 178,328
+            C 170,352 162,376 158,400
+            C 154,422 155,444 150,466
+            C 145,490 134,512 128,534
+            C 122,558 120,582 118,606
+            C 116,630 115,654 118,678
+            C 121,702 130,724 142,744
+            C 154,764 170,782 188,798
+            C 208,816 232,830 256,842
+            C 280,854 306,862 332,868
+            C 356,874 382,876 408,876
+            C 434,876 460,874 484,868
+            C 494,865 504,862 512,856
+            C 524,848 532,836 540,824
+            C 550,810 558,794 564,778
+            C 572,760 578,742 582,724
+            C 586,706 588,688 590,670
+            C 592,650 592,630 594,610
+            C 596,588 600,566 606,546
+            C 612,524 622,504 634,486
+            C 646,468 660,452 674,436
+            C 690,418 708,402 724,386
+            C 742,368 760,350 776,332
+            C 792,314 806,294 818,274
+            C 830,254 840,232 848,210
+            C 856,188 862,166 864,144
+            C 866,122 864,100 858,80
+            C 852,60 840,42 826,28
+            C 810,14 790,6 768,4
+            C 748,2 726,6 706,12
+            C 686,18 666,26 646,30
+            C 626,34 604,34 582,32
+            C 562,30 542,26 522,22
+            C 502,18 474,14 445,18
+            Z
+          " fill="url(#africaGrad)" filter="url(#continentShadow)"/>
+
+          <!-- SAHARA — zone désertique nord -->
+          <ellipse cx="490" cy="200" rx="240" ry="110" fill="url(#saharaGrad)"/>
+          <ellipse cx="350" cy="180" rx="120" ry="70" fill="rgba(210,170,60,0.18)"/>
+          <ellipse cx="620" cy="210" rx="100" ry="60" fill="rgba(200,160,50,0.15)"/>
+
+          <!-- FORÊT ÉQUATORIALE CONGO -->
+          <ellipse cx="500" cy="590" rx="160" ry="90" fill="url(#forestGrad)"/>
+          <ellipse cx="440" cy="570" rx="100" ry="60" fill="rgba(20,80,10,0.3)"/>
+
+          <!-- KALAHARI / AFRIQUE AUSTRALE — savane sèche -->
+          <ellipse cx="560" cy="780" rx="120" ry="70" fill="rgba(180,130,30,0.2)"/>
+
+          <!-- CONTOUR CÔTE — trait lumineux -->
+          <path d="
+            M 445,18
+            C 430,16 410,18 395,22
+            C 375,27 355,30 338,38
+            C 318,47 300,58 285,72
+            C 268,88 255,106 248,126
+            C 240,148 238,172 232,194
+            C 225,218 212,238 202,260
+            C 192,282 185,306 178,328
+            C 170,352 162,376 158,400
+            C 154,422 155,444 150,466
+            C 145,490 134,512 128,534
+            C 122,558 120,582 118,606
+            C 116,630 115,654 118,678
+            C 121,702 130,724 142,744
+            C 154,764 170,782 188,798
+            C 208,816 232,830 256,842
+            C 280,854 306,862 332,868
+            C 356,874 382,876 408,876
+            C 434,876 460,874 484,868
+            C 494,865 504,862 512,856
+            C 524,848 532,836 540,824
+            C 550,810 558,794 564,778
+            C 572,760 578,742 582,724
+            C 586,706 588,688 590,670
+            C 592,650 592,630 594,610
+            C 596,588 600,566 606,546
+            C 612,524 622,504 634,486
+            C 646,468 660,452 674,436
+            C 690,418 708,402 724,386
+            C 742,368 760,350 776,332
+            C 792,314 806,294 818,274
+            C 830,254 840,232 848,210
+            C 856,188 862,166 864,144
+            C 866,122 864,100 858,80
+            C 852,60 840,42 826,28
+            C 810,14 790,6 768,4
+            C 748,2 726,6 706,12
+            C 686,18 666,26 646,30
+            C 626,34 604,34 582,32
+            C 562,30 542,26 522,22
+            C 502,18 474,14 445,18 Z
+          " fill="none" stroke="rgba(255,220,120,0.55)" stroke-width="2.5" stroke-linejoin="round"/>
+
+          <!-- Reflet côtier intérieur -->
+          <path d="
+            M 445,18
+            C 430,16 410,18 395,22
+            C 375,27 355,30 338,38
+            C 318,47 300,58 285,72
+            C 268,88 255,106 248,126
+            C 240,148 238,172 232,194
+            C 225,218 212,238 202,260
+            C 192,282 185,306 178,328
+            C 170,352 162,376 158,400
+            C 154,422 155,444 150,466
+            C 145,490 134,512 128,534
+            C 122,558 120,582 118,606
+            C 116,630 115,654 118,678
+            C 121,702 130,724 142,744
+            C 154,764 170,782 188,798
+            C 208,816 232,830 256,842
+            C 280,854 306,862 332,868
+            C 356,874 382,876 408,876
+            C 434,876 460,874 484,868
+            C 494,865 504,862 512,856
+            C 524,848 532,836 540,824
+            C 550,810 558,794 564,778
+            C 572,760 578,742 582,724
+            C 586,706 588,688 590,670
+            C 592,650 592,630 594,610
+            C 596,588 600,566 606,546
+            C 612,524 622,504 634,486
+            C 646,468 660,452 674,436
+            C 690,418 708,402 724,386
+            C 742,368 760,350 776,332
+            C 792,314 806,294 818,274
+            C 830,254 840,232 848,210
+            C 856,188 862,166 864,144
+            C 866,122 864,100 858,80
+            C 852,60 840,42 826,28
+            C 810,14 790,6 768,4
+            C 748,2 726,6 706,12
+            C 686,18 666,26 646,30
+            C 626,34 604,34 582,32
+            C 562,30 542,26 522,22
+            C 502,18 474,14 445,18 Z
+          " fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1" stroke-dasharray="6,4"/>
+
+          <!-- FLEUVE NIL — nord-est -->
+          <path d="M 620,70 C 622,120 618,170 610,220 C 600,275 585,325 570,375 C 558,418 548,462 540,508"
+                fill="none" stroke="#4a9fd4" stroke-width="2" stroke-linecap="round" opacity="0.65"/>
+          <!-- Reflet Nil -->
+          <path d="M 620,70 C 622,120 618,170 610,220 C 600,275 585,325 570,375 C 558,418 548,462 540,508"
+                fill="none" stroke="rgba(150,220,255,0.3)" stroke-width="0.8" stroke-dasharray="3,3"/>
+
+          <!-- FLEUVE NIGER -->
+          <path d="M 248,140 C 240,180 235,225 245,270 C 256,318 280,360 310,395 C 340,430 374,455 400,485 C 420,508 432,535 435,565"
+                fill="none" stroke="#3a8fc4" stroke-width="2.2" stroke-linecap="round" opacity="0.6"/>
+
+          <!-- FLEUVE CONGO -->
+          <path d="M 430,560 C 460,575 494,582 522,592 C 554,604 580,622 604,642 C 626,660 645,682 660,705"
+                fill="none" stroke="#3a8fc4" stroke-width="2.5" stroke-linecap="round" opacity="0.55"/>
+
+          <!-- FLEUVE ZAMBÈZE -->
+          <path d="M 470,730 C 510,740 548,752 580,766 C 610,778 636,794 658,812"
+                fill="none" stroke="#3a8fc4" stroke-width="1.8" stroke-linecap="round" opacity="0.5"/>
+
+          <!-- LAC VICTORIA -->
+          <ellipse cx="610" cy="560" rx="28" ry="22" fill="#2a6fa8" opacity="0.7"/>
+          <ellipse cx="610" cy="560" rx="28" ry="22" fill="none" stroke="rgba(150,220,255,0.4)" stroke-width="1"/>
+          <text x="610" y="592" text-anchor="middle" font-size="11" fill="rgba(180,230,255,0.6)" font-family="Georgia,serif" font-style="italic">Vic.</text>
+
+          <!-- LAC TCHAD -->
+          <ellipse cx="495" cy="310" rx="18" ry="14" fill="#2a6fa8" opacity="0.6"/>
+
+          <!-- LAC TANGANYIKA -->
+          <ellipse cx="638" cy="630" rx="10" ry="32" fill="#2a6fa8" opacity="0.6"/>
+
+          <!-- GUINÉE — mise en évidence subtile -->
+          <ellipse cx="220" cy="405" rx="32" ry="28" fill="rgba(255,215,0,0.18)" stroke="rgba(255,215,0,0.5)" stroke-width="1.5"/>
+          <text x="220" y="400" text-anchor="middle" font-size="10" fill="rgba(255,215,0,0.9)" font-family="'Fredoka One',cursive" font-weight="bold">GN</text>
+          <text x="220" y="413" text-anchor="middle" font-size="9" fill="rgba(255,215,0,0.7)" font-family="Georgia,serif" font-style="italic">Guinée</text>
+
+          <!-- FRONTIÈRES PAYS — lignes subtiles intérieures -->
+          <!-- Maroc/Algérie -->
+          <path d="M 395,22 L 380,90 L 370,140 L 365,190" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="0.8"/>
+          <!-- Mauritanie/Mali/Niger -->
+          <path d="M 248,140 C 280,145 330,148 380,145 C 430,142 480,138 530,138 C 580,138 630,142 680,148"
+                fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="0.8"/>
+          <!-- Sahel band -->
+          <path d="M 178,328 C 220,322 270,318 320,316 C 380,314 440,315 500,318 C 560,321 618,326 660,332"
+                fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="0.8"/>
+          <!-- Afrique centrale -->
+          <path d="M 435,560 C 460,555 500,552 540,554 C 575,556 610,560 640,568"
+                fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="0.8"/>
+
+          <!-- NOMS DE RÉGIONS -->
+          <!-- Afrique du Nord -->
+          <text x="490" y="155" text-anchor="middle" font-size="18" fill="rgba(230,190,80,0.5)" font-family="Georgia,serif" font-style="italic" font-weight="700" letter-spacing="3">SAHARA</text>
+          <!-- Afrique de l'Ouest -->
+          <text x="265" y="480" text-anchor="middle" font-size="13" fill="rgba(255,200,80,0.45)" font-family="Georgia,serif" font-style="italic" transform="rotate(-8,265,480)">Afrique de l'Ouest</text>
+          <!-- Afrique centrale -->
+          <text x="505" y="605" text-anchor="middle" font-size="13" fill="rgba(100,220,100,0.45)" font-family="Georgia,serif" font-style="italic">Congo</text>
+          <!-- Afrique de l'Est -->
+          <text x="680" y="520" text-anchor="middle" font-size="13" fill="rgba(255,200,80,0.4)" font-family="Georgia,serif" font-style="italic" transform="rotate(5,680,520)">Afrique de l'Est</text>
+          <!-- Afrique australe -->
+          <text x="530" y="800" text-anchor="middle" font-size="13" fill="rgba(200,160,60,0.45)" font-family="Georgia,serif" font-style="italic">Afrique Australe</text>
+          <!-- Méditerranée -->
+          <text x="490" y="45" text-anchor="middle" font-size="13" fill="rgba(100,180,255,0.4)" font-family="Georgia,serif" font-style="italic" letter-spacing="2">Méditerranée</text>
+          <!-- Atlantique -->
+          <text x="108" y="550" text-anchor="middle" font-size="11" fill="rgba(100,180,255,0.35)" font-family="Georgia,serif" font-style="italic" transform="rotate(-90,108,550)" letter-spacing="2">Atlantique</text>
+          <!-- Océan Indien -->
+          <text x="890" y="600" text-anchor="middle" font-size="11" fill="rgba(100,180,255,0.35)" font-family="Georgia,serif" font-style="italic" transform="rotate(90,890,600)" letter-spacing="2">Océan Indien</text>
+          <!-- Nil label -->
+          <text x="640" y="200" text-anchor="middle" font-size="11" fill="rgba(140,210,255,0.55)" font-family="Georgia,serif" font-style="italic" transform="rotate(80,640,200)">Nil</text>
+          <!-- Niger label -->
+          <text x="308" y="345" text-anchor="middle" font-size="10" fill="rgba(140,210,255,0.5)" font-family="Georgia,serif" font-style="italic" transform="rotate(-20,308,345)">Niger</text>
+
+          <!-- ÉTOILE SUD AFRIQUE (cap de bonne espérance symbolique) -->
+          <polygon points="500,876 504,888 516,888 506,895 510,907 500,900 490,907 494,895 484,888 496,888"
+                   fill="rgba(255,220,100,0.5)" stroke="rgba(255,200,80,0.4)" stroke-width="0.5"/>
+
+          <!-- BOUSSOLE MINIATURE océan indien -->
+          <g transform="translate(850, 200)">
+            <circle r="22" fill="rgba(0,20,50,0.6)" stroke="rgba(255,200,80,0.35)" stroke-width="1.5"/>
+            <text x="0" y="-8" text-anchor="middle" font-size="9" fill="rgba(255,220,100,0.7)" font-family="Georgia,serif">N</text>
+            <text x="0" y="14" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.4)" font-family="Georgia,serif">S</text>
+            <text x="12" y="4" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.4)" font-family="Georgia,serif">E</text>
+            <text x="-12" y="4" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.4)" font-family="Georgia,serif">O</text>
+            <line x1="0" y1="-16" x2="0" y2="16" stroke="rgba(255,220,100,0.5)" stroke-width="1.2"/>
+            <line x1="-16" y1="0" x2="16" y2="0" stroke="rgba(255,255,255,0.3)" stroke-width="0.8"/>
+          </g>
+
+          <!-- GRAIN TEXTURE parchemin -->
+          <filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" result="noiseOut"/><feBlend in="SourceGraphic" in2="noiseOut" mode="multiply"/></filter>
+          <rect width="1000" height="1100" fill="rgba(20,10,0,0.08)" filter="url(#noise)"/>
+
+          <!-- GRADUATIONS latitude (tropiques) -->
+          <!-- Tropique du Cancer ~23°N -->
+          <line x1="160" y1="258" x2="860" y2="258" stroke="rgba(255,200,80,0.12)" stroke-width="0.8" stroke-dasharray="6,6"/>
+          <text x="880" y="262" font-size="9" fill="rgba(255,200,80,0.3)" font-family="Georgia,serif">23°N</text>
+          <!-- Équateur -->
+          <line x1="135" y1="530" x2="860" y2="530" stroke="rgba(255,100,100,0.18)" stroke-width="1" stroke-dasharray="4,4"/>
+          <text x="880" y="534" font-size="9" fill="rgba(255,100,100,0.4)" font-family="Georgia,serif">0°</text>
+          <!-- Tropique du Capricorne ~23°S -->
+          <line x1="175" y1="760" x2="860" y2="760" stroke="rgba(255,200,80,0.12)" stroke-width="0.8" stroke-dasharray="6,6"/>
+          <text x="880" y="764" font-size="9" fill="rgba(255,200,80,0.3)" font-family="Georgia,serif">23°S</text>
+        </svg>
+      </div>
       <svg class="map-svg" id="mapSvg" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
       <div class="map-title-bar">
         <div class="map-region-label" id="mapLabel">Royaume du Collège</div>
@@ -1426,6 +1843,8 @@ body.light .score-pill { background: rgba(0,0,0,0.06); border-color: rgba(0,0,0,
         <div class="conquest-pct" id="conquestPct">0%</div>
       </div>
       <div class="map-grid" id="mapGrid"></div>
+      <!-- Biome overlay dynamique -->
+      <div class="biome-overlay" id="biomeOverlay"></div>
       <!-- Boussole -->
       <div class="compass">
         <div class="compass-ring">
@@ -1474,6 +1893,31 @@ body.light .score-pill { background: rgba(0,0,0,0.06); border-color: rgba(0,0,0,
       <div class="progress-bar" id="progressBar" style="width:0%"></div>
     </div>
     <div class="game-card" id="gameCard"></div>
+  </div>
+
+  <!-- ARTEFACT MODAL -->
+  <div class="artefact-modal" id="artefactModal">
+    <div class="artefact-modal-inner">
+      <div class="artefact-modal-box">
+        <div class="artefact-modal-header">
+          <div class="artefact-modal-title">🏺 Collection d'Artefacts</div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <div class="artefact-count" id="artefactCountLabel">0 / 0</div>
+            <button onclick="hideArtefacts()" style="background:rgba(255,255,255,0.1);border:none;color:white;font-size:1.2rem;width:34px;height:34px;border-radius:50%;cursor:pointer;">✕</button>
+          </div>
+        </div>
+        <div style="font-size:0.78rem;opacity:0.5;margin-bottom:16px;line-height:1.5;">
+          Termine une ville pour débloquer son artefact culturel africain.
+        </div>
+        <div class="artefact-grid" id="artefactGrid"></div>
+        <div class="artefact-detail" id="artefactDetail">
+          <div class="artefact-detail-emoji" id="artefactDetailEmoji"></div>
+          <div class="artefact-detail-name" id="artefactDetailName"></div>
+          <div class="artefact-detail-origin" id="artefactDetailOrigin"></div>
+          <div class="artefact-detail-fact" id="artefactDetailFact"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- FOOTER -->
@@ -3249,6 +3693,7 @@ function switchTab(tab) {
   selectedCity = null;
   document.getElementById('infoPanel').classList.remove('show');
   renderMap();
+  resetBiomeForTab();
   // Zoom animation sur le mapGrid au changement d'onglet
   const grid = document.getElementById('mapGrid');
   grid.classList.remove('zoom-in');
@@ -3565,6 +4010,8 @@ function getBuildingIcon(matiere) {
 
 function selectCity(city) {
   selectedCity = city;
+  // Biome dynamique selon la ville sélectionnée
+  applyBiomeForCity(city);
 
   // Déplacer le sprite joueur vers la ville sélectionnée
   const sprite = document.getElementById('playerSprite');
@@ -3897,6 +4344,8 @@ function showResult() {
   if (win) {
     confetti();
     if (mission.roi) setTimeout(confetti, 600);
+    // Artefact unlock toast
+    setTimeout(() => showArtefactToast(mission.id), 1800);
     // Bonus : recharger 1 cœur si victoire et pas au max
     const ld = getLivesData();
     if (ld.lives < MAX_LIVES) {
@@ -4495,12 +4944,189 @@ function validerMotJeu() {
   }
 }
 
-// ===================== INIT =====================
+// ===================== ARTEFACTS =====================
+const ARTEFACTS = {
+  // PRIMAIRE
+  p_calcul:         { emoji:'🔢', nom:'Abaque de Tombouctou', origine:'Mali · XIIIe siècle', biome:'savane', fact:'Les marchands de Tombouctou utilisaient des abaques en bois sculpté pour calculer le prix de l\'or et du sel lors des grandes caravanes transsahariennes.' },
+  p_lecture:        { emoji:'📜', nom:'Manuscrit de Djenné', origine:'Mali · XIIe siècle', biome:'desert', fact:'La cité de Djenné abritait une des plus grandes bibliothèques d\'Afrique médiévale. Des milliers de manuscrits en arabe et en langues africaines y ont été conservés pendant des siècles.' },
+  p_multiplication: { emoji:'🗼', nom:'Tour de Gbèrèkourou', origine:'Guinée · Fouta-Djalon', biome:'foret', fact:'Les tours de guet du Fouta-Djalon étaient des centres d\'apprentissage où les maîtres coraniques enseignaient les mathématiques et l\'astronomie aux jeunes talibés.' },
+  p_grammaire:      { emoji:'🖊️', nom:'Plume de l\'École de Conakry', origine:'Guinée · XIXe siècle', biome:'savane', fact:'Les premières écoles de Conakry fondées sous le règne de l\'Almamy Samory Touré formaient des scribes maîtrisant l\'écriture arabe et les langues locales comme le pular et le malinké.' },
+  p_sciences:       { emoji:'🌿', nom:'Herbier du Fouta-Djalon', origine:'Guinée · Montagnes', biome:'foret', fact:'Le Fouta-Djalon, surnommé "château d\'eau de l\'Afrique de l\'Ouest", abrite plus de 3 000 espèces végétales. Les guérisseurs peuls y récoltaient des plantes médicinales depuis des siècles.' },
+  p_geo_guinee:     { emoji:'🗺️', nom:'Carte de l\'Empire du Mali', origine:'Mali · XIVe siècle', biome:'desert', fact:'La carte d\'Al-Idrisi (1154) représente déjà le Mali et la Guinée. L\'Empire du Mali sous Mansa Moussa s\'étendait de l\'Atlantique au Niger, couvrant la Guinée actuelle.' },
+  p_histoire_guinee:{ emoji:'⚔️', nom:'Épée de Samory Touré', origine:'Guinée · 1882–1898', biome:'savane', fact:'Samory Touré, né à Manyambaladougou (Guinée), résista 16 ans à la colonisation française. Sa forge de Bissandougou produisait des armes qui rivalisaient avec les fusils européens.' },
+  p_calcul_avance:  { emoji:'📐', nom:'Équerre des Bâtisseurs de Mosquées', origine:'Guinée-Conakry · XVIIIe s.', biome:'desert', fact:'Les architectes peuls du Fouta-Djalon construisaient des mosquées à l\'aide d\'équerres en bois taillé. La Grande Mosquée de Labé (1884) fut édifiée sans instruments modernes.' },
+  p_examen_college: { emoji:'🏰', nom:'Porte d\'Or de Kankan', origine:'Guinée · Haute-Guinée', biome:'savane', fact:'Kankan, capitale spirituelle de la Haute-Guinée, était un carrefour d\'apprentissage islamique. Ses portes sculptées symbolisaient l\'accès au savoir pour les élèves du Manden.' },
+  // COLLEGE
+  c_maths_6:        { emoji:'📐', nom:'Triangle d\'Al-Khawarizmi', origine:'Afrique du Nord · IXe siècle', biome:'desert', fact:'Al-Khawarizmi, né en Perse mais ayant travaillé au Caire, inventa l\'algèbre (al-jabr). Son nom latin "Algoritmi" donna le mot "algorithme". L\'Afrique du Nord conserva ses manuscrits.' },
+  c_arithmetique:   { emoji:'🔢', nom:'Tablette de Plimpton 322', origine:'Nil · Antiquité', biome:'desert', fact:'Les scribes égyptiens de la vallée du Nil maîtrisaient les fractions et les équations 3 000 ans avant J.-C. Le papyrus de Rhind (1650 av. J.-C.) contient 84 problèmes mathématiques.' },
+  c_physique_6:     { emoji:'⚡', nom:'Générateur de l\'École de Dakar', origine:'Sénégal · 1957', biome:'savane', fact:'L\'École Normale William Ponty de Dakar forma les premières générations de scientifiques africains francophones. Ses laboratoires de physique étaient les plus modernes d\'Afrique subsaharienne à l\'époque.' },
+  c_francais:       { emoji:'📖', nom:'Roman de Camara Laye', origine:'Guinée · Kouroussa 1928', biome:'foret', fact:'"L\'Enfant noir" (1953) de Camara Laye, né à Kouroussa en Guinée forestière, est le premier roman guinéen. Il décrit la forge de son père et l\'initiation traditionnelle malinké.' },
+  c_bio_6:          { emoji:'🌿', nom:'Feuille de Caïlcédrat', origine:'Afrique de l\'Ouest', biome:'savane', fact:'Le caïlcédrat (Khaya senegalensis) est un arbre sacré du Fouta-Djalon. Son écorce est utilisée en médecine traditionnelle guinéenne pour traiter le paludisme depuis des siècles.' },
+  c_chimie:         { emoji:'🧪', nom:'Alambic de Zosime', origine:'Égypte · IIIe siècle', biome:'desert', fact:'Zosime de Panopolis, alchimiste égyptien du IIIe siècle, inventa les premiers alambics et distillateurs. Son traité "Cheirokmeta" est le plus ancien manuscrit chimique conservé au monde.' },
+  c_geo_monde:      { emoji:'🌍', nom:'Boussole de Mansa Moussa', origine:'Mali · 1324', biome:'desert', fact:'Le pèlerinage de Mansa Moussa à La Mecque (1324) traversa l\'Afrique du Nord avec 60 000 hommes et 12 tonnes d\'or. Ses navigateurs utilisaient des boussoles et cartes arabes.' },
+  c_histoire:       { emoji:'👑', nom:'Trône de Soundiata Keïta', origine:'Mali · XIIIe siècle', biome:'savane', fact:'Soundiata Keïta fonda l\'Empire du Mali en 1235 après la bataille de Kirina. Son trône, selon la tradition orale des griots mandingues, était sculpté dans le bois de l\'arbre à palabres.' },
+  c_examen_lycee:   { emoji:'🎓', nom:'Diplôme de l\'École Polytechnique de Conakry', origine:'Guinée · 1963', biome:'savane', fact:'L\'Institut Polytechnique de Conakry (aujourd\'hui UGANC), fondé en 1963 juste après l\'indépendance, fut la première université d\'Afrique de l\'Ouest francophone post-coloniale.' },
+  // LYCEE
+  l_maths:          { emoji:'∞', nom:'Symbole Infini de Bernoulli', origine:'Égypte-Afrique · XVIIe s.', biome:'desert', fact:'Les mathématiciens arabes d\'Égypte et du Maghreb transmirent l\'algèbre et la notation mathématique à l\'Europe médiévale. Le mot "zéro" vient de l\'arabe "sifr" (vide).' },
+  l_physique:       { emoji:'🔭', nom:'Astrolabe de Fès', origine:'Maroc · Xe siècle', biome:'desert', fact:'Les astronomes de la mosquée al-Qarawiyyin de Fès (fondée 859, plus vieille université du monde) fabriquaient des astrolabes pour calculer l\'heure des prières et la direction de La Mecque.' },
+  l_chimie:         { emoji:'⚗️', nom:'Creuset d\'Or de Siguiri', origine:'Guinée · Haute-Guinée', biome:'savane', fact:'Siguiri, dans la Haute-Guinée, est le centre aurifère de la Guinée. Ses orfèvres malinké pratiquaient une chimie de l\'or ancestrale : séparation, affinage et alliage transmis de maître en apprenti.' },
+  l_bio:            { emoji:'🦋', nom:'Papillon Morpho de Guinée Forestière', origine:'Guinée Forestière', biome:'foret', fact:'La Guinée Forestière abrite 1 300 espèces de papillons, dont des morphos aux ailes bleu irisé uniques au monde. La forêt de Ziama est classée réserve de biosphère par l\'UNESCO.' },
+  l_geo:            { emoji:'🌊', nom:'Coquillage du Rio Nunez', origine:'Guinée · Basse-Guinée', biome:'ocean', fact:'Le Rio Nunez en Basse-Guinée fut le premier comptoir commercial de la Guinée. Ses marchands échangeaient des coquillages-monnaies (cauris) contre du sel, du fer et des tissus depuis le XIVe siècle.' },
+  l_histoire:       { emoji:'🏛️', nom:'Stèle de Chinguetti', origine:'Mauritanie · IXe siècle', biome:'desert', fact:'Chinguetti (Mauritanie), 7e ville sainte de l\'Islam et carrefour des routes caravanières, abrite 5 bibliothèques de 6 600 manuscrits médiévaux sur l\'astronomie, la médecine et la philosophie.' },
+  l_philo:          { emoji:'🏺', nom:'Masque Nimba Baga', origine:'Guinée · Boké', biome:'foret', fact:'Le masque Nimba, symbole de fertilité et de sagesse des Baga de Basse-Guinée, est l\'artefact africain le plus étudié en philosophie esthétique. Picasso s\'en inspira pour "Les Demoiselles d\'Avignon" (1907).' },
+  l_culture:        { emoji:'🎭', nom:'Griot de Kouroussa', origine:'Guinée · Haute-Guinée', biome:'savane', fact:'Les griots (djéliwolu) de Kouroussa, ville natale de Camara Laye, sont les gardiens de 800 ans d\'histoire mandingue. Leur mémoire encyclopédique est reconnue patrimoine immatériel de l\'UNESCO.' },
+  l_francais:       { emoji:'🖋️', nom:'Plume de la Négritude', origine:'Paris-Afrique · 1934', biome:'savane', fact:'Le mouvement Négritude, fondé à Paris par Aimé Césaire, Léopold Sédar Senghor et Léon-Gontran Damas, reconnut la valeur des cultures africaines face à l\'assimilation coloniale.' },
+  l_eco:            { emoji:'💰', nom:'Lingot de Bauxite Guinéenne', origine:'Guinée · Fria 1952', biome:'montagne', fact:'La Guinée détient les plus grandes réserves mondiales de bauxite (25 milliards de tonnes, soit 25% des réserves mondiales). La mine de Fria, ouverte en 1952, fut la première exploitation industrielle d\'Afrique subsaharienne.' },
+  l_examen_roi:     { emoji:'👑', nom:'Couronne de l\'Empire Songhaï', origine:'Mali-Niger · XVe siècle', biome:'desert', fact:'L\'Empire Songhaï (1464–1591), le plus grand empire de l\'histoire africaine (3,4 millions km²), avait son centre à Gao. Son roi Askia Mohammed fut considéré comme le souverain le plus savant d\'Afrique.' },
+};
+
+// ===== BIOMES =====
+// Chaque biome a un gradient d'overlay qui teinte la carte
+const BIOMES = {
+  desert:   { gradient: 'radial-gradient(ellipse at 50% 40%, rgba(210,160,30,0.22) 0%, rgba(180,120,20,0.10) 60%, transparent 100%)', icon:'🏜️', label:'Désert' },
+  savane:   { gradient: 'radial-gradient(ellipse at 50% 50%, rgba(180,140,30,0.18) 0%, rgba(120,170,40,0.08) 60%, transparent 100%)', icon:'🌾', label:'Savane' },
+  foret:    { gradient: 'radial-gradient(ellipse at 50% 55%, rgba(20,100,20,0.28) 0%, rgba(10,80,10,0.12) 60%, transparent 100%)', icon:'🌳', label:'Forêt' },
+  montagne: { gradient: 'radial-gradient(ellipse at 50% 40%, rgba(100,120,160,0.22) 0%, rgba(60,80,110,0.10) 60%, transparent 100%)', icon:'🏔️', label:'Montagne' },
+  ocean:    { gradient: 'radial-gradient(ellipse at 50% 50%, rgba(20,80,160,0.28) 0%, rgba(10,50,120,0.12) 60%, transparent 100%)', icon:'🌊', label:'Océan' },
+};
+
+// Biome par défaut par tab
+const TAB_BIOMES = { primaire:'savane', college:'savane', lycee:'desert' };
+
+let currentBiome = 'savane';
+
+function applyBiome(biomeKey) {
+  const biome = BIOMES[biomeKey] || BIOMES['savane'];
+  if (biomeKey === currentBiome) return;
+  currentBiome = biomeKey;
+  const overlay = document.getElementById('biomeOverlay');
+  if (!overlay) return;
+  overlay.classList.remove('show');
+  setTimeout(() => {
+    overlay.style.background = biome.gradient;
+    overlay.classList.add('show');
+  }, 80);
+}
+
+function applyBiomeForCity(city) {
+  const art = ARTEFACTS[city.id];
+  if (art && art.biome) applyBiome(art.biome);
+}
+
+function resetBiomeForTab() {
+  const biome = TAB_BIOMES[currentTab] || 'savane';
+  const overlay = document.getElementById('biomeOverlay');
+  if (!overlay) return;
+  overlay.classList.remove('show');
+  setTimeout(() => {
+    overlay.style.background = BIOMES[biome].gradient;
+    overlay.classList.add('show');
+    currentBiome = biome;
+  }, 200);
+}
+
+// ===== ARTEFACT UNLOCK TOAST =====
+let artefactToastTimer = null;
+function showArtefactToast(cityId) {
+  const art = ARTEFACTS[cityId];
+  if (!art) return;
+  // Mark as seen
+  try {
+    const seen = JSON.parse(localStorage.getItem('bhds_artefacts_seen') || '{}');
+    if (seen[cityId]) return; // already shown
+    seen[cityId] = true;
+    localStorage.setItem('bhds_artefacts_seen', JSON.stringify(seen));
+  } catch(e) {}
+
+  const toast = document.createElement('div');
+  toast.className = 'artefact-toast';
+  toast.id = 'artefactToastEl';
+  toast.innerHTML = `
+    <div class="artefact-toast-label">🏺 Artefact débloqué !</div>
+    <div class="artefact-toast-glow">${art.emoji}</div>
+    <div class="artefact-toast-name">${art.nom}</div>
+    <div style="font-size:0.68rem;opacity:0.5;margin-bottom:6px;">${art.origine}</div>
+    <div class="artefact-toast-fact">${art.fact.slice(0, 100)}…</div>
+  `;
+  toast.onclick = () => {
+    toast.classList.add('out');
+    setTimeout(() => toast.remove(), 500);
+    showArtefacts();
+  };
+  document.body.appendChild(toast);
+  if (artefactToastTimer) clearTimeout(artefactToastTimer);
+  artefactToastTimer = setTimeout(() => {
+    if (toast.parentNode) {
+      toast.classList.add('out');
+      setTimeout(() => toast.remove(), 500);
+    }
+  }, 5000);
+}
+
+// ===== ARTEFACT MODAL =====
+function showArtefacts() {
+  const modal = document.getElementById('artefactModal');
+  modal.classList.add('show');
+  renderArtefactGrid();
+  document.getElementById('artefactDetail').classList.remove('show');
+}
+function hideArtefacts() {
+  document.getElementById('artefactModal').classList.remove('show');
+}
+
+function renderArtefactGrid() {
+  const allCities = [...PRIMAIRES, ...COLLEGES, ...LYCEES];
+  const artIds = Object.keys(ARTEFACTS);
+  const unlocked = artIds.filter(id => saveData[id] && saveData[id].stars >= 1);
+  document.getElementById('artefactCountLabel').textContent = unlocked.length + ' / ' + artIds.length;
+
+  let seen = {};
+  try { seen = JSON.parse(localStorage.getItem('bhds_artefacts_seen') || '{}'); } catch(e) {}
+
+  const grid = document.getElementById('artefactGrid');
+  grid.innerHTML = artIds.map(id => {
+    const art = ARTEFACTS[id];
+    const isUnlocked = saveData[id] && saveData[id].stars >= 1;
+    const isNew = isUnlocked && !seen[id];
+    return `
+      <div class="artefact-card ${isUnlocked ? 'unlocked' : 'locked'}" onclick="${isUnlocked ? `showArtefactDetail('${id}')` : ''}">
+        ${isNew ? '<div class="artefact-new-badge">NEW</div>' : ''}
+        <div class="artefact-card-emoji">${isUnlocked ? art.emoji : '🔒'}</div>
+        <div class="artefact-card-name">${isUnlocked ? art.nom : '???'}</div>
+        <div class="artefact-card-biome">${isUnlocked ? (BIOMES[art.biome]?.icon || '') + ' ' + (BIOMES[art.biome]?.label || '') : ''}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function showArtefactDetail(id) {
+  const art = ARTEFACTS[id];
+  if (!art) return;
+  // Clear "new" badge
+  try {
+    const seen = JSON.parse(localStorage.getItem('bhds_artefacts_seen') || '{}');
+    seen[id] = true;
+    localStorage.setItem('bhds_artefacts_seen', JSON.stringify(seen));
+  } catch(e) {}
+
+  document.getElementById('artefactDetailEmoji').textContent = art.emoji;
+  document.getElementById('artefactDetailName').textContent = art.nom;
+  document.getElementById('artefactDetailOrigin').textContent = art.origine;
+  document.getElementById('artefactDetailFact').textContent = art.fact;
+  document.getElementById('artefactDetail').classList.add('show');
+  document.getElementById('artefactDetail').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  // Refresh grid to remove NEW badges
+  renderArtefactGrid();
+}
+
+// ===================== ARTEFACTS — INIT =====================
 renderMap();
 updateGlobalScore();
 renderHearts();
 // Sync bouton personnage avec la valeur chargée
 try { const btn = document.getElementById('persoBtn'); if (btn) btn.textContent = currentPlayer; } catch(e) {}
+// Biome initial
+resetBiomeForTab();
 </script>
 <!-- Service Worker PWA -->
 <script>
