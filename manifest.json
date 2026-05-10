@@ -2,8 +2,8 @@
   "name": "KaramokoBHDS",
   "short_name": "Karamoko",
   "description": "La plateforme de quiz interactif pour les élèves de Guinée. Du Primaire au Lycée, chaque étape est une aventure.",
-  "start_url": "/Karamoko-bhds/",
-  "scope": "/Karamoko-bhds/",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#07090f",
@@ -12,52 +12,60 @@
   "categories": ["education", "games"],
   "icons": [
     {
-      "src": "https://boubacardraga123-sketch.github.io/Karamoko-bhds/icon-72.png",
+      "src": "icons/icon-72.png",
       "sizes": "72x72",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://boubacardraga123-sketch.github.io/Karamoko-bhds/icon-96.png",
+      "src": "icons/icon-96.png",
       "sizes": "96x96",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://boubacardraga123-sketch.github.io/Karamoko-bhds/icon-128.png",
+      "src": "icons/icon-128.png",
       "sizes": "128x128",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://boubacardraga123-sketch.github.io/Karamoko-bhds/icon-144.png",
+      "src": "icons/icon-144.png",
       "sizes": "144x144",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://boubacardraga123-sketch.github.io/Karamoko-bhds/icon-152.png",
+      "src": "icons/icon-152.png",
       "sizes": "152x152",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://boubacardraga123-sketch.github.io/Karamoko-bhds/icon-192.png",
+      "src": "icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "https://boubacardraga123-sketch.github.io/Karamoko-bhds/icon-384.png",
+      "src": "icons/icon-384.png",
       "sizes": "384x384",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://boubacardraga123-sketch.github.io/Karamoko-bhds/icon-512.png",
+      "src": "icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "icons/screenshot1.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "label": "Carte Aventure KaramokoBHDS"
     }
   ],
   "shortcuts": [
@@ -65,8 +73,8 @@
       "name": "Carte Aventure",
       "short_name": "Aventure",
       "description": "Lancer directement la carte aventure",
-      "url": "/Karamoko-bhds/carte_aventure_college_lycee.html",
-      "icons": [{ "src": "https://boubacardraga123-sketch.github.io/Karamoko-bhds/icon-96.png", "sizes": "96x96" }]
+      "url": "./carte_aventure_college_lycee.html",
+      "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96" }]
     }
   ]
 }
