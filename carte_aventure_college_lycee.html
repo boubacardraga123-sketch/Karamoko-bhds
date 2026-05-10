@@ -866,7 +866,13 @@ body.light .score-pill { background: rgba(0,0,0,0.06); border-color: rgba(0,0,0,
   gap: 3px;
   font-size: 1.1rem;
   letter-spacing: 1px;
+  max-width: 120px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  flex-wrap: nowrap;
 }
+.hearts-display::-webkit-scrollbar { display: none; }
 .heart-item {
   transition: transform 0.3s, opacity 0.3s;
 }
@@ -1100,6 +1106,217 @@ body.light .score-pill { background: rgba(0,0,0,0.06); border-color: rgba(0,0,0,
   transition: all 0.2s;
 }
 .perso-close:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(167,139,250,0.4); }
+
+/* ===== JEU DE MOTS ===== */
+.motjeu-wrap {
+  text-align: center;
+  padding: 8px 0;
+}
+.motjeu-indice {
+  font-size: 0.88rem;
+  opacity: 0.75;
+  line-height: 1.5;
+  margin-bottom: 18px;
+  font-style: italic;
+  padding: 10px 14px;
+  background: rgba(167,139,250,0.08);
+  border-radius: 10px;
+  border: 1px solid rgba(167,139,250,0.2);
+}
+.motjeu-cases {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+.motjeu-case {
+  width: 38px;
+  height: 44px;
+  border-radius: 8px;
+  border: 2px solid rgba(167,139,250,0.4);
+  background: rgba(255,255,255,0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.2rem;
+  color: var(--text);
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.motjeu-case.fixe {
+  background: rgba(167,139,250,0.18);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.motjeu-case.vide {
+  background: rgba(255,255,255,0.03);
+  border-color: rgba(255,255,255,0.15);
+  border-style: dashed;
+  color: transparent;
+}
+.motjeu-case.active-input {
+  border-color: #fbbf24;
+  box-shadow: 0 0 12px rgba(251,191,36,0.4);
+  background: rgba(251,191,36,0.08);
+}
+.motjeu-case.correct-letter {
+  background: rgba(52,211,153,0.2);
+  border-color: var(--green);
+  color: var(--green);
+}
+.motjeu-case.wrong-letter {
+  background: rgba(248,113,113,0.2);
+  border-color: var(--red);
+  color: var(--red);
+  animation: shakeLetter 0.4s ease;
+}
+@keyframes shakeLetter {
+  0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)}
+}
+.motjeu-clavier {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 5px;
+  max-width: 360px;
+  margin: 0 auto 14px;
+}
+.motjeu-touche {
+  width: 34px;
+  height: 38px;
+  border-radius: 7px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.07);
+  color: var(--text);
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  touch-action: manipulation;
+}
+.motjeu-touche:hover { background: rgba(167,139,250,0.25); border-color: var(--accent); transform: scale(1.08); }
+.motjeu-touche:active { transform: scale(0.95); }
+.motjeu-touche.used-correct { background: rgba(52,211,153,0.25); border-color: var(--green); opacity: 0.5; pointer-events:none; }
+.motjeu-touche.used-wrong { background: rgba(248,113,113,0.15); border-color: rgba(248,113,113,0.4); opacity: 0.35; pointer-events:none; }
+.motjeu-essais {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.85rem;
+  color: var(--gold);
+  margin-bottom: 10px;
+}
+.motjeu-feedback {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1rem;
+  min-height: 28px;
+  margin-bottom: 8px;
+}
+.motjeu-btn-valider {
+  background: linear-gradient(135deg, var(--accent), #7c3aed);
+  border: none; border-radius: 12px;
+  color: white; cursor: pointer;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1rem; padding: 10px 28px;
+  transition: all 0.2s; margin-top: 6px;
+  display: none;
+}
+.motjeu-btn-valider.show { display: inline-block; }
+.motjeu-btn-valider:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(167,139,250,0.4); }
+
+/* ===== MODE BOSS ===== */
+@keyframes bossGlow {
+  0%,100% { box-shadow: 0 0 18px #ef4444, 0 0 40px rgba(239,68,68,0.4), 0 0 80px rgba(239,68,68,0.15); transform: scale(1); }
+  50%      { box-shadow: 0 0 28px #f97316, 0 0 60px rgba(249,115,22,0.5), 0 0 100px rgba(249,115,22,0.2); transform: scale(1.1); }
+}
+@keyframes bossShake {
+  0%,100%{transform:translate(-50%,-50%) rotate(0deg)}
+  20%{transform:translate(-50%,-50%) rotate(-6deg) scale(1.1)}
+  40%{transform:translate(-50%,-50%) rotate(6deg) scale(1.15)}
+  60%{transform:translate(-50%,-50%) rotate(-4deg) scale(1.1)}
+  80%{transform:translate(-50%,-50%) rotate(4deg) scale(1.05)}
+}
+@keyframes bossEntrance {
+  0%  { opacity:0; transform:translateY(-30px) scale(0.5); }
+  60% { opacity:1; transform:translateY(6px) scale(1.08); }
+  100%{ opacity:1; transform:translateY(0) scale(1); }
+}
+@keyframes bossAura {
+  0%,100% { opacity:0.5; transform:translate(-50%,-50%) scale(1); }
+  50%      { opacity:0.9; transform:translate(-50%,-50%) scale(1.25); }
+}
+@keyframes bossLightning {
+  0%,90%,100%{ opacity:0; }
+  92%,96%{ opacity:1; }
+}
+
+.city-node.boss .city-pin {
+  animation: bossGlow 1.5s ease-in-out infinite !important;
+  border-color: #ef4444 !important;
+  background: radial-gradient(circle, #3d0a0a, #1a0000) !important;
+  position: relative;
+  overflow: visible;
+}
+.city-node.boss .city-pin::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(239,68,68,0.3) 0%, transparent 70%);
+  animation: bossAura 1.5s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+.city-node.boss.completed .city-pin {
+  animation: none !important;
+  background: linear-gradient(135deg, #6b0000, #3d0000) !important;
+  box-shadow: 0 0 10px rgba(239,68,68,0.4) !important;
+}
+.city-node.boss .city-name {
+  color: #fca5a5;
+  font-weight: 900;
+  text-shadow: 0 0 8px rgba(239,68,68,0.6);
+}
+.boss-badge-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #7f1d1d, #991b1b, #7f1d1d);
+  background-size: 200% auto;
+  color: #fca5a5;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.9rem;
+  padding: 6px 18px;
+  border-radius: 20px;
+  margin-bottom: 10px;
+  animation: shimmerBadge 2s ease infinite, pulse 1s ease-in-out infinite;
+  border: 1px solid rgba(239,68,68,0.5);
+  box-shadow: 0 0 20px rgba(239,68,68,0.3);
+}
+.boss-entrance-card {
+  animation: bossEntrance 0.6s cubic-bezier(0.4,0,0.2,1) forwards;
+}
+.boss-q-text {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.6rem;
+  text-align: center;
+  margin-bottom: 18px;
+  line-height: 1.3;
+  text-shadow: 0 0 20px rgba(239,68,68,0.3);
+}
+.game-card.boss-mode {
+  border-color: rgba(239,68,68,0.35) !important;
+  background: linear-gradient(135deg, #0d0505, #1a0808) !important;
+  box-shadow: 0 0 40px rgba(239,68,68,0.15), 0 12px 50px rgba(0,0,0,0.7) !important;
+}
+.boss-lightning {
+  position: fixed;
+  inset: 0;
+  background: rgba(239,68,68,0.08);
+  pointer-events: none;
+  z-index: 50;
+  animation: bossLightning 3s ease-in-out infinite;
+}
 </style>
 </head>
 <body>
@@ -1455,6 +1672,108 @@ const PRIMAIRES = [
     ]
   },
   {
+    id:'p_problemes_maths',
+    nom:'Marché des Problèmes',
+    emoji:'🧮',
+    matiere:'Calcul',
+    niveau:'5ème/6ème année',
+    desc:'Résous des problèmes de la vie quotidienne : achats au marché, partages, distances et mesures en Guinée.',
+    tags:[{t:'Problèmes',c:'#60a5fa'},{t:'Guinée',c:'#CE1126'}],
+    diff:'⭐⭐⭐',
+    questions:8,
+    prerequis:['p_calcul_avance'],
+    x:20, y:88,
+    data:[
+      { q:"Mamadou a 1 500 francs. Il achète du pain à 400 francs et du lait à 350 francs. Combien lui reste-t-il ?", opts:["650 francs","750 francs","800 francs","900 francs"], ans:1, fact:"1 500 − 400 − 350 = 750 francs. Toujours soustraire les dépenses une par une ou les additionner puis soustraire." },
+      { q:"Une maman partage 48 mangues équitablement entre ses 6 enfants. Combien chaque enfant reçoit-il ?", opts:["6 mangues","7 mangues","8 mangues","9 mangues"], ans:2, fact:"48 ÷ 6 = 8 mangues chacun. Le partage équitable, c'est une division." },
+      { q:"Un taxi fait 12 km par litre d'essence. Avec 5 litres, quelle distance peut-il parcourir ?", opts:["50 km","55 km","60 km","65 km"], ans:2, fact:"12 × 5 = 60 km. Pour trouver la distance totale, on multiplie la distance par litre par le nombre de litres." },
+      { q:"Fatou a 3 sacs de riz de 25 kg chacun. Quel est le poids total ?", opts:["65 kg","70 kg","75 kg","80 kg"], ans:2, fact:"3 × 25 = 75 kg. Quand on a plusieurs fois la même quantité, on multiplie." },
+      { q:"Un rectangle mesure 8 m de long et 5 m de large. Quelle est son aire ?", opts:["26 m²","30 m²","40 m²","45 m²"], ans:2, fact:"Aire = longueur × largeur = 8 × 5 = 40 m². L'aire mesure la surface intérieure." },
+      { q:"Ibrahima gagne 2 400 francs par jour. Combien gagne-t-il en 5 jours ?", opts:["10 000 francs","11 000 francs","12 000 francs","12 400 francs"], ans:2, fact:"2 400 × 5 = 12 000 francs. Pour un salaire sur plusieurs jours, on multiplie le salaire journalier par le nombre de jours." },
+      { q:"Une bouteille contient 1,5 litre d'eau. Combien faut-il de bouteilles pour remplir un seau de 9 litres ?", opts:["4 bouteilles","5 bouteilles","6 bouteilles","7 bouteilles"], ans:2, fact:"9 ÷ 1,5 = 6 bouteilles. On divise la quantité totale par la contenance d'une bouteille." },
+      { q:"Une classe a 35 élèves. 2/5 des élèves sont des filles. Combien y a-t-il de filles ?", opts:["12 filles","13 filles","14 filles","15 filles"], ans:2, fact:"2/5 de 35 = (35 ÷ 5) × 2 = 7 × 2 = 14 filles. Pour trouver une fraction d'une quantité, on divise par le dénominateur puis on multiplie par le numérateur." },
+    ]
+  },
+  {
+    id:'p_logique',
+    nom:'Grotte de la Sagesse',
+    emoji:'🧠',
+    matiere:'Calcul',
+    niveau:'5ème/6ème année',
+    desc:'Aiguise ta réflexion ! Résous des énigmes logiques, des suites de nombres et des devinettes de la vie quotidienne en Guinée.',
+    tags:[{t:'Logique',c:'#a78bfa'},{t:'Réflexion',c:'#fbbf24'}],
+    diff:'⭐⭐⭐',
+    questions:8,
+    prerequis:['p_calcul_avance'],
+    x:62, y:88,
+    data:[
+      { q:"Quelle est la suite logique : 2, 4, 8, 16, ... ?", opts:["18","24","32","36"], ans:2, fact:"Chaque nombre est multiplié par 2 : 2×2=4, 4×2=8, 8×2=16, 16×2=32. C'est une suite géométrique de raison 2." },
+      { q:"J'ai un nombre. Je lui ajoute 15, puis je divise par 5 et j'obtiens 7. Quel est ce nombre ?", opts:["15","20","25","30"], ans:2, fact:"On remonte en sens inverse : 7×5 = 35, puis 35 − 15 = 20. La méthode inverse permet de retrouver le nombre de départ." },
+      { q:"Dans une ferme, il y a des poules et des vaches. On compte 10 têtes et 28 pattes. Combien y a-t-il de vaches ?", opts:["3 vaches","4 vaches","5 vaches","6 vaches"], ans:3, fact:"Soit x vaches et (10−x) poules. 4x + 2(10−x) = 28 → 4x + 20 − 2x = 28 → 2x = 8 → x = 4. Méthode d'essai-erreur ou d'algèbre." },
+      { q:"Quelle est la suite logique : 1, 4, 9, 16, 25, ... ?", opts:["30","34","36","40"], ans:2, fact:"Ce sont les carrés des entiers : 1²=1, 2²=4, 3²=9, 4²=16, 5²=25, 6²=36." },
+      { q:"Un père a 4 fois l'âge de son fils. Dans 6 ans, il aura 3 fois l'âge du fils. Quel est l'âge actuel du fils ?", opts:["10 ans","12 ans","14 ans","16 ans"], ans:1, fact:"Fils = x, père = 4x. Dans 6 ans : 4x+6 = 3(x+6) → 4x+6 = 3x+18 → x = 12. Le fils a 12 ans, le père 48 ans." },
+      { q:"Si lundi est le 3 du mois, quel jour sera le 17 du même mois ?", opts:["Lundi","Mardi","Mercredi","Jeudi"], ans:0, fact:"Du 3 au 17, il y a 14 jours = exactement 2 semaines. Deux semaines plus tard, c'est le même jour : lundi." },
+      { q:"Une bougie de 20 cm brûle entièrement en 4 heures. Quelle longueur reste-t-il après 1h30 ?", opts:["10,5 cm","12,5 cm","13,5 cm","15 cm"], ans:1, fact:"La bougie perd 20÷4 = 5 cm/heure. En 1h30 = 1,5 h → elle perd 5×1,5 = 7,5 cm. Reste : 20 − 7,5 = 12,5 cm." },
+      { q:"Quelle est la suite logique : 3, 6, 12, 24, 48, ... ?", opts:["72","84","96","108"], ans:2, fact:"Chaque terme est multiplié par 2 : 48 × 2 = 96. Suite géométrique de raison 2." },
+    ]
+  },
+  {
+    id:'p_arithmetique',
+    nom:'Forteresse de l\'Arithmétique',
+    emoji:'🔣',
+    matiere:'Calcul',
+    niveau:'5ème/6ème année',
+    desc:'Maîtrise les nombres entiers, les multiples, les diviseurs, les nombres pairs et impairs, et les critères de divisibilité.',
+    tags:[{t:'Arithmétique',c:'#60a5fa'}],
+    diff:'⭐⭐⭐',
+    questions:14,
+    prerequis:['p_multiplication'],
+    x:48, y:36,
+    data:[
+      { q:"Quel est le plus grand diviseur commun (PGCD) de 12 et 18 ?", opts:["2","3","6","9"], ans:2, fact:"Les diviseurs de 12 : 1,2,3,4,6,12. Les diviseurs de 18 : 1,2,3,6,9,18. Le plus grand commun est 6." },
+      { q:"Lequel de ces nombres est un multiple de 7 ?", opts:["45","49","51","54"], ans:1, fact:"7×7=49. Un multiple de 7 s'obtient en multipliant 7 par un entier : 7,14,21,28,35,42,49..." },
+      { q:"Un nombre est divisible par 3 si :", opts:["Il se termine par 0 ou 5","Il est pair","La somme de ses chiffres est divisible par 3","Il est un multiple de 9"], ans:2, fact:"Exemple : 123 → 1+2+3=6, divisible par 3 ✓. 124 → 1+2+4=7, non divisible par 3." },
+      { q:"Quel est le plus petit commun multiple (PPCM) de 4 et 6 ?", opts:["8","12","18","24"], ans:1, fact:"Multiples de 4 : 4,8,12,16... Multiples de 6 : 6,12,18... Le plus petit en commun est 12." },
+      { q:"Lequel de ces nombres est un nombre premier ?", opts:["1","4","9","11"], ans:3, fact:"Un nombre premier n'a que 2 diviseurs : 1 et lui-même. 11 est premier car ses seuls diviseurs sont 1 et 11." },
+      { q:"Combien de diviseurs a le nombre 24 ?", opts:["4","6","8","10"], ans:2, fact:"Diviseurs de 24 : 1, 2, 3, 4, 6, 8, 12, 24. Il y en a 8. Pour les trouver, on cherche tous les nombres qui divisent 24 exactement." },
+      { q:"Un nombre divisible par 2 ET par 3 est divisible par :", opts:["4","5","6","9"], ans:2, fact:"Si un nombre est divisible par 2 et par 3 (qui sont premiers entre eux), il est divisible par 2×3=6. Ex : 12, 18, 24..." },
+      { q:"Quel est le reste de la division de 37 par 5 ?", opts:["1","2","3","4"], ans:1, fact:"37 = 5×7 + 2. Le quotient est 7, le reste est 2. On vérifie : 5×7=35, 37−35=2 ✓." },
+      { q:"Quel est le PGCD de 20 et 30 ?", opts:["5","10","15","20"], ans:1, fact:"Diviseurs de 20 : 1,2,4,5,10,20. Diviseurs de 30 : 1,2,3,5,6,10,15,30. Le plus grand commun est 10." },
+      { q:"Lequel de ces nombres est pair ?", opts:["37","53","84","91"], ans:2, fact:"Un nombre pair est divisible par 2. 84 ÷ 2 = 42 exactement. Les nombres pairs se terminent par 0, 2, 4, 6 ou 8." },
+      { q:"Un nombre est divisible par 5 si :", opts:["Il est impair","Il se termine par 0 ou 5","La somme de ses chiffres est 5","Il est divisible par 10"], ans:1, fact:"Exemple : 35, 40, 75, 100 sont tous divisibles par 5 car ils se terminent par 5 ou 0." },
+      { q:"Quel est le PPCM de 3 et 5 ?", opts:["8","10","15","20"], ans:2, fact:"Multiples de 3 : 3,6,9,12,15... Multiples de 5 : 5,10,15... Le plus petit commun est 15. On peut aussi calculer : (3×5)/PGCD(3,5) = 15/1 = 15." },
+      { q:"Combien y a-t-il de nombres pairs entre 1 et 10 inclus ?", opts:["3","4","5","6"], ans:2, fact:"Les nombres pairs de 1 à 10 : 2, 4, 6, 8, 10. Il y en a 5." },
+      { q:"Quel est le reste de la division de 50 par 7 ?", opts:["1","3","5","6"], ans:0, fact:"50 = 7 × 7 + 1. En effet : 7×7=49, et 50−49=1. Le quotient est 7 et le reste est 1. On vérifie : 7×7+1 = 50 ✓." },
+    ]
+  },
+  {
+    id:'p_geometrie',
+    nom:'Palais des Formes',
+    emoji:'📐',
+    matiere:'Calcul',
+    niveau:'4ème/5ème année',
+    desc:'Découvre les formes géométriques : triangles, rectangles, cercles. Calcule périmètres et aires pour devenir un champion de la géométrie !',
+    tags:[{t:'Géométrie',c:'#60a5fa'},{t:'Formes',c:'#34d399'}],
+    diff:'⭐⭐',
+    questions:12,
+    prerequis:['p_multiplication'],
+    x:65, y:52,
+    data:[
+      { q:"Combien de côtés a un triangle ?", opts:["2","3","4","5"], ans:1, fact:"Un triangle est un polygone à 3 côtés et 3 angles. La somme de ses angles est toujours égale à 180°." },
+      { q:"Le périmètre d'un carré de côté 5 cm est :", opts:["10 cm","15 cm","20 cm","25 cm"], ans:2, fact:"Le périmètre d'un carré = 4 × côté = 4 × 5 = 20 cm. Le périmètre, c'est la longueur du contour." },
+      { q:"L'aire d'un rectangle de longueur 6 cm et de largeur 4 cm est :", opts:["10 cm²","20 cm²","24 cm²","28 cm²"], ans:2, fact:"Aire = longueur × largeur = 6 × 4 = 24 cm². L'aire mesure la surface intérieure de la figure." },
+      { q:"Un cercle est délimité par :", opts:["Des côtés droits","Une courbe fermée appelée cercle","Deux droites","Des angles"], ans:1, fact:"Le cercle est l'ensemble des points situés à égale distance du centre. Cette distance s'appelle le rayon." },
+      { q:"Combien d'angles droits a un rectangle ?", opts:["1","2","3","4"], ans:3, fact:"Un rectangle possède 4 angles droits (90° chacun). C'est sa propriété principale avec ses côtés opposés égaux." },
+      { q:"Le périmètre d'un rectangle de longueur 8 cm et largeur 3 cm est :", opts:["11 cm","22 cm","24 cm","11 cm²"], ans:1, fact:"Périmètre = 2 × (longueur + largeur) = 2 × (8 + 3) = 2 × 11 = 22 cm." },
+      { q:"L'aire d'un carré de côté 7 cm est :", opts:["14 cm²","28 cm²","42 cm²","49 cm²"], ans:3, fact:"Aire d'un carré = côté × côté = 7 × 7 = 49 cm². On dit aussi côté au carré : 7² = 49." },
+      { q:"Un triangle dont les 3 côtés sont égaux s'appelle :", opts:["Rectangle","Isocèle","Équilatéral","Scalène"], ans:2, fact:"Un triangle équilatéral a 3 côtés égaux et 3 angles égaux de 60° chacun. C'est la forme la plus régulière des triangles." },
+      { q:"La partie du cercle allant du centre à un point du cercle s'appelle :", opts:["Le diamètre","Le rayon","La corde","L'arc"], ans:1, fact:"Le rayon relie le centre au cercle. Le diamètre passe par le centre et joint deux points du cercle : Diamètre = 2 × rayon." },
+      { q:"Un carré est aussi un rectangle ?", opts:["Oui, toujours","Non, jamais","Seulement parfois","Ce sont les mêmes formes"], ans:0, fact:"Oui ! Un carré est un cas particulier de rectangle où tous les côtés sont égaux. Tout carré est un rectangle, mais tout rectangle n'est pas un carré." },
+      { q:"Combien de côtés a un hexagone ?", opts:["5","6","7","8"], ans:1, fact:"Un hexagone a 6 côtés. Un pentagone en a 5, un heptagone 7, un octogone 8. En grec : hexa = six." },
+      { q:"Dans un triangle rectangle, l'angle droit mesure :", opts:["45°","60°","90°","180°"], ans:2, fact:"Un angle droit mesure exactement 90°. Dans un triangle rectangle, les deux autres angles sont aigus et leur somme vaut 90°." },
+    ]
+  },
+  {
     id:'p_examen_college',
     nom:'Porte du Royaume Collège',
     emoji:'🏰',
@@ -1507,6 +1826,37 @@ const COLLEGES = [
       { q:"L'aire d'un rectangle de longueur 8 cm et largeur 5 cm est :", opts:["26 cm²","40 cm²","13 cm²","30 cm²"], ans:1 },
       { q:"Si x + 7 = 15, alors x vaut :", opts:["6","7","8","22"], ans:2 },
       { q:"Dans un triangle, la somme des angles vaut :", opts:["90°","180°","270°","360°"], ans:1 },
+    ]
+  },
+  {
+    id:'c_arithmetique',
+    nom:'Tour de l\'Arithmétique',
+    emoji:'🔢',
+    matiere:'Maths',
+    niveau:'8e/9e',
+    desc:'Approfondis l\'arithmétique : entiers relatifs, divisibilité, fractions, puissances et calcul littéral.',
+    tags:[{t:'Arithmétique',c:'var(--maths)'}],
+    diff:'⭐⭐⭐',
+    questions:16,
+    prerequis:['c_maths_6'],
+    x:82, y:36,
+    data:[
+      { q:"Le résultat de (−3) × (−4) est :", opts:["−12","−7","7","12"], ans:3, fact:"Moins × moins = plus. (−3)×(−4) = +12. La règle des signes : deux signes identiques donnent + ; deux signes différents donnent −." },
+      { q:"Simplifier la fraction 36/48 :", opts:["3/4","4/5","6/8","2/3"], ans:0, fact:"PGCD(36,48)=12. 36÷12=3 et 48÷12=4. La fraction irréductible est 3/4." },
+      { q:"Quel est le résultat de 2³ × 2⁴ ?", opts:["2⁷","2¹²","4⁷","8⁷"], ans:0, fact:"aᵐ × aⁿ = aᵐ⁺ⁿ. Donc 2³ × 2⁴ = 2³⁺⁴ = 2⁷ = 128." },
+      { q:"Développer : 3(2x − 5) donne :", opts:["6x − 5","6x − 15","6x + 15","3x − 15"], ans:1, fact:"On distribue : 3×2x = 6x et 3×(−5) = −15. Résultat : 6x − 15." },
+      { q:"Factoriser : 4x + 12 donne :", opts:["4(x + 3)","2(2x + 6)","4(x + 12)","x(4 + 12)"], ans:0, fact:"On cherche le facteur commun : 4 divise 4x et 12. 4x+12 = 4(x+3). On vérifie : 4×x+4×3 = 4x+12 ✓." },
+      { q:"La valeur absolue de −7 est :", opts:["−7","0","7","49"], ans:2, fact:"|−7| = 7. La valeur absolue d'un nombre est sa distance à zéro, toujours positive. |−7| = |7| = 7." },
+      { q:"Résoudre : 2x − 6 = 10. x vaut :", opts:["2","6","8","10"], ans:2, fact:"2x = 10 + 6 = 16, donc x = 16÷2 = 8. Vérification : 2×8−6 = 16−6 = 10 ✓." },
+      { q:"Quel est le résultat de (−2)⁴ ?", opts:["−16","−8","8","16"], ans:3, fact:"(−2)⁴ = (−2)×(−2)×(−2)×(−2) = 4×4 = 16. Une puissance paire d'un nombre négatif est positive." },
+      { q:"Le PPCM de 8 et 12 est :", opts:["4","16","24","48"], ans:2, fact:"Multiples de 8 : 8,16,24... Multiples de 12 : 12,24... Le plus petit commun est 24. On peut aussi utiliser : PPCM = (8×12)/PGCD(8,12) = 96/4 = 24." },
+      { q:"Si a = −3 et b = 5, calculer a² − b :", opts:["−14","4","9","14"], ans:1, fact:"a² = (−3)² = 9. Puis a² − b = 9 − 5 = 4. Attention : (−3)² = 9, pas −9 !" },
+      { q:"Quel est le PGCD de 45 et 60 ?", opts:["5","10","15","20"], ans:2, fact:"45 = 3²×5 et 60 = 2²×3×5. Le PGCD est le produit des facteurs communs au plus petit exposant : 3×5 = 15." },
+      { q:"La décomposition en facteurs premiers de 60 est :", opts:["2²×15","2²×3×5","2×3×10","4×3×5"], ans:1, fact:"60 = 2×30 = 2×2×15 = 2²×3×5. La décomposition en facteurs premiers est unique (théorème fondamental)." },
+      { q:"Quel est le résultat de (−5) + (−3) − (−2) ?", opts:["−10","−6","0","6"], ans:1, fact:"(−5) + (−3) − (−2) = −5 − 3 + 2 = −8 + 2 = −6. Soustraire un négatif revient à additionner le positif." },
+      { q:"Additionner les fractions : 2/3 + 1/4 =", opts:["3/7","3/12","11/12","8/12"], ans:2, fact:"On met au même dénominateur : PPCM(3,4)=12. 2/3 = 8/12 et 1/4 = 3/12. Somme : (8+3)/12 = 11/12." },
+      { q:"Le résultat de 3⁰ est :", opts:["0","1","3","Indéfini"], ans:1, fact:"Tout nombre non nul élevé à la puissance 0 vaut 1. a⁰ = 1 pour tout a ≠ 0. Ex : 3⁰ = 1, 100⁰ = 1." },
+      { q:"Résoudre : 3x + 9 = 0. x vaut :", opts:["−3","−9","3","9"], ans:0, fact:"3x = −9, donc x = −9÷3 = −3. Vérification : 3×(−3)+9 = −9+9 = 0 ✓." },
     ]
   },
   {
@@ -1735,6 +2085,33 @@ const COLLEGES = [
     ]
   },
   {
+    id:'c_geometrie',
+    nom:'Temple de la Géométrie',
+    emoji:'📏',
+    matiere:'Maths',
+    niveau:'8e/9e',
+    desc:'Maîtrise la géométrie du collège : théorème de Pythagore, Thalès, angles, triangles, cercles et calculs de périmètres et d\'aires.',
+    tags:[{t:'Géométrie',c:'var(--maths)'}],
+    diff:'⭐⭐⭐',
+    questions:12,
+    prerequis:['c_maths_6'],
+    x:25, y:72,
+    data:[
+      { q:"Dans un triangle rectangle de côtés 3 et 4, l'hypoténuse vaut :", opts:["5","6","7","√7"], ans:0, fact:"Pythagore : hyp² = 3² + 4² = 9 + 16 = 25. Hypoténuse = √25 = 5. Ce triplet (3,4,5) est le plus célèbre en géométrie." },
+      { q:"Le théorème de Thalès dit que si deux droites parallèles coupent deux sécantes, alors :", opts:["Les angles sont égaux","Les rapports des segments sont égaux","Les longueurs sont égales","Les triangles sont rectangles"], ans:1, fact:"Si AB ∥ A'B', alors AA'/AB = BB'/AB = A'B'/AB. On utilise Thalès pour calculer des longueurs inconnues par proportionnalité." },
+      { q:"La somme des angles d'un triangle est :", opts:["90°","180°","270°","360°"], ans:1, fact:"Dans tout triangle, la somme des trois angles est toujours 180°. Ex : si deux angles valent 60° et 80°, le troisième vaut 180°−60°−80° = 40°." },
+      { q:"Le périmètre d'un cercle de rayon r est :", opts:["πr²","2πr","πr","4πr²"], ans:1, fact:"Périmètre (circonférence) = 2πr ≈ 6,28 × r. Pour un rayon de 5 cm : P = 2 × π × 5 ≈ 31,4 cm." },
+      { q:"L'aire d'un disque de rayon r est :", opts:["2πr","πr²","πr/2","4πr²"], ans:1, fact:"Aire du disque = πr². Pour r = 7 cm : A = π × 7² ≈ 3,14 × 49 ≈ 153,9 cm²." },
+      { q:"Deux triangles sont semblables si :", opts:["Ils ont le même périmètre","Leurs angles sont respectivement égaux","Ils ont la même aire","Leurs côtés sont égaux"], ans:1, fact:"Deux triangles semblables ont les mêmes angles et leurs côtés sont proportionnels. Ils ont la même forme mais pas nécessairement la même taille." },
+      { q:"Dans un triangle rectangle, sin(θ) = :", opts:["Adjacent / Hypoténuse","Opposé / Hypoténuse","Opposé / Adjacent","Hypoténuse / Opposé"], ans:1, fact:"SOH-CAH-TOA : Sin = Opposé/Hypoténuse, Cos = Adjacent/Hypoténuse, Tan = Opposé/Adjacent." },
+      { q:"L'aire d'un triangle de base b et de hauteur h est :", opts:["b × h","b + h","b × h / 2","2 × b × h"], ans:2, fact:"Aire = (base × hauteur) / 2 = bh/2. La hauteur est perpendiculaire à la base. Ex : base=8 cm, h=5 cm → A = 8×5/2 = 20 cm²." },
+      { q:"Un angle inscrit dans un demi-cercle est toujours :", opts:["Aigu","Droit (90°)","Obtus","Plat"], ans:1, fact:"Théorème de l'angle inscrit dans un demi-cercle (Thalès) : tout angle inscrit dans un demi-cercle et s'appuyant sur le diamètre est droit." },
+      { q:"Le médian d'un triangle est :", opts:["La droite passant par un sommet perpendiculairement au côté opposé","Le segment reliant un sommet au milieu du côté opposé","La droite passant par le milieu de deux côtés","La bissectrice d'un angle"], ans:1, fact:"Le médian relie un sommet au milieu du côté opposé. Les trois médianes se croisent au centre de gravité (barycentre) du triangle." },
+      { q:"Combien d'axes de symétrie a un carré ?", opts:["1","2","3","4"], ans:3, fact:"Le carré possède 4 axes de symétrie : les 2 diagonales et les 2 médianes (droites passant par les milieux des côtés opposés)." },
+      { q:"La diagonale d'un carré de côté a vaut :", opts:["a","a√2","2a","a²"], ans:1, fact:"Par Pythagore : d² = a² + a² = 2a². Donc d = a√2 ≈ 1,41 × a. Ex : carré de 5 cm → diagonale = 5√2 ≈ 7,07 cm." },
+    ]
+  },
+  {
     id:'c_examen_lycee',
     nom:'Porte du Royaume Lycée',
     emoji:'🏯',
@@ -1787,6 +2164,38 @@ const LYCEES = [
       { q:"log₁₀(1000) vaut :", opts:["2","3","4","10"], ans:1 },
       { q:"Si f'(x) > 0 sur [a,b], alors f est :", opts:["Décroissante","Constante","Croissante","Nulle"], ans:2 },
       { q:"C(5,2) (combinaisons de 2 parmi 5) vaut :", opts:["5","10","15","20"], ans:1 },
+    ]
+  },
+  {
+    id:'l_arithmetique',
+    nom:'Citadelle de l\'Arithmétique',
+    emoji:'∞',
+    matiere:'Maths',
+    niveau:'11e/12e',
+    desc:'Approfondis l\'arithmétique avancée : congruences, théorèmes de divisibilité, algorithme d\'Euclide, décomposition en facteurs premiers et arithmétique modulaire.',
+    tags:[{t:'Arithmétique',c:'var(--maths)'}],
+    diff:'⭐⭐⭐⭐',
+    questions:16,
+    prerequis:['l_maths'],
+    x:85, y:28,
+    data:[
+      { q:"La décomposition en facteurs premiers de 360 est :", opts:["2³ × 3² × 5","2⁴ × 3 × 5","2² × 3³ × 5","2³ × 3 × 5²"], ans:0, fact:"360 = 2×180 = 2×2×90 = 2²×2×45 = 2³×9×5 = 2³×3²×5. La décomposition est unique (théorème fondamental de l'arithmétique)." },
+      { q:"L'algorithme d'Euclide pour calculer PGCD(252, 105) commence par :", opts:["252 = 2×105 + 42","252 = 3×105 − 63","252 = 105 + 147","252 = 4×105 − 168"], ans:0, fact:"252 = 2×105 + 42. Puis PGCD(105,42) : 105 = 2×42+21. Puis PGCD(42,21) = 21. Donc PGCD(252,105) = 21." },
+      { q:"On dit que a ≡ b (mod n) si :", opts:["a + b = n","a − b est divisible par n","a × b = n","a / b = n"], ans:1, fact:"a ≡ b (mod n) signifie que n divise (a−b). Ex : 17 ≡ 5 (mod 6) car 17−5=12 est divisible par 6." },
+      { q:"Quel est le reste de 2²⁰ divisé par 7 ?", opts:["1","2","4","6"], ans:2, fact:"2³ = 8 ≡ 1 (mod 7). La période est 3. 20 = 3×6 + 2, donc 2²⁰ ≡ (2³)⁶ × 2² ≡ 1 × 4 = 4 (mod 7)." },
+      { q:"Le théorème de Bézout dit que si PGCD(a,b) = d, alors il existe des entiers u,v tels que :", opts:["a×b = d","au + bv = d","a+b = d×u","a/b = u/v"], ans:1, fact:"Identité de Bézout : au + bv = d = PGCD(a,b). Ex : PGCD(12,8)=4 et 12×(−1)+8×2=4. Utile pour résoudre les équations diophantiennes." },
+      { q:"Un entier n est divisible par 9 si et seulement si :", opts:["n est pair","n se termine par 0","La somme de ses chiffres est divisible par 9","n est divisible par 3 mais pas par 27"], ans:2, fact:"Ex : 729 → 7+2+9=18 → 1+8=9, divisible par 9 ✓. Ce critère découle du fait que 10≡1 (mod 9), donc chaque chiffre conserve sa valeur (mod 9)." },
+      { q:"Le petit théorème de Fermat dit que si p est premier et p ne divise pas a, alors :", opts:["aᵖ ≡ 1 (mod p)","aᵖ⁻¹ ≡ 1 (mod p)","a² ≡ 1 (mod p)","aᵖ ≡ a (mod p) seulement"], ans:1, fact:"Fermat : aᵖ⁻¹ ≡ 1 (mod p). Ex : p=7, a=3 : 3⁶=729=7×104+1 ≡ 1 (mod 7) ✓. Base de la cryptographie RSA." },
+      { q:"Combien y a-t-il de nombres premiers inférieurs à 20 ?", opts:["6","7","8","9"], ans:2, fact:"Les nombres premiers < 20 : 2, 3, 5, 7, 11, 13, 17, 19. Il y en a 8." },
+      { q:"L'équation diophantienne 3x + 5y = 1 admet comme solution particulière :", opts:["x=2, y=−1","x=−2, y=1","x=1, y=−1","x=0, y=1"], ans:0, fact:"3×2 + 5×(−1) = 6−5 = 1 ✓. Les solutions générales sont x = 2+5k et y = −1−3k pour tout entier k." },
+      { q:"Le crible d'Ératosthène permet de :", opts:["Calculer le PGCD de deux entiers","Trouver tous les nombres premiers jusqu'à un entier N donné","Décomposer un entier en facteurs premiers","Résoudre les équations modulaires"], ans:1, fact:"On barre tous les multiples de chaque nombre premier à partir de 2. Ce qui reste non barré est premier. Méthode connue depuis l'Antiquité." },
+      { q:"Le PGCD de deux entiers a et b vérifie toujours :", opts:["PGCD(a,b) = PGCD(b, a mod b)","PGCD(a,b) = a × b","PGCD(a,b) = a + b","PGCD(a,b) = a − b"], ans:0, fact:"C'est la propriété fondamentale utilisée dans l'algorithme d'Euclide : PGCD(a,b) = PGCD(b, r) où r est le reste de la division de a par b." },
+      { q:"Un nombre entier n est congru à 0 modulo 4 si et seulement si :", opts:["n est pair","Les deux derniers chiffres de n forment un nombre divisible par 4","La somme de ses chiffres est divisible par 4","n se termine par 0"], ans:1, fact:"Ex : 124 → 24 ÷ 4 = 6 ✓. 126 → 26 ÷ 4 = 6,5 ✗. Ce critère découle du fait que 100 ≡ 0 (mod 4)." },
+      { q:"Le nombre de diviseurs de p^a × q^b (p, q premiers distincts) est :", opts:["a + b","a × b","(a+1)(b+1)","(a−1)(b−1)"], ans:2, fact:"Ex : 12 = 2²×3¹ → (2+1)(1+1) = 6 diviseurs : 1,2,3,4,6,12. La formule générale : si n = p₁^a₁×...×pₖ^aₖ alors d(n) = (a₁+1)×...×(aₖ+1)." },
+      { q:"Dans Z/nZ, l'élément a est inversible si et seulement si :", opts:["a est premier","PGCD(a, n) = 1","a est pair","a < n/2"], ans:1, fact:"a est inversible mod n ⟺ PGCD(a,n) = 1 (a et n sont premiers entre eux). On trouve l'inverse avec l'algorithme d'Euclide étendu." },
+      { q:"La somme des n premiers entiers naturels 1+2+3+...+n vaut :", opts:["n²","n(n+1)","n(n+1)/2","n(n−1)/2"], ans:2, fact:"Formule de Gauss : 1+2+...+n = n(n+1)/2. Pour n=100 : 100×101/2 = 5050. Gauss l'aurait calculé mentalement à l'âge de 10 ans." },
+      { q:"Quel est le reste de 17⁴ divisé par 5 ?", opts:["0","1","2","3"], ans:1, fact:"17 ≡ 2 (mod 5). Donc 17⁴ ≡ 2⁴ = 16 ≡ 1 (mod 5). Le reste est 1. On utilise la propriété : si a≡b(mod n), alors aᵏ≡bᵏ(mod n)." },
+      { q:"L'indicatrice d'Euler φ(p) pour un nombre premier p vaut :", opts:["p","p − 1","p + 1","p/2"], ans:1, fact:"φ(p) = p − 1 pour tout nombre premier p (il y a p−1 entiers de 1 à p−1 premiers avec p). Ex : φ(7) = 6. Base du théorème d'Euler : a^φ(n) ≡ 1 (mod n)." },
     ]
   },
   {
@@ -2067,6 +2476,56 @@ const LYCEES = [
     ]
   },
   {
+    id:'l_types_radioactivite',
+    nom:'Arsenal des Rayonnements',
+    emoji:'☣️',
+    matiere:'Physique',
+    niveau:'Terminale',
+    desc:'Maîtrise les trois types de radioactivité : alpha, bêta et gamma, leurs propriétés et leurs effets sur la matière.',
+    tags:[{t:'Physique Nucléaire',c:'var(--physique)'}],
+    diff:'⭐⭐⭐⭐',
+    questions:10,
+    prerequis:['l_nucleaire'],
+    x:46, y:42,
+    data:[
+      { q:"La désintégration alpha (α) émet :", opts:["Un électron","Un photon de haute énergie","Un noyau d'hélium ⁴₂He (2 protons + 2 neutrons)","Un neutron libre"], ans:2, fact:"Désintégration α : ᴬ_ZX → ᴬ⁻⁴_(Z-2)Y + ⁴₂He. Le noyau fils perd 2 protons et 2 neutrons. Ex : ²³⁸₉₂U → ²³⁴₉₀Th + ⁴₂He." },
+      { q:"La désintégration bêta moins (β⁻) correspond à la transformation dans le noyau de :", opts:["Un proton en neutron","Un neutron en proton + électron + antineutrino","Un électron en proton","Un noyau en photon"], ans:1, fact:"β⁻ : n → p + e⁻ + ν̄_e. Z augmente de 1, A est inchangé. Ex : ¹⁴₆C → ¹⁴₇N + e⁻ + ν̄_e (datation au carbone 14)." },
+      { q:"La désintégration bêta plus (β⁺) correspond à la transformation dans le noyau de :", opts:["Un neutron en proton","Un proton en neutron + positron + neutrino","Un photon en électron","Un noyau en alpha"], ans:1, fact:"β⁺ : p → n + e⁺ + ν_e. Un proton se transforme en neutron avec émission d'un positron (antiélectron). Z diminue de 1, A inchangé." },
+      { q:"Le rayonnement gamma (γ) est :", opts:["Un flux d'électrons","Un flux de noyaux d'hélium","Un rayonnement électromagnétique de très haute énergie","Un flux de neutrons"], ans:2, fact:"Le rayonnement γ est un photon de très haute énergie (hν > 100 keV). Il accompagne souvent les désintégrations α ou β quand le noyau fils est dans un état excité." },
+      { q:"Quel rayonnement est le plus pénétrant (le plus difficile à arrêter) ?", opts:["Alpha (α)","Bêta (β)","Gamma (γ)","Tous sont équivalents"], ans:2, fact:"γ : stoppé par plusieurs cm de plomb ou béton. β : stoppé par quelques mm d'aluminium. α : stoppé par une feuille de papier ou quelques cm d'air. Mais α est le plus ionisant." },
+      { q:"Quel rayonnement est le plus ionisant (endommage le plus les tissus biologiques) ?", opts:["Alpha (α)","Bêta (β)","Gamma (γ)","Ils sont tous identiques"], ans:0, fact:"α est très ionisant (charge +2, masse élevée) mais très peu pénétrant. Dangereux si ingéré ou inhalé. γ est peu ionisant mais très pénétrant (irradiation externe)." },
+      { q:"La loi de conservation du nombre de masse A dans une désintégration signifie :", opts:["La masse reste identique","La somme des nombres de masse est identique avant et après","Le nombre de protons est conservé","L'énergie est nulle"], ans:1, fact:"Conservation de A (nombre de nucléons) et de Z (charge). Ex : ²³⁸₉₂U → ²³⁴₉₀Th + ⁴₂He : 238 = 234 + 4 ✓ et 92 = 90 + 2 ✓." },
+      { q:"La capture électronique est un type de radioactivité où :", opts:["Un électron est émis du noyau","Un électron du cortège est capturé par le noyau : p + e⁻ → n + ν_e","Un neutron capture un photon","Un proton est émis"], ans:1, fact:"Capture électronique : p + e⁻ → n + ν_e. Z diminue de 1, A inchangé. Comme β⁺, mais sans émission de positron. Souvent suivi d'émission de rayons X caractéristiques." },
+      { q:"Le rayonnement bêta moins (β⁻) est dévié par un champ magnétique car :", opts:["Il est neutre","Il porte une charge électrique négative","Il est constitué de photons","Il est trop lourd"], ans:1, fact:"L'électron émis (charge -e) est dévié par un champ magnétique (force de Lorentz). α (charge +2e) est dévié dans le sens opposé. γ (neutre) n'est pas dévié." },
+      { q:"La filiation radioactive est :", opts:["La réaction de fission nucléaire","La suite de désintégrations successives d'un noyau père jusqu'à un noyau stable","La fusion de deux noyaux","L'absorption d'un neutron par un noyau"], ans:1, fact:"Ex : ²³⁸U se désintègre en chaîne (14 étapes) jusqu'au ²⁰⁶Pb stable. Chaque étape α ou β est une désintégration distincte avec sa propre demi-vie." },
+    ]
+  },
+  {
+    id:'l_decroissance_radioactive',
+    nom:'Horloge de la Décroissance',
+    emoji:'⏳',
+    matiere:'Physique',
+    niveau:'Terminale',
+    desc:'Maîtrise la loi de décroissance radioactive : calcul du nombre de noyaux, de la demi-vie, de l\'activité et applications.',
+    tags:[{t:'Physique Nucléaire',c:'var(--physique)'}],
+    diff:'⭐⭐⭐⭐⭐',
+    questions:10,
+    prerequis:['l_types_radioactivite'],
+    x:40, y:52,
+    data:[
+      { q:"La loi de décroissance radioactive exprime le nombre de noyaux N(t) à l'instant t par :", opts:["N(t) = N₀ − λt","N(t) = N₀ · e^(+λt)","N(t) = N₀ · e^(−λt)","N(t) = N₀ / (1 + λt)"], ans:2, fact:"N(t) = N₀·e^(−λt). N₀ est le nombre initial de noyaux, λ (s⁻¹) est la constante radioactive propre à chaque noyau. La décroissance est exponentielle." },
+      { q:"La constante radioactive λ est liée à la demi-vie T½ par :", opts:["λ = T½ / ln2","λ = ln2 / T½","λ = T½ × ln2","λ = 1 / T½"], ans:1, fact:"λ = ln2 / T½ ≈ 0,693 / T½. Plus la demi-vie est courte, plus λ est grand et plus le noyau se désintègre rapidement." },
+      { q:"La demi-vie T½ d'un noyau radioactif est :", opts:["La durée au bout de laquelle tous les noyaux sont désintégrés","La durée au bout de laquelle la moitié des noyaux se sont désintégrés","La moitié de la durée de vie d'un noyau","La durée de la réaction nucléaire"], ans:1, fact:"T½ = ln2 / λ ≈ 0,693 / λ. Après n demi-vies, il reste N₀/2ⁿ noyaux. Ex : après 3 demi-vies → N₀/8 noyaux restants." },
+      { q:"Après 4 demi-vies, quelle fraction des noyaux initiaux reste-t-il ?", opts:["1/2","1/4","1/8","1/16"], ans:3, fact:"Après n demi-vies : N = N₀/2ⁿ. Pour n = 4 : N = N₀/2⁴ = N₀/16. Soit 6,25% du nombre initial de noyaux." },
+      { q:"L'activité A d'un échantillon radioactif est définie comme :", opts:["Le nombre total de noyaux N","Le nombre de désintégrations par seconde : A = λN","L'énergie libérée par désintégration","La masse de l'échantillon"], ans:1, fact:"A = λN = λN₀·e^(−λt) = A₀·e^(−λt) (en Becquerel : 1 Bq = 1 désintégration/seconde). A décroît exponentiellement comme N." },
+      { q:"L'unité de l'activité radioactive dans le système international est :", opts:["Le Gray (Gy)","Le Sievert (Sv)","Le Becquerel (Bq)","Le Curie (Ci)"], ans:2, fact:"1 Bq = 1 désintégration par seconde. Ancienne unité : le Curie (Ci) : 1 Ci = 3,7×10¹⁰ Bq (activité de 1 g de radium-226)." },
+      { q:"La datation au carbone 14 utilise le fait que :", opts:["Le carbone 14 est stable","Le rapport ¹⁴C/¹²C dans les êtres vivants reste constant, puis décroît après la mort","Le ¹²C est radioactif","La demi-vie du ¹⁴C est de 1 an"], ans:1, fact:"T½(¹⁴C) ≈ 5 730 ans. Tant que l'être est vivant, il échange du carbone avec l'atmosphère (rapport ¹⁴C/¹²C constant). Après la mort, le ¹⁴C décroît → datation possible jusqu'à ~50 000 ans." },
+      { q:"Si à t = 0 on a N₀ = 10 000 noyaux et λ = 0,1 s⁻¹, combien reste-t-il de noyaux après 10 s ?", opts:["N = 10 000 / 10 = 1 000","N = 10 000 × e⁻¹ ≈ 3 679","N = 10 000 × 0,1 = 1 000","N = 10 000 − 0,1 × 10 = 9 999"], ans:1, fact:"N(10) = N₀·e^(−λt) = 10 000 × e^(−0,1 × 10) = 10 000 × e^(−1) ≈ 10 000 × 0,368 ≈ 3 679 noyaux." },
+      { q:"La durée de vie moyenne τ (tau) d'un noyau radioactif est liée à λ par :", opts:["τ = λ","τ = 1/λ","τ = λ²","τ = ln2 × λ"], ans:1, fact:"τ = 1/λ = T½/ln2 ≈ 1,443 × T½. C'est la durée de vie moyenne d'un noyau individuel. N(t) = N₀·e^(−t/τ)." },
+      { q:"La loi de décroissance radioactive est une loi statistique car :", opts:["On peut prévoir exactement quand un noyau donné va se désintégrer","On ne peut prévoir que le comportement moyen d'un grand nombre de noyaux, pas d'un noyau individuel","Les noyaux se concertent","La loi change avec la température"], ans:1, fact:"La radioactivité est aléatoire au niveau d'un noyau individuel. Pour un grand nombre N, la loi statistique N(t) = N₀e^(−λt) est excellente. La désintégration est indépendante des conditions extérieures (T, P, état chimique)." },
+    ]
+  },
+  {
     id:'l_atomique',
     nom:'Monde de l\'Atome',
     emoji:'⚛️',
@@ -2242,6 +2701,302 @@ const LYCEES = [
     ]
   },
   {
+    id:'l_champ_magnetique',
+    nom:'Royaume du Champ Magnétique',
+    emoji:'🧲',
+    matiere:'Physique',
+    niveau:'Terminale',
+    desc:'Découvre la notion de champ magnétique, ses propriétés et comment le représenter par des lignes de champ.',
+    tags:[{t:'Magnétisme',c:'var(--physique)'}],
+    diff:'⭐⭐⭐⭐',
+    questions:10,
+    prerequis:['l_physique'],
+    x:12, y:72,
+    data:[
+      { q:"Le champ magnétique est noté :", opts:["E⃗","F⃗","B⃗","g⃗"], ans:2, fact:"Le champ magnétique B⃗ (aussi appelé induction magnétique) s'exprime en Tesla (T). Il décrit l'action magnétique en chaque point de l'espace." },
+      { q:"L'unité du champ magnétique dans le système international est :", opts:["Le Weber","Le Tesla (T)","L'Ampère","Le Gauss"], ans:1, fact:"1 Tesla (T) = 1 kg/(A·s²). Le champ magnétique terrestre est d'environ 5×10⁻⁵ T. Un IRM médical produit 1 à 3 T." },
+      { q:"Les lignes de champ magnétique d'un aimant droit sortent :", opts:["Du pôle Sud et entrent au pôle Nord","Du pôle Nord et entrent au pôle Sud","Des deux pôles à la fois","Ne sortent jamais"], ans:1, fact:"Par convention, les lignes de champ magnétique sortent du pôle Nord et entrent dans le pôle Sud à l'extérieur de l'aimant." },
+      { q:"À l'intérieur d'un solénoïde (bobine longue), le champ magnétique est :", opts:["Nul","Radial","Uniforme et parallèle à l'axe","Perpendiculaire à l'axe"], ans:2, fact:"B = μ₀·n·I à l'intérieur d'un solénoïde (n = nombre de spires/mètre, I = intensité). Le champ est uniforme et orienté le long de l'axe." },
+      { q:"Un champ magnétique peut être créé par :", opts:["Un objet immobile chargé","Un courant électrique ou un aimant permanent","La gravité uniquement","La chaleur"], ans:1, fact:"Oersted (1820) découvrit qu'un fil parcouru par un courant crée un champ magnétique. Les aimants permanents sont dûs aux courants microscopiques des électrons." },
+      { q:"Le champ magnétique créé par un fil rectiligne infini parcouru par un courant I est :", opts:["B = μ₀I/(2πr)","B = μ₀I","B = I/(2πr)","B = μ₀/(2πrI)"], ans:0, fact:"B = μ₀I/(2πr) avec μ₀ = 4π×10⁻⁷ T·m/A (perméabilité du vide) et r la distance au fil. Les lignes de champ sont des cercles concentriques." },
+      { q:"Les lignes de champ magnétique sont toujours :", opts:["Ouvertes (elles ont un début et une fin)","Fermées (elles forment des boucles)","Rectilignes","Parallèles entre elles"], ans:1, fact:"Contrairement aux lignes de champ électrique, les lignes de champ magnétique forment toujours des boucles fermées. Il n'existe pas de monopole magnétique." },
+      { q:"La règle de la main droite (ou règle du tire-bouchon) permet de déterminer :", opts:["L'intensité du courant","Le sens des lignes de champ magnétique autour d'un fil","La résistance d'un fil","La longueur d'onde de la lumière"], ans:1, fact:"Règle de la main droite : le pouce dans le sens du courant, les doigts s'enroulent dans le sens des lignes de champ B⃗ autour du fil." },
+      { q:"Un aimant permanent est attiré vers :", opts:["Tout métal","Seulement le fer, le nickel et le cobalt (matériaux ferromagnétiques)","Tout isolant","Le cuivre et l'aluminium"], ans:1, fact:"Seuls les matériaux ferromagnétiques (Fe, Ni, Co et leurs alliages) sont fortement attirés. Le cuivre et l'aluminium sont non-magnétiques." },
+      { q:"Le champ magnétique terrestre sert à :", opts:["Chauffer l'atmosphère","Produire de l'électricité","Protéger la Terre du vent solaire et orienter les boussoles","Créer les marées"], ans:2, fact:"Le champ magnétique terrestre (B ≈ 5×10⁻⁵ T) protège la Terre du rayonnement solaire (magnétosphère) et permet l'orientation par boussole." },
+    ]
+  },
+  {
+    id:'l_meridien_magnetique',
+    nom:'Plan du Méridien Magnétique',
+    emoji:'🧭',
+    matiere:'Physique',
+    niveau:'Terminale',
+    desc:'Comprends le méridien magnétique, la déclinaison magnétique et l\'orientation par rapport au champ terrestre.',
+    tags:[{t:'Magnétisme Terrestre',c:'var(--physique)'}],
+    diff:'⭐⭐⭐⭐',
+    questions:10,
+    prerequis:['l_champ_magnetique'],
+    x:28, y:76,
+    data:[
+      { q:"Le méridien magnétique en un lieu est :", opts:["La verticale du lieu","Le plan vertical contenant le vecteur champ magnétique terrestre B⃗","La ligne de l'équateur","Le plan horizontal"], ans:1, fact:"Le méridien magnétique est le plan vertical contenant le vecteur B⃗ terrestre en un point donné. Une boussole s'aligne dans ce plan." },
+      { q:"L'aiguille aimantée d'une boussole se place :", opts:["Dans le plan horizontal uniquement","Dans le méridien magnétique, orientée par le champ terrestre","Perpendiculairement au sol","Dans la direction Est-Ouest"], ans:1, fact:"Une boussole libre de tourner dans les trois dimensions s'aligne sur le méridien magnétique et pointe vers le bas (inclinaison) dans l'hémisphère Nord." },
+      { q:"La déclinaison magnétique est :", opts:["L'angle entre le méridien géographique et le méridien magnétique","La force du champ magnétique","La hauteur du pôle magnétique","La variation de l'intensité"], ans:0, fact:"La déclinaison magnétique δ est l'angle entre le Nord géographique et le Nord magnétique. Elle varie selon le lieu et change légèrement chaque année." },
+      { q:"L'inclinaison magnétique (plongée) est :", opts:["L'angle entre le Nord géographique et magnétique","L'angle entre le vecteur B⃗ et le plan horizontal","La valeur de B en Tesla","La variation saisonnière"], ans:1, fact:"L'inclinaison I est l'angle entre B⃗ et le plan horizontal. Elle vaut 0° à l'équateur magnétique, 90° aux pôles magnétiques." },
+      { q:"Le pôle Nord géographique et le pôle Nord magnétique :", opts:["Sont exactement au même endroit","Ne coïncident pas exactement (décalage d'environ 11°)","Sont aux antipodes","Sont sur l'équateur"], ans:1, fact:"Le pôle Nord magnétique est actuellement au-dessus du Canada et se déplace d'environ 50 km/an vers la Sibérie. Il ne coïncide pas avec le pôle géographique." },
+      { q:"La composante horizontale du champ magnétique terrestre B_H est liée à B et à l'inclinaison I par :", opts:["B_H = B × sin(I)","B_H = B × cos(I)","B_H = B / sin(I)","B_H = B × tan(I)"], ans:1, fact:"B_H = B·cos(I) est la composante horizontale. C'est elle qui oriente l'aiguille d'une boussole horizontale. B_V = B·sin(I) est la composante verticale." },
+      { q:"À l'équateur magnétique, l'inclinaison I est :", opts:["90°","45°","0°","180°"], ans:2, fact:"À l'équateur magnétique, B⃗ est horizontal : I = 0°. Aux pôles magnétiques, B⃗ est vertical : I = ±90°." },
+      { q:"La composante verticale du champ magnétique terrestre B_V vaut :", opts:["B_V = B × cos(I)","B_V = B × sin(I)","B_V = B × tan(I)","B_V = B / cos(I)"], ans:1, fact:"B_V = B·sin(I). Elle est dirigée vers le bas dans l'hémisphère Nord. Un compas d'inclinaison (dipping compass) mesure I directement." },
+      { q:"Le champ magnétique terrestre est comparable à celui d'un :", opts:["Fil rectiligne","Solénoïde court","Grand aimant dipolaire placé au centre de la Terre","Condensateur sphérique"], ans:2, fact:"Le champ magnétique terrestre est approximativement dipolaire, comme si un grand aimant incliné de 11° était placé au centre de la Terre." },
+      { q:"En navigation, pour passer du Nord magnétique au Nord vrai, on :", opts:["Ajoute ou soustrait la déclinaison magnétique","Ajoute toujours 90°","Divise par l'inclinaison","Multiplie par cos(I)"], ans:0, fact:"Cap vrai = Cap magnétique ± déclinaison. Si déclinaison Est : on soustrait. Si déclinaison Ouest : on ajoute. Essentiel en navigation maritime et aérienne." },
+    ]
+  },
+  {
+    id:'l_laplace',
+    nom:'Tour de Laplace',
+    emoji:'🔌',
+    matiere:'Physique',
+    niveau:'Terminale',
+    desc:'Maîtrise la loi de Laplace : force exercée sur un conducteur parcouru par un courant dans un champ magnétique.',
+    tags:[{t:'Magnétisme',c:'var(--physique)'}],
+    diff:'⭐⭐⭐⭐',
+    questions:10,
+    prerequis:['l_champ_magnetique'],
+    x:44, y:74,
+    data:[
+      { q:"La loi de Laplace donne la force exercée sur :", opts:["Une charge au repos dans un champ magnétique","Un conducteur parcouru par un courant dans un champ magnétique B⃗","Une bobine sans courant","Un aimant permanent"], ans:1, fact:"La loi de Laplace donne la force sur un conducteur de longueur L portant un courant I dans un champ B⃗ : dF⃗ = I·dL⃗ ∧ B⃗." },
+      { q:"La force de Laplace sur un conducteur rectiligne de longueur L, courant I, dans un champ B perpendiculaire vaut :", opts:["F = I×L/B","F = B×L/I","F = B×I×L","F = I/(B×L)"], ans:2, fact:"F = BIL·sin(α) où α est l'angle entre le conducteur et B⃗. Si le conducteur est perpendiculaire à B⃗ (α = 90°) : F = BIL (maximum)." },
+      { q:"La direction de la force de Laplace F⃗ = IL⃗ ∧ B⃗ est :", opts:["Parallèle au courant","Parallèle au champ B⃗","Perpendiculaire à la fois au courant et à B⃗","Dans le sens de B⃗"], ans:2, fact:"La force de Laplace est perpendiculaire au plan formé par L⃗ et B⃗. Elle est donnée par le produit vectoriel : F⃗ = I·L⃗ ∧ B⃗." },
+      { q:"La règle des 3 doigts de la main gauche (règle de Fleming) donne :", opts:["Le sens du courant","Le sens du champ magnétique","Le sens de la force de Laplace","L'intensité de la force"], ans:2, fact:"Règle de Fleming (main gauche) : l'index pointe dans le sens de B⃗, le majeur dans le sens de I, le pouce donne le sens de la force F⃗." },
+      { q:"Si l'angle entre le conducteur et B⃗ est 0°, la force de Laplace est :", opts:["Maximale : F = BIL","Minimale : F = 0","Égale à BIL/2","Dirigée vers le haut"], ans:1, fact:"Si le conducteur est parallèle à B⃗ (α = 0°), sin(0°) = 0 → F = 0. La force est nulle quand le courant est dans le sens du champ." },
+      { q:"Un moteur électrique fonctionne grâce à :", opts:["L'effet Joule uniquement","La loi de Laplace : force sur un conducteur parcouru par un courant dans un champ magnétique","La loi d'Ohm","L'effet photoélectrique"], ans:1, fact:"Le moteur électrique convertit l'énergie électrique en énergie mécanique grâce à la force de Laplace exercée sur les bobines du rotor." },
+      { q:"L'unité de la force de Laplace est :", opts:["Le Tesla","Le Joule","Le Newton (N)","Le Watt"], ans:2, fact:"La force de Laplace F = BIL s'exprime en Newtons (N). [B] = T, [I] = A, [L] = m → [BIL] = T·A·m = kg·m/s² = N." },
+      { q:"Si on double l'intensité du courant I dans un conducteur (B et L constants), la force de Laplace :", opts:["Reste constante","Est divisée par 2","Double","Quadruple"], ans:2, fact:"F = BIL → si I double, F double. La force de Laplace est directement proportionnelle à l'intensité du courant." },
+      { q:"La force de Laplace sur une spire rectangulaire de courant I dans un champ B crée :", opts:["Aucun effet","Un courant supplémentaire","Un couple de rotation (moment de force)","Une chaleur importante"], ans:2, fact:"Sur une spire rectangulaire, les forces de Laplace sur les côtés opposés créent un couple moteur M = BISA (S = surface, A = nombre de spires). Principe du galvanomètre." },
+      { q:"Le rail de Laplace est un dispositif qui démontre :", opts:["La loi d'Ohm","Le déplacement d'un conducteur mobile sous l'effet de la force de Laplace","La réfraction de la lumière","La loi de Newton gravitationnelle"], ans:1, fact:"Dans un rail de Laplace, un conducteur mobile glisse sur deux rails dans un champ B. Le courant crée une force F = BIL qui déplace le conducteur." },
+    ]
+  },
+  {
+    id:'l_lorentz',
+    nom:'Forteresse de Lorentz',
+    emoji:'⚡',
+    matiere:'Physique',
+    niveau:'Terminale',
+    desc:'Explore la loi de Lorentz : force exercée sur une charge électrique en mouvement dans un champ magnétique.',
+    tags:[{t:'Magnétisme',c:'var(--physique)'}],
+    diff:'⭐⭐⭐⭐',
+    questions:10,
+    prerequis:['l_champ_magnetique','l_laplace'],
+    x:60, y:72,
+    data:[
+      { q:"La force de Lorentz magnétique sur une charge q se déplaçant à vitesse v⃗ dans un champ B⃗ est :", opts:["F⃗ = q·E⃗","F⃗ = q·v⃗ ∧ B⃗","F⃗ = q·B⃗/v","F⃗ = q·v·B⃗"], ans:1, fact:"Force de Lorentz magnétique : F⃗ = q·v⃗ ∧ B⃗. La force totale de Lorentz est F⃗ = q(E⃗ + v⃗ ∧ B⃗), incluant la force électrique." },
+      { q:"Si une charge q > 0 se déplace dans le sens de B⃗ (v⃗ parallèle à B⃗), la force magnétique de Lorentz est :", opts:["Maximale","Égale à qvB","Nulle","Dirigée vers le bas"], ans:2, fact:"F = q·v·B·sin(α). Si v⃗ est parallèle à B⃗, α = 0° → sin(0°) = 0 → F = 0. Aucune force si la vitesse est dans le sens du champ." },
+      { q:"La force de Lorentz magnétique ne travaille jamais car elle est toujours :", opts:["Nulle","Parallèle à v⃗","Perpendiculaire à v⃗","Dans le sens de B⃗"], ans:2, fact:"La force magnétique F⃗ = qv⃗∧B⃗ est toujours perpendiculaire à v⃗ → travail W = F⃗·v⃗ = 0. Elle change la direction mais pas la vitesse (module constant)." },
+      { q:"Une charge positive lancée perpendiculairement à un champ B⃗ uniforme décrit :", opts:["Une ligne droite","Un mouvement parabolique","Un cercle (mouvement circulaire uniforme)","Une spirale descendante"], ans:2, fact:"La force de Lorentz joue le rôle de force centripète : F = qvB = mv²/r → r = mv/(qB). La charge décrit un cercle de rayon r dans un plan perpendiculaire à B⃗." },
+      { q:"Le rayon r du cercle décrit par une charge dans un champ magnétique est :", opts:["r = qBm/v","r = mv/(qB)","r = qB/(mv)","r = qvB/m"], ans:1, fact:"r = mv/(qB). Plus la masse m est grande ou la vitesse v est grande, plus le rayon est grand. Plus la charge q ou B est grand, plus le rayon est petit." },
+      { q:"Le spectrographe de masse utilise la force de Lorentz pour :", opts:["Accélérer les ions","Séparer des ions de masses différentes selon le rayon de leur trajectoire","Mesurer la charge des protons","Détecter les rayons gamma"], ans:1, fact:"Dans un spectrographe de masse, des ions de masses différentes mais même vitesse décrivent des cercles de rayons r = mv/(qB) différents → séparation des masses." },
+      { q:"Si on double la vitesse d'une charge dans un champ B constant, le rayon de la trajectoire circulaire :", opts:["Reste constant","Est divisé par 2","Double","Quadruple"], ans:2, fact:"r = mv/(qB) → si v double, r double. La charge tourne plus vite mais sur un cercle plus grand. La période T = 2πm/(qB) reste constante !" },
+      { q:"La période T du mouvement circulaire d'une charge dans un champ B ne dépend pas :", opts:["De la masse m","De la charge q","Du champ B","De la vitesse v"], ans:3, fact:"T = 2πr/v = 2πm/(qB). Remarquable : T ne dépend pas de v ! C'est le principe du cyclotron : T est constant quelle que soit l'énergie de la particule." },
+      { q:"L'effet Hall est dû à la force de Lorentz qui :", opts:["Accélère les charges","Dévie les porteurs de charge vers un côté du conducteur, créant une tension Hall","Annule le courant","Crée de la chaleur"], ans:1, fact:"L'effet Hall : les porteurs de charge sont déviés par F⃗ = qv⃗∧B⃗ vers un bord du conducteur → apparition d'une tension transversale V_H = IB/(nqe). Permet de mesurer B." },
+      { q:"Dans un tube cathodique, le faisceau d'électrons est dévié par :", opts:["La loi de Laplace sur les fils","La force de Lorentz sur les électrons en mouvement","La gravité uniquement","La pression atmosphérique"], ans:1, fact:"Un faisceau d'électrons dans un champ magnétique est dévié par F⃗ = qv⃗∧B⃗. C'est le principe des oscilloscopes anciens et des accélérateurs de particules." },
+    ]
+  },
+  {
+    id:'l_flux_magnetique',
+    nom:'Temple du Flux Magnétique',
+    emoji:'🌀',
+    matiere:'Physique',
+    niveau:'Terminale',
+    desc:'Maîtrise la notion de flux magnétique, ses propriétés et son calcul à travers une surface.',
+    tags:[{t:'Induction',c:'var(--physique)'}],
+    diff:'⭐⭐⭐⭐',
+    questions:10,
+    prerequis:['l_champ_magnetique'],
+    x:76, y:68,
+    data:[
+      { q:"Le flux magnétique Φ à travers une surface S est défini par :", opts:["Φ = B + S","Φ = B / S","Φ = B × S × cos(α)","Φ = B × S × sin(α)"], ans:2, fact:"Φ = B·S·cos(α) = B⃗·S⃗ (produit scalaire). α est l'angle entre B⃗ et la normale n⃗ à la surface. Φ = BS si B⃗ est perpendiculaire à la surface." },
+      { q:"L'unité du flux magnétique dans le système international est :", opts:["Le Tesla","Le Joule","Le Weber (Wb)","L'Ampère-tour"], ans:2, fact:"1 Weber (Wb) = 1 Tesla × 1 mètre² = 1 T·m². Le Weber est aussi égal à 1 Volt·seconde (1 V·s)." },
+      { q:"Si la surface est parallèle au champ B⃗ (B⃗ dans le plan de la surface), le flux est :", opts:["Maximum : Φ = BS","Moyen : Φ = BS/2","Nul : Φ = 0","Négatif"], ans:2, fact:"Si B⃗ est dans le plan de S, il est perpendiculaire à la normale n⃗ → α = 90° → cos(90°) = 0 → Φ = 0. Pas de flux quand B⃗ est tangent à la surface." },
+      { q:"Si la surface est perpendiculaire au champ B⃗ (B⃗ traverse la surface de face), le flux est :", opts:["Nul","Minimal","Maximum : Φ = B × S","Égal à B seul"], ans:2, fact:"Si B⃗ est perpendiculaire à S (parallèle à n⃗), α = 0° → cos(0°) = 1 → Φ = BS (maximum). Le flux est maximal quand B⃗ est normal à la surface." },
+      { q:"Le flux magnétique peut être :", opts:["Uniquement positif","Uniquement négatif","Positif, négatif ou nul selon l'orientation","Toujours nul"], ans:2, fact:"Φ = BS·cos(α). Si α < 90°, Φ > 0. Si α > 90°, Φ < 0 (cos négatif). Si α = 90°, Φ = 0. Le signe dépend de l'orientation choisie pour n⃗." },
+      { q:"Le théorème de flux de Gauss pour B⃗ dit que le flux total à travers une surface fermée est :", opts:["Égal à la charge enfermée","Toujours positif","Toujours nul (il n'existe pas de monopole magnétique)","Proportionnel à l'intensité"], ans:2, fact:"∯ B⃗·dS⃗ = 0. Le flux magnétique sortant d'une surface fermée est toujours nul. Cela confirme qu'il n'existe pas de 'charge magnétique' (monopole)." },
+      { q:"Si une bobine de N spires et de surface S tourne dans un champ B⃗ uniforme, le flux à l'instant t est :", opts:["Φ = NBS","Φ = NBS·sin(ωt)","Φ = NBS·cos(ωt)","Φ = NBS·ωt"], ans:2, fact:"Φ(t) = NBS·cos(ωt) si la normale à la spire fait un angle ωt avec B⃗ à l'instant t. La variation de Φ induira une force électromotrice (loi de Faraday)." },
+      { q:"Augmenter le flux magnétique à travers une spire peut se faire en :", opts:["Diminuant B","Diminuant la surface S","Augmentant B ou S ou en orientant la spire perpendiculairement à B⃗","Retournant la spire à 180°"], ans:2, fact:"Φ = BS·cos(α). Pour maximiser Φ : augmenter B, augmenter S, ou mettre α = 0° (normale à la spire parallèle à B⃗)." },
+      { q:"Le flux propre (ou flux propre) d'une bobine est le flux créé par :", opts:["Le champ extérieur","Son propre courant à travers elle-même","Les aimants voisins","La chaleur ambiante"], ans:1, fact:"Le flux propre Φ = L·I est créé par le courant de la bobine elle-même (L = inductance propre en Henry). C'est la base de l'auto-induction." },
+      { q:"L'inductance mutuelle M entre deux bobines traduit le fait que :", opts:["Les deux bobines ont la même résistance","Le flux d'une bobine traverse partiellement l'autre","Les deux bobines sont identiques","Les flux s'annulent toujours"], ans:1, fact:"M = Φ₁₂/I₂ : le flux créé par la bobine 2 qui traverse la bobine 1. L'inductance mutuelle est la base du transformateur électrique." },
+    ]
+  },
+  {
+    id:'l_lenz_faraday',
+    nom:'Palais Lenz-Faraday',
+    emoji:'⚡🔄',
+    matiere:'Physique',
+    niveau:'Terminale',
+    desc:'Maîtrise les lois de Faraday et Lenz : induction électromagnétique, force électromotrice induite et conservation de l\'énergie.',
+    tags:[{t:'Induction',c:'var(--physique)'}],
+    diff:'⭐⭐⭐⭐⭐',
+    questions:10,
+    prerequis:['l_flux_magnetique','l_courant_alternatif'],
+    x:88, y:76,
+    data:[
+      { q:"La loi de Faraday stipule que la force électromotrice (f.é.m.) induite e est :", opts:["e = Φ × t","e = -dΦ/dt","e = dΦ × dt","e = Φ / N"], ans:1, fact:"Loi de Faraday : e = -dΦ/dt. La f.é.m. induite est égale à l'opposé de la dérivée du flux magnétique par rapport au temps. Le signe - est la loi de Lenz." },
+      { q:"La loi de Lenz dit que le courant induit s'oppose à :", opts:["La source de courant","La variation du flux magnétique qui lui a donné naissance","Le champ électrique","L'effet Joule"], ans:1, fact:"Loi de Lenz : le courant induit crée un champ B qui s'oppose à la variation du flux inducteur. C'est une manifestation du principe de conservation de l'énergie." },
+      { q:"Si le flux magnétique à travers une spire augmente, le courant induit crée un champ qui :", opts:["Renforce le flux","S'oppose à l'augmentation (s'oppose au flux inducteur)","Est perpendiculaire au flux","S'annule avec le flux"], ans:1, fact:"Lenz : si Φ augmente, le courant induit crée un champ opposé pour 's'opposer' à cette augmentation. Si Φ diminue, le courant induit cherche à le 'maintenir'." },
+      { q:"Pour une bobine de N spires, la f.é.m. induite totale est :", opts:["e = -dΦ/dt","e = -N·dΦ/dt","e = N·Φ·t","e = -Φ/(N·t)"], ans:1, fact:"e = -N·dΦ/dt. Chaque spire contribue à la f.é.m. Pour N = 1000 spires et dΦ/dt = 0,01 Wb/s → e = -10 V. Plus de spires = plus de tension induite." },
+      { q:"Faraday a découvert l'induction électromagnétique en observant que :", opts:["Un courant crée un champ magnétique (Oersted)","Un champ magnétique variable dans le temps induit un courant dans un circuit","La lumière est une onde","L'électricité se conserve"], ans:1, fact:"Faraday (1831) découvrit que faire varier le flux magnétique à travers une bobine induit un courant. C'est le principe du générateur, du transformateur et de l'alternateur." },
+      { q:"Un alternateur transforme :", opts:["Énergie électrique en énergie mécanique","Énergie mécanique en énergie électrique alternative (par induction)","Courant continu en courant alternatif","Chaleur en électricité"], ans:1, fact:"L'alternateur (générateur AC) utilise la loi de Faraday : une bobine tournant dans un champ B génère une f.é.m. sinusoïdale e = NBS·ω·sin(ωt)." },
+      { q:"Un transformateur fonctionne car :", opts:["Le courant continu passe d'une bobine à l'autre","Le flux magnétique variable créé par le primaire induit une f.é.m. au secondaire (Faraday)","Les deux bobines sont reliées électriquement","L'effet Joule transfère l'énergie"], ans:1, fact:"Transformateur idéal : e₂/e₁ = N₂/N₁ (rapport de transformation). La puissance se conserve : U₁I₁ = U₂I₂. Principe fondé sur la loi de Faraday." },
+      { q:"La f.é.m. d'auto-induction d'une bobine d'inductance L est :", opts:["e = L × I","e = -L × dI/dt","e = -L/I","e = L × t"], ans:1, fact:"e = -L·dI/dt. Quand le courant varie, la bobine génère une f.é.m. qui s'oppose à cette variation (Lenz). C'est l'auto-induction, cause du retard de phase dans les circuits RL." },
+      { q:"Les courants de Foucault sont des courants induits qui se forment dans :", opts:["Les fils conducteurs uniquement","Les masses métalliques conductrices soumises à un flux variable","Les isolants","Les aimants permanents"], ans:1, fact:"Les courants de Foucault se créent dans les masses conductrices (plaques métalliques) soumises à des variations de flux. Ils dissipent de l'énergie par effet Joule (freinage magnétique, induction par plaque)." },
+      { q:"La règle de la main droite (ou tire-bouchon) pour la loi de Lenz permet de déterminer :", opts:["La valeur de la f.é.m.","Le sens du courant induit en appliquant la loi de Lenz","La résistance du circuit","La valeur du flux"], ans:1, fact:"Pour trouver le sens du courant induit : 1) déterminer le sens de variation de Φ, 2) par Lenz, le champ induit s'oppose → 3) règle de la main droite pour le sens du courant." },
+    ]
+  },
+  {
+    id:'l_mots_sciences',
+    nom:'Grotte des Mots Cachés',
+    emoji:'🔤',
+    matiere:'Physique',
+    niveau:'Terminale',
+    desc:'Complète les mots de physique et chimie lettre par lettre. Des cases vides t\'attendent — sauras-tu trouver les bons termes scientifiques ?',
+    tags:[{t:'Physique',c:'var(--physique)'},{t:'Chimie',c:'var(--chimie)'},{t:'🔤 MOTS',c:'#f59e0b'}],
+    diff:'⭐⭐⭐',
+    questions:10,
+    prerequis:['l_physique','l_chimie'],
+    x:30, y:86,
+    motsjeu: true,
+    data:[
+      { mot:'ELECTRON', indice:'Particule chargée négativement qui gravite autour du noyau', lettres_visibles:[0,3,6] },
+      { mot:'NEUTRON', indice:'Particule du noyau sans charge électrique', lettres_visibles:[0,3] },
+      { mot:'ISOTOPE', indice:'Atomes d\'un même élément avec un nombre de neutrons différent', lettres_visibles:[0,2,5] },
+      { mot:'CATALYSEUR', indice:'Substance qui accélère une réaction sans être consommée', lettres_visibles:[0,3,6,9] },
+      { mot:'RADIOACTIVITE', indice:'Désintégration spontanée d\'un noyau instable', lettres_visibles:[0,4,8,12] },
+      { mot:'INDUCTION', indice:'Phénomène par lequel un champ magnétique variable crée une tension', lettres_visibles:[0,2,5,8] },
+      { mot:'MOLECULE', indice:'Assemblage d\'atomes liés par des liaisons chimiques', lettres_visibles:[0,2,6] },
+      { mot:'RESONANCE', indice:'Phénomène d\'amplification à la fréquence propre d\'un circuit RLC', lettres_visibles:[0,3,7] },
+      { mot:'PHOTOELECTRIQUE', indice:'Effet découvert par Einstein : lumière éjecte des électrons d\'un métal', lettres_visibles:[0,4,8,12] },
+      { mot:'ESTÉRIFICATION', indice:'Réaction entre un acide carboxylique et un alcool pour former un ester', lettres_visibles:[0,3,7,11] },
+    ]
+  },
+  {
+    id:'l_geometrie',
+    nom:'Forteresse de la Géométrie',
+    emoji:'🔺',
+    matiere:'Maths',
+    niveau:'11e/12e',
+    desc:'Géométrie analytique, vecteurs, produit scalaire, coniques et transformations du plan. Le sommet de la géométrie au lycée.',
+    tags:[{t:'Géométrie',c:'var(--maths)'}],
+    diff:'⭐⭐⭐⭐',
+    questions:12,
+    prerequis:['l_maths'],
+    x:62, y:28,
+    data:[
+      { q:"Le vecteur AB a pour coordonnées, si A(1,2) et B(4,6) :", opts:["(3,4)","(5,8)","(−3,−4)","(2,3)"], ans:0, fact:"AB = (xB − xA ; yB − yA) = (4−1 ; 6−2) = (3 ; 4). La norme : |AB| = √(3²+4²) = √25 = 5." },
+      { q:"Le produit scalaire de u⃗(a,b) et v⃗(c,d) est :", opts:["ac − bd","ac + bd","ad + bc","ad − bc"], ans:1, fact:"u⃗·v⃗ = ac + bd. Aussi : u⃗·v⃗ = |u||v|cos(θ). Si u⃗·v⃗ = 0, les vecteurs sont perpendiculaires." },
+      { q:"L'équation d'un cercle de centre Ω(a,b) et rayon r est :", opts:["(x−a)² + (y−b)² = r","(x+a)² + (y+b)² = r²","(x−a)² + (y−b)² = r²","x² + y² = r²"], ans:2, fact:"Tout point M(x,y) du cercle vérifie ΩM = r, soit √((x−a)²+(y−b)²) = r, d'où (x−a)²+(y−b)² = r²." },
+      { q:"La distance entre deux points A(x₁,y₁) et B(x₂,y₂) est :", opts:["(x₂−x₁) + (y₂−y₁)","√((x₂−x₁)² + (y₂−y₁)²)","(x₂+x₁)/2","√(x₂² + y₂²)"], ans:1, fact:"Formule de la distance : d = √((Δx)²+(Δy)²). C'est une application directe du théorème de Pythagore dans le repère." },
+      { q:"Les coordonnées du milieu I du segment [AB] avec A(x₁,y₁) et B(x₂,y₂) sont :", opts:["(x₂−x₁ ; y₂−y₁)","(x₁×x₂ ; y₁×y₂)","((x₁+x₂)/2 ; (y₁+y₂)/2)","(x₂/x₁ ; y₂/y₁)"], ans:2, fact:"Le milieu est la moyenne des coordonnées : I = ((x₁+x₂)/2 ; (y₁+y₂)/2). Utile pour trouver le centre d'un segment." },
+      { q:"Deux droites sont perpendiculaires si le produit de leurs coefficients directeurs vaut :", opts:["0","1","−1","Infini"], ans:2, fact:"d₁ (pente m₁) ⊥ d₂ (pente m₂) ⟺ m₁ × m₂ = −1. Ex : pentes 2 et −1/2 : 2 × (−1/2) = −1 ✓." },
+      { q:"L'équation d'une droite de pente m passant par (x₀,y₀) est :", opts:["y = mx","y − y₀ = m(x − x₀)","y = mx + y₀","x − x₀ = m(y − y₀)"], ans:1, fact:"Forme point-pente : y − y₀ = m(x − x₀). On développe pour obtenir la forme y = mx + p. Très utile en géométrie analytique." },
+      { q:"Le déterminant de deux vecteurs u⃗(a,b) et v⃗(c,d) vaut ad − bc. Il est nul si :", opts:["Les vecteurs sont perpendiculaires","Les vecteurs sont colinéaires","Les vecteurs ont la même norme","Les vecteurs sont unitaires"], ans:1, fact:"det(u⃗,v⃗) = ad − bc = 0 ⟺ u⃗ et v⃗ sont colinéaires (parallèles). Le déterminant mesure l'aire du parallélogramme formé." },
+      { q:"La translation de vecteur v⃗(3,−2) appliquée au point A(1,5) donne :", opts:["A'(4,3)","A'(−2,7)","A'(3,10)","A'(2,3)"], ans:0, fact:"Translation : A'(xA + 3 ; yA + (−2)) = (1+3 ; 5−2) = (4 ; 3). Une translation déplace chaque point du même vecteur." },
+      { q:"Dans le plan, la symétrie centrale de centre O appliquée à A donne A' tel que :", opts:["OA = OA'","O est le milieu de [AA']","OA ⊥ OA'","AA' = OA"], ans:1, fact:"Dans une symétrie centrale, O est le milieu de [AA']. Donc A' a pour coordonnées (2xO − xA ; 2yO − yA)." },
+      { q:"Le foyer d'une parabole y = ax² + bx + c se situe :", opts:["À l'origine","Sur l'axe de symétrie","Au sommet","En dehors de la parabole"], ans:1, fact:"La parabole est une conique. Son axe de symétrie est la droite x = −b/(2a). Le foyer est sur cet axe, à une distance 1/(4a) du sommet." },
+      { q:"Deux vecteurs u⃗ et v⃗ sont orthogonaux si :", opts:["Ils ont la même norme","Leur produit scalaire est nul","Ils sont colinéaires","Leur somme est nulle"], ans:1, fact:"u⃗ ⊥ v⃗ ⟺ u⃗·v⃗ = 0 ⟺ cos(θ) = 0 ⟺ θ = 90°. C'est la condition fondamentale de perpendicularité en géométrie analytique." },
+    ]
+  },
+  {
+    id:'l_denombrement',
+    nom:'Citadelle du Dénombrement',
+    emoji:'🎲',
+    matiere:'Maths',
+    niveau:'Terminale',
+    desc:'Maîtrise le dénombrement au niveau Terminale : arrangements, permutations, combinaisons, triangle de Pascal, binôme de Newton et probabilités combinatoires.',
+    tags:[{t:'Dénombrement',c:'var(--maths)'},{t:'Combinatoire',c:'#a78bfa'}],
+    diff:'⭐⭐⭐⭐',
+    questions:14,
+    prerequis:['l_maths'],
+    x:78, y:52,
+    data:[
+      { q:"Le factoriel de 5 (noté 5!) vaut :", opts:["15","60","120","720"], ans:2, fact:"5! = 5×4×3×2×1 = 120. Convention : 0! = 1. Le factoriel n! compte le nombre de façons d'ordonner n objets distincts." },
+      { q:"Le nombre d'arrangements de 3 éléments parmi 5 (noté A⁵₃) vaut :", opts:["10","20","60","120"], ans:2, fact:"Aⁿₖ = n!/(n−k)! = 5!/2! = 120/2 = 60. Un arrangement tient compte de l'ordre : ABC ≠ BAC." },
+      { q:"Le nombre de combinaisons de 2 éléments parmi 5 (noté C²₅ ou C(5,2)) vaut :", opts:["5","10","15","20"], ans:1, fact:"Cⁿₖ = n!/(k!(n−k)!) = 5!/(2!×3!) = 120/(2×6) = 10. Une combinaison ignore l'ordre : {A,B} = {B,A}." },
+      { q:"Quelle est la différence entre arrangement et combinaison ?", opts:["Il n'y en a pas","L'arrangement tient compte de l'ordre, la combinaison non","La combinaison tient compte de l'ordre, l'arrangement non","L'arrangement choisit plus d'éléments"], ans:1, fact:"Aⁿₖ = k! × Cⁿₖ. Ex : parmi 5 livres, choisir 2 rangés sur une étagère → arrangement. Choisir 2 à emporter → combinaison." },
+      { q:"Dans la formule C(n,k) = n! / (k!(n−k)!), C(n,0) vaut toujours :", opts:["0","n","1","n!"], ans:2, fact:"C(n,0) = n!/(0!×n!) = n!/n! = 1. Il y a toujours une seule façon de choisir 0 élément : ne rien choisir." },
+      { q:"Le coefficient binomial C(n,k) vérifie toujours :", opts:["C(n,k) = C(n,n+k)","C(n,k) = C(n,n−k)","C(n,k) = C(k,n)","C(n,k) = C(n+1,k)"], ans:1, fact:"C(n,k) = C(n,n−k) car choisir k éléments revient à écarter n−k éléments. Ex : C(5,2) = C(5,3) = 10." },
+      { q:"Le triangle de Pascal donne C(5,2) = C(4,1) + C(4,2). Quelle est la relation générale ?", opts:["C(n,k) = C(n−1,k) + C(n+1,k)","C(n,k) = C(n−1,k−1) + C(n−1,k)","C(n,k) = C(n,k−1) + C(n,k+1)","C(n,k) = 2×C(n−1,k)"], ans:1, fact:"Relation de Pascal : C(n,k) = C(n−1,k−1) + C(n−1,k). Elle permet de construire le triangle de Pascal ligne par ligne sans calculer de factorielles." },
+      { q:"Le développement de (a+b)³ selon le binôme de Newton est :", opts:["a³+b³","a³+3a²b+3ab²+b³","a³+2a²b+2ab²+b³","3a²+3b²"], ans:1, fact:"(a+b)ⁿ = Σ C(n,k)aⁿ⁻ᵏbᵏ. Pour n=3 : C(3,0)a³ + C(3,1)a²b + C(3,2)ab² + C(3,3)b³ = a³+3a²b+3ab²+b³." },
+      { q:"Combien de façons peut-on ranger 4 livres distincts sur une étagère ?", opts:["4","12","24","256"], ans:2, fact:"Le nombre de permutations de n objets distincts est n! = 4! = 4×3×2×1 = 24. Chaque ordre est unique." },
+      { q:"Un code PIN de 4 chiffres distincts choisis parmi {1,2,3,4,5,6} : combien de codes possibles ?", opts:["15","24","180","360"], ans:3, fact:"Arrangement de 4 parmi 6 (ordre important car 1234 ≠ 4321) : A⁶₄ = 6!/(6−4)! = 720/2 = 360." },
+      { q:"On tire une main de 5 cartes dans un jeu de 32. Combien de mains différentes ?", opts:["C(32,5)","A(32,5)","32×5","32!"], ans:0, fact:"C(32,5) = 32!/(5!×27!) = 201 376. On utilise une combinaison car l'ordre des cartes dans la main n'importe pas." },
+      { q:"La somme de tous les coefficients de (a+b)ⁿ vaut :", opts:["n","n!","2ⁿ","nⁿ"], ans:2, fact:"En posant a=b=1 : (1+1)ⁿ = 2ⁿ = Σ C(n,k). Ex : (1+1)³ = 8 = 1+3+3+1. La somme des coefficients de la ligne n du triangle de Pascal vaut 2ⁿ." },
+      { q:"Dans une classe de 10 élèves, combien de façons de choisir un délégué et un suppléant (deux rôles différents) ?", opts:["10","45","90","100"], ans:2, fact:"Arrangement de 2 parmi 10 (ordre important : délégué ≠ suppléant) : A¹⁰₂ = 10×9 = 90." },
+      { q:"La probabilité d'obtenir exactement 3 faces sur 5 lancers d'une pièce équilibrée est :", opts:["C(5,3)/32","C(5,3)/5","3/5","1/8"], ans:0, fact:"P(X=3) = C(5,3)×(1/2)³×(1/2)² = 10/32 = 5/16. On utilise la loi binomiale B(n,p) : P(X=k) = C(n,k)×pᵏ×(1−p)ⁿ⁻ᵏ." },
+    ]
+  },
+  {
+    id:'l_bac_sm',
+    nom:'Salle BAC — Série SM',
+    emoji:'🧪',
+    matiere:'BAC',
+    niveau:'Terminale SM',
+    desc:'Révise les vrais sujets du Baccalauréat guinéen série SM ! Mathématiques, Physique-Chimie, Sciences de la Vie et de la Terre. Chrono 30 secondes — comme le jour J !',
+    tags:[{t:'🎓 BAC',c:'#ef4444'},{t:'Série SM',c:'#60a5fa'},{t:'Guinée',c:'#CE1126'}],
+    diff:'⭐⭐⭐⭐⭐',
+    questions:15,
+    prerequis:['l_arithmetique','l_geometrie','l_denombrement'],
+    x:22, y:72,
+    chrono: 30,
+    examen: true,
+    data:[
+      { q:"La dérivée de f(x) = 3x² − 5x + 2 est :", opts:["6x − 5","3x − 5","6x + 2","3x²− 5"], ans:0, fact:"f'(x) = 2×3x − 5 = 6x − 5. Règle : la dérivée de axⁿ est n×axⁿ⁻¹, et la dérivée d'une constante est 0." },
+      { q:"∫₀² (2x + 1) dx vaut :", opts:["4","5","6","8"], ans:2, fact:"∫(2x+1)dx = x²+x. Évalué entre 0 et 2 : (4+2) − (0+0) = 6. Penser à appliquer le théorème fondamental de l'analyse." },
+      { q:"Les solutions de x² − 5x + 6 = 0 sont :", opts:["x=1 et x=6","x=2 et x=3","x=−2 et x=−3","x=0 et x=5"], ans:1, fact:"Δ = 25−24 = 1. x = (5±1)/2 → x₁ = 3 et x₂ = 2. Vérification : (x−2)(x−3) = x²−5x+6 ✓." },
+      { q:"Dans un triangle rectangle, si l'hypoténuse vaut 13 et un côté 5, l'autre côté vaut :", opts:["8","10","12","√194"], ans:2, fact:"Pythagore : c² = a²+b². 13² = 5²+b² → 169 = 25+b² → b² = 144 → b = 12. Triplet pythagoricien (5,12,13)." },
+      { q:"Le logarithme néperien de e² vaut :", opts:["2","e","2e","e²"], ans:0, fact:"ln(eˣ) = x. Donc ln(e²) = 2. Rappel : ln est la fonction réciproque de l'exponentielle. ln(e) = 1." },
+      { q:"La loi de modération de Le Chatelier dit que tout système en équilibre soumis à une perturbation :", opts:["Se déplace dans le sens de la perturbation","S'oppose à la perturbation pour retrouver l'équilibre","Se décompose","Reste identique"], ans:1, fact:"Si on augmente la pression, l'équilibre se déplace dans le sens qui diminue le volume (côté avec moins de moles de gaz)." },
+      { q:"Le pH d'une solution d'acide chlorhydrique HCl de concentration 0,01 mol/L est :", opts:["1","2","12","−2"], ans:1, fact:"HCl est un acide fort totalement dissocié : [H₃O⁺] = 0,01 = 10⁻² mol/L. pH = −log(10⁻²) = 2." },
+      { q:"La constante de décroissance radioactive λ est liée à la demi-vie T½ par :", opts:["λ = T½ × ln2","λ = ln2 / T½","λ = 1 / T½","λ = T½ / 2"], ans:1, fact:"λ = ln2 / T½ ≈ 0,693 / T½. Plus T½ est courte, plus λ est grand et plus le noyau se désintègre vite." },
+      { q:"L'énergie libérée par la réaction nucléaire de masse défaut Δm est :", opts:["E = Δm × c","E = Δm × c²","E = Δm / c²","E = ½Δm × c²"], ans:1, fact:"E = Δmc² (Einstein). Avec c = 3×10⁸ m/s. 1 uma de masse défaut libère ≈ 931 MeV. C'est l'énergie des réactions nucléaires." },
+      { q:"La force de Laplace s'exerce sur :", opts:["Une charge électrique immobile","Un conducteur parcouru par un courant dans un champ magnétique","Un aimant en mouvement","Un isolant chargé"], ans:1, fact:"F = BIL sin(α) en newtons. Si B ⊥ I : F = BIL. Direction donnée par la règle des trois doigts ou F = IL⃗ × B⃗." },
+      { q:"C(n,2) = n(n−1)/2. Pour n=7, C(7,2) vaut :", opts:["14","21","28","42"], ans:1, fact:"C(7,2) = 7!/(2!×5!) = (7×6)/(2×1) = 42/2 = 21. Le nombre de paires possibles parmi 7 éléments." },
+      { q:"La suite géométrique de premier terme u₀=3 et de raison q=2 a pour terme général uₙ :", opts:["uₙ = 3+2n","uₙ = 3×2ⁿ","uₙ = 2×3ⁿ","uₙ = 3n²"], ans:1, fact:"Suite géométrique : uₙ = u₀ × qⁿ = 3 × 2ⁿ. Vérification : u₀=3, u₁=6, u₂=12... chaque terme multiplié par 2 ✓." },
+      { q:"L'équation différentielle y' + 2y = 0 a pour solution générale :", opts:["y = Ce²ˣ","y = Ce⁻²ˣ","y = C + 2x","y = C×cos(2x)"], ans:1, fact:"y' = −2y → y'/y = −2 → ln|y| = −2x + cst → y = Ce⁻²ˣ. Les équations diff. du type y'+ay=0 ont pour solution Ce^(−ax)." },
+      { q:"En optique, la relation de conjugaison pour un miroir sphérique est :", opts:["1/f = 1/p + 1/p'","1/OA' − 1/OA = 1/f","OA × OA' = OF²","f = OA + OA'"], ans:1, fact:"Relation de conjugaison : 1/OA' − 1/OA = 1/f = 2/R, avec OA (objet), OA' (image), f (focale), R (rayon de courbure)." },
+      { q:"La probabilité d'obtenir au moins un 6 en lançant deux dés équilibrés est :", opts:["1/6","11/36","12/36","1/3"], ans:1, fact:"P(au moins un 6) = 1 − P(aucun 6) = 1 − (5/6)² = 1 − 25/36 = 11/36. La méthode du complémentaire est souvent plus rapide." },
+    ]
+  },
+  {
+    id:'l_bac_l',
+    nom:'Salle BAC — Série L',
+    emoji:'📜',
+    matiere:'BAC',
+    niveau:'Terminale L',
+    desc:'Révise les vrais sujets du Baccalauréat guinéen série L ! Français, Philosophie, Histoire-Géographie, Langues et Culture africaine. Chrono 30 secondes !',
+    tags:[{t:'🎓 BAC',c:'#ef4444'},{t:'Série L',c:'#f472b6'},{t:'Guinée',c:'#CE1126'}],
+    diff:'⭐⭐⭐⭐⭐',
+    questions:15,
+    prerequis:['l_francais','l_philo','l_culture'],
+    x:38, y:72,
+    chrono: 30,
+    examen: true,
+    data:[
+      { q:"La figure de style qui consiste à comparer sans outil de comparaison est :", opts:["La comparaison","La métaphore","L'hyperbole","La personnification"], ans:1, fact:"La métaphore établit une similitude implicite : 'La vie est un long fleuve tranquille'. La comparaison utilise 'comme', 'tel que', 'pareil à'." },
+      { q:"Dans la phrase 'Bien qu'il soit fatigué, il continue', la proposition soulignée est :", opts:["Une subordonnée relative","Une subordonnée causale","Une subordonnée concessive","Une subordonnée temporelle"], ans:2, fact:"'Bien que' introduit une concession : on admet un fait qui devrait s'opposer à la proposition principale. Autres concessifs : quoique, même si." },
+      { q:"Le roman 'L'Enfant noir' de Camara Laye est publié en :", opts:["1948","1953","1958","1960"], ans:1, fact:"'L'Enfant noir' paraît en 1953 chez Plon. C'est un récit autobiographique sur l'enfance de Camara Laye à Kouroussa et Conakry, et sa relation avec son père forgeron." },
+      { q:"En quelle année la Guinée a-t-elle voté NON au référendum de De Gaulle ?", opts:["1956","1957","1958","1960"], ans:2, fact:"Le 28 septembre 1958, la Guinée vote NON à 95% au référendum sur la Communauté française, choisissant l'indépendance immédiate sous Sékou Touré." },
+      { q:"La philosophie de Descartes est fondée sur le doute méthodique. Sa première certitude est :", opts:["Dieu existe","Le monde est réel","Je pense donc je suis","La matière est première"], ans:2, fact:"'Cogito ergo sum' (Je pense donc je suis) est la première vérité indubitable de Descartes dans les Méditations Métaphysiques (1641)." },
+      { q:"L'œuvre 'Une si longue lettre' est écrite par :", opts:["Camara Laye","Mariama Bâ","Ahmadou Kourouma","Cheikh Hamidou Kane"], ans:1, fact:"'Une si longue lettre' (1979) de la Sénégalaise Mariama Bâ est un roman épistolaire sur la condition féminine en Afrique. Prix Noma en 1980." },
+      { q:"La négritude est un mouvement littéraire fondé notamment par :", opts:["Sékou Touré et Nkrumah","Léopold Sédar Senghor et Aimé Césaire","Camara Laye et Mongo Beti","Hampâté Bâ et Birago Diop"], ans:1, fact:"La négritude naît dans les années 1930 à Paris autour de Senghor (Sénégal), Césaire (Martinique) et Damas (Guyane), valorisant les cultures africaines." },
+      { q:"Le Fouta-Djalon est surnommé 'château d'eau de l'Afrique de l'Ouest' parce que :", opts:["Il a beaucoup de lacs","De nombreux grands fleuves y prennent leur source","Il est très froid","Il reçoit le plus de pluies du continent"], ans:1, fact:"Niger, Sénégal, Gambie, Konkouré... 23 grands fleuves naissent au Fouta-Djalon. D'où son surnom de 'château d'eau'." },
+      { q:"En philosophie, l'éthique kantienne est fondée sur :", opts:["Le bonheur maximum pour le plus grand nombre","Le devoir et l'impératif catégorique","La vertu et le juste milieu","L'intérêt personnel éclairé"], ans:1, fact:"Kant formule l'impératif catégorique : 'Agis de telle sorte que la maxime de ta volonté puisse toujours valoir comme principe d'une législation universelle'." },
+      { q:"L'accord du participe passé employé avec 'avoir' se fait :", opts:["Toujours avec le sujet","Jamais","Avec le COD si celui-ci est placé avant le verbe","Avec le COD placé après le verbe"], ans:2, fact:"Ex : 'Les livres que j'ai lus' — 'lus' s'accorde avec 'livres' (COD placé avant). 'J'ai lu des livres' — pas d'accord (COD après)." },
+      { q:"Samory Touré fut capturé par les Français en :", opts:["1885","1890","1895","1898"], ans:3, fact:"Samory Touré résista 16 ans (1882–1898) avant d'être capturé le 29 septembre 1898 dans le nord de la Côte d'Ivoire. Il mourut en exil au Gabon en 1900." },
+      { q:"La CEDEAO (Communauté Économique des États de l'Afrique de l'Ouest) a été fondée en :", opts:["1963","1975","1980","1989"], ans:1, fact:"La CEDEAO est fondée le 28 mai 1975 à Lagos (Nigeria) par le Traité de Lagos. Elle regroupe 15 pays d'Afrique de l'Ouest, dont la Guinée." },
+      { q:"Dans un texte argumentatif, la thèse est :", opts:["L'ensemble des arguments","La position défendue par l'auteur","La conclusion uniquement","L'introduction du texte"], ans:1, fact:"La thèse = la prise de position. Les arguments = les preuves qui soutiennent la thèse. Les exemples = les illustrations concrètes des arguments." },
+      { q:"L'épopée de Soundiata Keïta est transmise principalement par :", opts:["Les livres scolaires","Les griots (djéli)","Les mosquées","Les colonisateurs"], ans:1, fact:"Les griots (djéliwolu en mandingue) sont les dépositaires de la mémoire orale africaine. L'épopée de Soundiata, fondateur de l'Empire du Mali, est leur récit majeur." },
+      { q:"Le subjonctif présent du verbe 'être' à la 3ème personne du singulier est :", opts:["est","était","soit","sera"], ans:2, fact:"Subjonctif présent : que je sois, que tu sois, qu'il soit... Le subjonctif exprime le doute, la volonté, le souhait. 'Bien qu'il soit', 'pour qu'il soit'." },
+    ]
+  },
+  {
     id:'l_examen_roi',
     nom:'Trône des Trois Royaumes',
     emoji:'👑',
@@ -2251,7 +3006,7 @@ const LYCEES = [
     tags:[{t:'⏱️ CHRONO',c:'#ef4444'},{t:'👑 ROI',c:'#f59e0b'},{t:'ULTIME',c:'#a78bfa'}],
     diff:'⭐⭐⭐⭐⭐',
     questions:15,
-    prerequis:['l_culture','l_philo','l_interference','l_rlc','l_organique'],
+    prerequis:['l_culture','l_philo','l_interference','l_rlc','l_organique','l_lenz_faraday'],
     x:50, y:90,
     chrono: 15,
     examen: true,
@@ -2355,8 +3110,8 @@ let chronoLeft = 0;
 let totalOk = 0, totalKo = 0, totalPts = 0;
 
 // ===== SYSTÈME DE VIES =====
-const MAX_LIVES = 3;
-const RECHARGE_MS = 30 * 60 * 1000; // 30 minutes
+const MAX_LIVES = 20;
+const RECHARGE_MS = 10 * 60 * 1000; // 10 minutes
 let livesRechargeTimer = null;
 
 function getLivesData() {
@@ -2946,8 +3701,12 @@ function nextQ() {
   const idx = (missionQIdx - 1) % data.length;
   const q = data[idx];
 
-  renderQ(q);
-  if (mission.chrono) startChrono(mission.chrono, q);
+  if (mission.motsjeu) {
+    renderMotJeu(q);
+  } else {
+    renderQ(q);
+    if (mission.chrono) startChrono(mission.chrono, q);
+  }
 }
 
 function renderQ(q) {
@@ -3566,6 +4325,173 @@ function confetti() {
     el.style.borderRadius = Math.random()>0.5?'50%':'3px';
     document.body.appendChild(el);
     setTimeout(()=>el.remove(),2200);
+  }
+}
+
+// ===================== JEU DE MOTS =====================
+let motjeuData = null;       // question courante
+let motjeuSaisie = [];       // lettres saisies par le joueur
+let motjeuEssaisRestants = 0;
+let motjeuTermine = false;
+
+function renderMotJeu(q) {
+  motjeuData = q;
+  motjeuSaisie = new Array(q.mot.length).fill('');
+  motjeuEssaisRestants = Math.max(3, Math.ceil(q.mot.length / 2));
+  motjeuTermine = false;
+
+  const card = document.getElementById('gameCard');
+  card.innerHTML = `
+    <div class="q-label">${mission.emoji} Mot ${missionQIdx} / ${mission.questions}</div>
+    <div class="motjeu-wrap">
+      <div class="motjeu-indice">${q.indice}</div>
+      <div class="motjeu-cases" id="motjeuCases"></div>
+      <div class="motjeu-essais" id="motjeuEssais">❤️ Essais restants : ${motjeuEssaisRestants}</div>
+      <div class="motjeu-feedback" id="motjeuFeedback"></div>
+      <div class="motjeu-clavier" id="motjeuClavier"></div>
+      <button class="motjeu-btn-valider" id="motjeuValider" onclick="validerMotJeu()">✅ Valider</button>
+      <button class="btn-next" id="btnNext" style="display:none" onclick="nextQ()">Suivant ➜</button>
+    </div>
+  `;
+  renderCasesMotJeu();
+  renderClavierMotJeu();
+}
+
+function renderCasesMotJeu() {
+  const q = motjeuData;
+  const cont = document.getElementById('motjeuCases');
+  if (!cont) return;
+  cont.innerHTML = '';
+  for (let i = 0; i < q.mot.length; i++) {
+    const div = document.createElement('div');
+    const estFixe = q.lettres_visibles.includes(i);
+    if (estFixe) {
+      div.className = 'motjeu-case fixe';
+      div.textContent = q.mot[i];
+    } else {
+      div.id = 'motcase_' + i;
+      div.className = 'motjeu-case vide';
+      div.textContent = motjeuSaisie[i] || '';
+      if (motjeuSaisie[i]) {
+        div.className = 'motjeu-case';
+        div.textContent = motjeuSaisie[i];
+      }
+    }
+    cont.appendChild(div);
+  }
+}
+
+function renderClavierMotJeu() {
+  const cont = document.getElementById('motjeuClavier');
+  if (!cont) return;
+  const lettres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  cont.innerHTML = '';
+  // Identifier les lettres déjà utilisées
+  const usedCorrect = new Set();
+  const usedWrong = new Set();
+  for (let i = 0; i < motjeuData.mot.length; i++) {
+    if (!motjeuData.lettres_visibles.includes(i) && motjeuSaisie[i]) {
+      if (motjeuSaisie[i] === motjeuData.mot[i]) usedCorrect.add(motjeuSaisie[i]);
+      else usedWrong.add(motjeuSaisie[i]);
+    }
+  }
+  lettres.forEach(l => {
+    const btn = document.createElement('button');
+    btn.className = 'motjeu-touche' +
+      (usedCorrect.has(l) ? ' used-correct' : usedWrong.has(l) ? ' used-wrong' : '');
+    btn.textContent = l;
+    btn.onclick = () => saisirLettre(l);
+    cont.appendChild(btn);
+  });
+}
+
+function saisirLettre(lettre) {
+  if (motjeuTermine) return;
+  const q = motjeuData;
+  // Trouver la prochaine case vide (non fixe, non remplie)
+  let idx = -1;
+  for (let i = 0; i < q.mot.length; i++) {
+    if (!q.lettres_visibles.includes(i) && !motjeuSaisie[i]) {
+      idx = i; break;
+    }
+  }
+  if (idx === -1) return; // toutes remplies
+  motjeuSaisie[idx] = lettre;
+  const el = document.getElementById('motcase_' + idx);
+  if (el) {
+    el.textContent = lettre;
+    el.className = 'motjeu-case';
+  }
+  // Si toutes les cases sont remplies, afficher le bouton valider
+  const toutesRemplies = q.mot.split('').every((_, i) =>
+    q.lettres_visibles.includes(i) || motjeuSaisie[i]
+  );
+  const btn = document.getElementById('motjeuValider');
+  if (btn) btn.className = 'motjeu-btn-valider' + (toutesRemplies ? ' show' : '');
+}
+
+function validerMotJeu() {
+  if (motjeuTermine) return;
+  const q = motjeuData;
+  let toutCorrect = true;
+  for (let i = 0; i < q.mot.length; i++) {
+    if (q.lettres_visibles.includes(i)) continue;
+    const el = document.getElementById('motcase_' + i);
+    if (motjeuSaisie[i] === q.mot[i]) {
+      if (el) el.className = 'motjeu-case correct-letter';
+    } else {
+      if (el) el.className = 'motjeu-case wrong-letter';
+      toutCorrect = false;
+    }
+  }
+  const fb = document.getElementById('motjeuFeedback');
+  if (toutCorrect) {
+    motjeuTermine = true;
+    if (fb) { fb.textContent = '🎉 Bravo ! Mot trouvé !'; fb.style.color = 'var(--green)'; }
+    mOk++; mPts += 10; totalOk++; totalPts += 10;
+    playSound('correct');
+    document.getElementById('motjeuValider').style.display = 'none';
+    const next = document.getElementById('btnNext');
+    if (next) next.style.display = 'block';
+    updateGlobalScore();
+    setTimeout(() => { if (!motjeuTermine || toutCorrect) nextQ(); }, 1500);
+  } else {
+    motjeuEssaisRestants--;
+    const essaisEl = document.getElementById('motjeuEssais');
+    if (essaisEl) essaisEl.textContent = '❤️ Essais restants : ' + motjeuEssaisRestants;
+    if (motjeuEssaisRestants <= 0) {
+      // Révéler la solution
+      motjeuTermine = true;
+      for (let i = 0; i < q.mot.length; i++) {
+        if (!q.lettres_visibles.includes(i)) {
+          const el = document.getElementById('motcase_' + i);
+          if (el) { el.textContent = q.mot[i]; el.className = 'motjeu-case wrong-letter'; }
+        }
+      }
+      if (fb) { fb.textContent = '❌ Le mot était : ' + q.mot; fb.style.color = 'var(--red)'; }
+      mKo++; totalKo++;
+      playSound('wrong');
+      animateHeartLost(); loseLife();
+      document.getElementById('motjeuValider').style.display = 'none';
+      const next = document.getElementById('btnNext');
+      if (next) next.style.display = 'block';
+      updateGlobalScore();
+      if (getCurrentLives() <= 0) { setTimeout(showNoLivesResult, 1800); return; }
+      setTimeout(() => nextQ(), 2000);
+    } else {
+      if (fb) { fb.textContent = '💡 Pas encore... réessaie !'; fb.style.color = 'var(--gold)'; }
+      // Effacer les cases incorrectes pour retenter
+      for (let i = 0; i < q.mot.length; i++) {
+        if (!q.lettres_visibles.includes(i) && motjeuSaisie[i] !== q.mot[i]) {
+          motjeuSaisie[i] = '';
+          const el = document.getElementById('motcase_' + i);
+          if (el) { el.textContent = ''; el.className = 'motjeu-case vide'; }
+        }
+      }
+      const btn = document.getElementById('motjeuValider');
+      if (btn) btn.className = 'motjeu-btn-valider';
+      renderClavierMotJeu();
+    }
   }
 }
 
